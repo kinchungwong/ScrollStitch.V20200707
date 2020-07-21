@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{515523D6-13F3-4327-8004-B18A3355DA43}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ScrollStitch.V20200707</RootNamespace>
+    <AssemblyName>ScrollStitch.V20200707</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Arrays\Array2HeteroHook.cs" />
+    <Compile Include="Arrays\Array2Hook.cs" />
+    <Compile Include="Arrays\Array2Wrapper.cs" />
+    <Compile Include="Arrays\ArrayCopyUtility.cs" />
+    <Compile Include="Arrays\ArrayDimAdapter_2as1.cs" />
+    <Compile Include="Arrays\ArrayWrapper.cs" />
+    <Compile Include="Arrays\IArray.cs" />
+    <Compile Include="Arrays\IArray2.cs" />
+    <Compile Include="Bitwise\BitwiseUtility.cs" />
+    <Compile Include="Caching\IItemSource.cs" />
+    <Compile Include="Caching\ItemSource.cs" />
+    <Compile Include="Collections\ReadOnlyUtility.cs" />
+    <Compile Include="Collections\Specialized\Histogram.cs" />
+    <Compile Include="Collections\Specialized\IHistogram.cs" />
+    <Compile Include="Collections\Internals\HistArith.cs" />
+    <Compile Include="Collections\Specialized\HistogramUtility.cs" />
+    <Compile Include="Collections\Internals\IHistArith.cs" />
+    <Compile Include="Caching\ItemFactory.cs" />
+    <Compile Include="Collections\IUniqueList.cs" />
+    <Compile Include="Collections\Specialized\IntKeyIntRow.cs" />
+    <Compile Include="Collections\Specialized\ITable.cs" />
+    <Compile Include="Collections\UniqueList.cs" />
+    <Compile Include="Data\HorzOrVert.cs" />
+    <Compile Include="Data\Movement.cs" />
+    <Compile Include="Data\Point.cs" />
+    <Compile Include="Data\Range.cs" />
+    <Compile Include="Data\Rect.cs" />
+    <Compile Include="Data\Size.cs" />
+    <Compile Include="Functional\IFunc.cs" />
+    <Compile Include="HashCode\HashCodeBuilder.cs" />
+    <Compile Include="ImageManager.cs" />
+    <Compile Include="Imaging\BitmapCopyUtility.cs" />
+    <Compile Include="Imaging\ByteBitmap.cs" />
+    <Compile Include="Imaging\Compare\FastImageComparer.cs" />
+    <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />
+    <Compile Include="Imaging\RowAccess\CroppedBitmapRowAccess.cs" />
+    <Compile Include="Imaging\FloatBitmap.cs" />
+    <Compile Include="Imaging\Hash2D\Direction.cs" />
+    <Compile Include="Imaging\Hash2D\Hash2DProcessor.cs" />
+    <Compile Include="Imaging\Hash2D\HashPoint.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowAccess.cs" />
+    <Compile Include="Imaging\IScalarBitmapInfo.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowDirect.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowSource.cs" />
+    <Compile Include="Imaging\ScreenCapture\ScreenCaptureUtility.cs" />
+    <Compile Include="Logging\Sinks\LogMemorySink.cs" />
+    <Compile Include="Logging\Structured\LoggingStringFormattingUtility.cs" />
+    <Compile Include="Logging\Structured\LogCall.cs" />
+    <Compile Include="Logging\Structured\LogTask.cs" />
+    <Compile Include="Logging\Structured\LogThread.cs" />
+    <Compile Include="Logging\Structured\LogThreadManager.cs" />
+    <Compile Include="Main_ScreenCaptureLoop.cs" />
+    <Compile Include="Memory\Diagnostics\ArrayPoolMemoryUsage.cs" />
+    <Compile Include="Spatial\GridArray.cs" />
+    <Compile Include="Spatial\GridArray_DoNotUse.cs" />
+    <Compile Include="Spatial\GridCollectionUtility_DoNotUse.cs" />
+    <Compile Include="Spatial\IGridCollection.cs" />
+    <Compile Include="Spatial\IRectTree.cs" />
+    <Compile Include="Spatial\PointTree.cs" />
+    <Compile Include="Spatial\RectList.cs" />
+    <Compile Include="Spatial\RectTreeUtility.cs" />
+    <Compile Include="TestSets\TestSet_ConsoleAsk.cs" />
+    <Compile Include="Text\IStringBuilder.cs" />
+    <Compile Include="Text\IMultiLineTextOutput.cs" />
+    <Compile Include="Text\ITextGridSource.cs" />
+    <Compile Include="Text\MultiLineTextOutput.cs" />
+    <Compile Include="Text\RecordFormatter.cs" />
+    <Compile Include="Text\StringBuilderWrapper.cs" />
+    <Compile Include="Text\TextGridFormatter.cs" />
+    <Compile Include="Text\TextGridSource.cs" />
+    <Compile Include="Tracking\BitFlagArith\BitFlagArith_Int32.cs" />
+    <Compile Include="Tracking\BitFlagArith\BitFlagArith_UInt32.cs" />
+    <Compile Include="Tracking\BitFlagArith\BitFlagArith_UInt64.cs" />
+    <Compile Include="Tracking\BitFlagArith\IBitFlagArith.cs" />
+    <Compile Include="Tracking\Diagnostics\T3Diagnostics.cs" />
+    <Compile Include="Tracking\Diagnostics\T3Diagnostics_SingleLabel.cs" />
+    <Compile Include="Tracking\DiagViz\Diag_IPGM.cs" />
+    <Compile Include="Tracking\FromTo.cs" />
+    <Compile Include="Tracking\T3Classifier.cs" />
+    <Compile Include="Tracking\T3ClassifierFlags.cs" />
+    <Compile Include="Tracking\T3ClassifierThreshold.cs" />
+    <Compile Include="Tracking\T3GridStats.cs" />
+    <Compile Include="Tracking\HashPointTable.cs" />
+    <Compile Include="Tracking\Bidirectional\ImageMovementGrid.cs" />
+    <Compile Include="Tracking\ImagePairGridMovement.cs" />
+    <Compile Include="Tracking\ImagePairMovementFlag.cs" />
+    <Compile Include="Tracking\ImagePairMovementHeuristic.cs" />
+    <Compile Include="Tracking\ImagePairMovementScore.cs" />
+    <Compile Include="Tracking\ImagePairMovement.cs" />
+    <Compile Include="Imaging\Hash2D\HorizontalBitmapWorker.cs" />
+    <Compile Include="Imaging\Hash2D\ImageHashPointList.cs" />
+    <Compile Include="Imaging\Hash2D\StageConfig.cs" />
+    <Compile Include="Tracking\ImagePairMovementDetail.cs" />
+    <Compile Include="Imaging\Hash2D\UniqueHashPointFilter.cs" />
+    <Compile Include="Imaging\Hash2D\VerticalBitmapWorker.cs" />
+    <Compile Include="Imaging\IArrayBitmap.cs" />
+    <Compile Include="Imaging\IntBitmap.cs" />
+    <Compile Include="Imaging\IO\Bgr888ToBgr32.cs" />
+    <Compile Include="Imaging\IO\Bgr888ToGray8.cs" />
+    <Compile Include="Imaging\IO\Bgrx8888ToBgr32.cs" />
+    <Compile Include="Imaging\IO\Bgrx8888ToGray8.cs" />
+    <Compile Include="Imaging\IO\BitmapIoConvertUtility.cs" />
+    <Compile Include="Imaging\IO\BitmapIoUtility.cs" />
+    <Compile Include="Imaging\IO\LockedByteBitmap.cs" />
+    <Compile Include="Imaging\Plotting\DotCmd.cs" />
+    <Compile Include="Imaging\Plotting\IDrawCmd.cs" />
+    <Compile Include="Imaging\Plotting\LineCmd.cs" />
+    <Compile Include="Imaging\Plotting\MarkCmds.cs" />
+    <Compile Include="Imaging\Plotting\PointList.cs" />
+    <Compile Include="Imaging\Plotting\PointListCmd.cs" />
+    <Compile Include="Memory\ExactLengthArrayPool.cs" />
+    <Compile Include="Memory\IArrayPoolClient.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spatial\AxisSubdiv.cs" />
+    <Compile Include="Spatial\AxisSubdivAlignment.cs" />
+    <Compile Include="Spatial\AxisSubdivFactory.cs" />
+    <Compile Include="Spatial\CellIndex.cs" />
+    <Compile Include="Spatial\Grid.cs" />
+    <Compile Include="TestClass_20200708_1112am.cs" />
+    <Compile Include="TestSets\Huge_Run.cs" />
+    <Compile Include="TestSets\ITestSet.cs" />
+    <Compile Include="TestSets\Run_1.cs" />
+    <Compile Include="TestSets\Run_20200403.cs" />
+    <Compile Include="TestSets\TestSetBase.cs" />
+    <Compile Include="TestSets\US_Death_Projections.cs" />
+    <Compile Include="Tracking\MultiImageTracking.cs" />
+    <Compile Include="Tracking\T3GridStats_Base.cs" />
+    <Compile Include="Tracking\T3GridStats_CellFlags.cs" />
+    <Compile Include="Tracking\T3GridStats_OneVotePerCell.cs" />
+    <Compile Include="Tracking\T3GridStats_SingleLabel.cs" />
+    <Compile Include="Tracking\T3Movements.cs" />
+    <Compile Include="Tracking\T3StatFilter.cs" />
+    <Compile Include="Tracking\ThreeImageMovementCluster.cs" />
+    <Compile Include="Arrays\ArrayWrapperUtility.cs" />
+    <Compile Include="Tracking\ThreeImageMovementFilter.cs" />
+    <Compile Include="Tracking\T3HashPoints.cs" />
+    <Compile Include="Utility\DynamicCast.cs" />
+    <Compile Include="Logging\MethodTimer.cs" />
+    <Compile Include="Utility\OwnershipToken.cs" />
+    <Compile Include="Utility\PercentFromRatio.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Experimental\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
