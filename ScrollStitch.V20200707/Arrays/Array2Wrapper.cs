@@ -13,6 +13,7 @@ namespace ScrollStitch.V20200707.Arrays
 {
     public class Array2Wrapper<T>
         : IArray2<T>
+        , IReadOnlyArray2<T>
     {
         public T[,] Target { get; }
 

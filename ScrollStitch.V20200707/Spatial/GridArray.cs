@@ -13,6 +13,8 @@ namespace ScrollStitch.V20200707.Spatial
         , IGridCollection<T>
         , IReadOnlyGridCollection<T>
         , IArray2<T> 
+        , IReadOnlyArray2<T>
+        , IArray2Info
     {
         public Grid Grid { get; }
 
@@ -29,16 +31,21 @@ namespace ScrollStitch.V20200707.Spatial
         }
 
         #region explicit properties IArray2<T>
-        int IArray2<T>.Length => Array.Length;
+        int IArray2Info.Length => Array.Length;
 
-        int IArray2<T>.Length0 => Array.Length0;
+        int IArray2Info.Length0 => Array.Length0;
 
-        int IArray2<T>.Length1 => Array.Length1;
+        int IArray2Info.Length1 => Array.Length1;
 
         T IArray2<T>.this[int idx0, int idx1]
         {
             get => Array[idx0, idx1];
             set => Array[idx0, idx1] = value;
+        }
+
+        T IReadOnlyArray2<T>.this[int idx0, int idx1]
+        {
+            get => Array[idx0, idx1];
         }
         #endregion
 
@@ -93,8 +100,8 @@ namespace ScrollStitch.V20200707.Spatial
                 });
         }
 
-        #region IArray2<T> explicit methods
-        int IArray2<T>.GetLength(int dim)
+        #region IArray2Info explicit methods
+        int IArray2Info.GetLength(int dim)
         {
             return Array.GetLength(dim);
         }

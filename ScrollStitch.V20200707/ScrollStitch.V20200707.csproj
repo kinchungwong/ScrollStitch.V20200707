@@ -71,6 +71,8 @@
     <Compile Include="Arrays\ArrayWrapper.cs" />
     <Compile Include="Arrays\IArray.cs" />
     <Compile Include="Arrays\IArray2.cs" />
+    <Compile Include="Arrays\IArray2Info.cs" />
+    <Compile Include="Arrays\IReadOnlyArray2.cs" />
     <Compile Include="Bitwise\BitwiseUtility.cs" />
     <Compile Include="Caching\IItemSource.cs" />
     <Compile Include="Caching\ItemSource.cs" />

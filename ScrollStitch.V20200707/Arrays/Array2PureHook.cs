@@ -10,11 +10,13 @@ namespace ScrollStitch.V20200707.Arrays
     /// An implementation of the <see cref="IArray2{T}"/> interface that relies solely on the 
     /// item getter and setter functions. This implementation does not have direct access to an 
     /// underlying array.
+    /// </summary>
     /// 
     /// <typeparam name="T">The item type exposed on the interface on this instance.</typeparam>
     /// 
     public class Array2PureHook<T>
         : IArray2<T>
+        , IReadOnlyArray2<T>
     {
         /// <summary>
         /// A function that is called when the array's getter is called.

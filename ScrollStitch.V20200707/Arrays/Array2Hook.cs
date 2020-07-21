@@ -8,6 +8,7 @@ namespace ScrollStitch.V20200707.Arrays
 {
     public class Array2Hook<T>
         : IArray2<T>
+        , IReadOnlyArray2<T>
     {
         /// <summary>
         /// A function that is called when the array's getter is called.
