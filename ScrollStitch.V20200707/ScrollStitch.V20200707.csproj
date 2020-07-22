@@ -149,6 +149,7 @@
     <Compile Include="Tracking\T3Classifier.cs" />
     <Compile Include="Tracking\T3ClassifierFlags.cs" />
     <Compile Include="Tracking\T3ClassifierThreshold.cs" />
+    <Compile Include="Tracking\T3Filter.cs" />
     <Compile Include="Tracking\T3GridStats.cs" />
     <Compile Include="Tracking\HashPointTable.cs" />
     <Compile Include="Tracking\Bidirectional\ImageMovementGrid.cs" />
