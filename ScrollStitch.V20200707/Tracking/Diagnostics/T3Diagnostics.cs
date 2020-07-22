@@ -181,7 +181,7 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
                 default:
                     throw new ArgumentException(nameof(toBase));
             }
-            int digitsToPrint = (int)Math.Ceiling(Math.Log(labelCount) / Math.Log(toBase));
+            int digitsToPrint = (int)Math.Ceiling(Math.Log(Math.Max(2, labelCount)) / Math.Log(toBase));
             string cellFlagsToString(ulong bits)
             {
                 char[] cs = new char[digitsToPrint];
