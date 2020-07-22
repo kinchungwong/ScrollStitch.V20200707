@@ -86,6 +86,30 @@ namespace ScrollStitch.V20200707.Tracking
         public IReadOnlyDictionary<int, IReadOnlyList<Point>> Points { get; }
 
         /// <summary>
+        /// The number of image points on each of the three images that do not have counterparts
+        /// having the same hash value on the other two images.
+        /// 
+        /// <para>
+        /// Three-image trajectory (T3) requires an image hash point to occur exactly once on 
+        /// each of the three images. <br/>
+        /// If an image hash point is not present in all three images, that image hash point is 
+        /// considered unmatched.
+        /// </para>
+        /// 
+        /// <example>
+        /// <para>
+        /// Technically, it can be calculated trivially as:
+        /// </para>
+        /// <para><code>
+        /// L001    UnmatchedPointCounts[imageKey] = ImageManager.InputHashPoints.Get(imageKey).Count - this.HashValues.Count;
+        /// </code></para>
+        /// </example>
+        /// 
+        /// </summary>
+        /// 
+        public IReadOnlyDictionary<int, int> UnmatchedPointCounts { get; }
+
+        /// <summary>
         /// Constructor.
         /// 
         /// <para>
@@ -98,11 +122,13 @@ namespace ScrollStitch.V20200707.Tracking
         public T3HashPoints(
             IReadOnlyList<int> imageKeys,
             IReadOnlyList<int> hashValues, 
-            IReadOnlyDictionary<int, IReadOnlyList<Point>> points)
+            IReadOnlyDictionary<int, IReadOnlyList<Point>> points,
+            IReadOnlyDictionary<int, int> unmatchedPointCounts)
         {
             ImageKeys = (imageKeys as UniqueList<int>) ?? (new UniqueList<int>(imageKeys));
             HashValues = hashValues;
             Points = points;
+            UnmatchedPointCounts = unmatchedPointCounts;
         }
 
         /// <summary>
@@ -120,6 +146,7 @@ namespace ScrollStitch.V20200707.Tracking
             private Dictionary<int, Point> _dict2;
             IReadOnlyList<int> _hashValues;
             IReadOnlyDictionary<int, IReadOnlyList<Point>> _points;
+            IReadOnlyDictionary<int, int> _unmatchedPointCounts;
 
             /// <summary>
             /// Creates an instance of <see cref="T3HashPoints"/> from hash points sampled from three images.
@@ -147,7 +174,8 @@ namespace ScrollStitch.V20200707.Tracking
                 _dict1 = _LoadPointsAsDict(_imageKey1);
                 _dict2 = _LoadPointsAsDict(_imageKey2);
                 _PopulateLists();
-                var t3hp = new T3HashPoints(_imageKeys, _hashValues, _points);
+                _CalculateUnmatchedPointCounts();
+                var t3hp = new T3HashPoints(_imageKeys, _hashValues, _points, _unmatchedPointCounts);
                 _Cleanup();
                 return t3hp;
             }
@@ -189,6 +217,15 @@ namespace ScrollStitch.V20200707.Tracking
                 dictRoPoints.Add(_imageKey1, new List<Point>(filtPts1).AsReadOnly());
                 dictRoPoints.Add(_imageKey2, new List<Point>(filtPts2).AsReadOnly());
                 _points = new ReadOnlyDictionary<int, IReadOnlyList<Point>>(dictRoPoints);
+            }
+
+            private void _CalculateUnmatchedPointCounts()
+            {
+                var unmatchedPointCounts = new Dictionary<int, int>(capacity: 3);
+                unmatchedPointCounts.Add(_imageKey0, _dict0.Count - _hashValues.Count);
+                unmatchedPointCounts.Add(_imageKey1, _dict1.Count - _hashValues.Count);
+                unmatchedPointCounts.Add(_imageKey2, _dict2.Count - _hashValues.Count);
+                _unmatchedPointCounts = unmatchedPointCounts.AsReadOnly();
             }
 
             private void _Cleanup()

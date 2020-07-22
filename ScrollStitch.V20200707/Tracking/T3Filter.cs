@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace ScrollStitch.V20200707.Tracking
 {
@@ -45,7 +47,9 @@ namespace ScrollStitch.V20200707.Tracking
         private Dictionary<int, IReadOnlyList<Point>> _newPoints;
         private List<int> _newLabels;
         private Dictionary<int, int> _newLabelPointCounts;
+        private int _oldPointCount;
         private int _newPointCount;
+        private Dictionary<int, int> _unmatchedPointCounts;
         #endregion
 
         public T3Filter(T3HashPoints oldHashPoints, T3Movements oldMovements, T3Classifier classifier)
@@ -56,12 +60,15 @@ namespace ScrollStitch.V20200707.Tracking
             _imageKey0 = oldHashPoints.ImageKeys.ItemAt(0);
             _imageKey1 = oldHashPoints.ImageKeys.ItemAt(1);
             _imageKey2 = oldHashPoints.ImageKeys.ItemAt(2);
+            _oldPointCount = OldHashPoints.HashValues.Count;
         }
 
         public void Process()
         {
             _FilterMovementTuples();
             _FilterHashPointLabelLists();
+            _DbgValidateNewPointCount();
+            _CalculateUnmatchedPointCounts();
             _InitNewInstances();
         }
 
@@ -134,9 +141,48 @@ namespace ScrollStitch.V20200707.Tracking
             _newLabels = newLabels;
         }
 
+        [Conditional("DEBUG")]
+        private void _DbgValidateNewPointCount()
+        {
+            if (_newPoints[_imageKey0].Count != _newPointCount ||
+                _newPoints[_imageKey1].Count != _newPointCount ||
+                _newPoints[_imageKey2].Count != _newPointCount ||
+                _newLabels.Count != _newPointCount)
+            {
+                _DebugBreakOrThrow();
+            }
+        }
+
+        [Conditional("DEBUG")]
+        private void _DebugBreakOrThrow([CallerMemberName]string methodName = null)
+        {
+            if (string.IsNullOrEmpty(methodName))
+            {
+                methodName = $"{nameof(T3Filter)}.{nameof(_DebugBreakOrThrow)}";
+            }
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+            else
+            {
+                throw new Exception(methodName);
+            }
+        }
+
+        private void _CalculateUnmatchedPointCounts()
+        {
+            int rejectedPointCount = _oldPointCount - _newPointCount;
+            var oldUnmatchedPointCounts = OldHashPoints.UnmatchedPointCounts;
+            _unmatchedPointCounts = new Dictionary<int, int>(capacity: 3);
+            _unmatchedPointCounts.Add(_imageKey0, oldUnmatchedPointCounts[_imageKey0] + rejectedPointCount);
+            _unmatchedPointCounts.Add(_imageKey1, oldUnmatchedPointCounts[_imageKey1] + rejectedPointCount);
+            _unmatchedPointCounts.Add(_imageKey2, oldUnmatchedPointCounts[_imageKey2] + rejectedPointCount);
+        }
+
         private void _InitNewInstances()
         {
-            NewHashPoints = new T3HashPoints(OldHashPoints.ImageKeys, _newHashValues, _newPoints);
+            NewHashPoints = new T3HashPoints(OldHashPoints.ImageKeys, _newHashValues, _newPoints, _unmatchedPointCounts.AsReadOnly());
             NewMovements = new T3Movements(NewHashPoints, _newMovementList, _newLabels.AsReadOnly(), new ReadOnlyDictionary<int, int>(_newLabelPointCounts));
         }
     }
