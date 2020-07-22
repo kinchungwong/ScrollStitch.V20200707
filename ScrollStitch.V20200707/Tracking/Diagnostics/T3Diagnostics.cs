@@ -143,7 +143,18 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
             mlto.AppendLine();
         }
 
-        public void RenderCellFlags(IMultiLineTextOutput mlto, int toBase = 16)
+        public void RenderCellFlags(IMultiLineTextOutput mlto, int toBase = 2)
+        {
+            // ======
+            // We intentionally allow toBase to be non-power-of-two values, because this causes 
+            // an whimsical "string hashing" effect that turns out to be practically valuable for 
+            // visually identifying clusters of relevant image content.
+            // ======
+            var baseDigitsArray = IntegerBaseFormatter.GetBaseDigitsArrayForBase(toBase);
+            RenderCellFlags(mlto, baseDigitsArray);
+        }
+
+        public void RenderCellFlags(IMultiLineTextOutput mlto, IntegerBaseFormatter.Internals.BaseDigitsArray baseDigitsArray)
         {
             if (CellFlagsClass is null)
             {
@@ -154,46 +165,18 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
             {
                 return;
             }
+            int toBase = baseDigitsArray.Base;
             int maxUsableBitsForUInt64 = 64;
             int labelCount = Math.Min(Movements.Count, maxUsableBitsForUInt64);
-            int gw = cellFlags.GridWidth;
-            int gh = cellFlags.GridHeight;
-            char[] digits;
-            int bitsPerDigit;
-            ulong u64Mask;
-            switch (toBase)
+            int formatWidth = (int)Math.Max(1, Math.Ceiling(Math.Log(2.0) * labelCount / Math.Log(toBase)));
+            string CellValueToStringFunc(ulong value)
             {
-                case 2:
-                    digits = "01".ToCharArray();
-                    bitsPerDigit = 1;
-                    u64Mask = 1uL;
-                    break;
-                case 16:
-                    digits = "0123456789abcdef".ToCharArray();
-                    bitsPerDigit = 4;
-                    u64Mask = 15uL;
-                    break;
-                case 64:
-                    digits = Constants.Base64Digits;
-                    bitsPerDigit = 6;
-                    u64Mask = 63uL;
-                    break;
-                default:
-                    throw new ArgumentException(nameof(toBase));
+                return IntegerBaseFormatter.Format(value, baseDigitsArray, formatWidth);
             }
-            int digitsToPrint = (int)Math.Ceiling(Math.Log(Math.Max(2, labelCount)) / Math.Log(toBase));
-            string cellFlagsToString(ulong bits)
-            {
-                char[] cs = new char[digitsToPrint];
-                for (int k = 0; k < digitsToPrint; ++k)
-                {
-                    cs[digitsToPrint - 1 - k] = digits[bits & u64Mask];
-                    bits = Bitwise.BitwiseUtility.Rotate(bits, -bitsPerDigit);
-                }
-                return new string(cs);
-            }
-            var myTGS = new Internal_TextGridHook(cellFlags, cellFlagsToString);
+            var myTGS = new Internal_TextGridHook(cellFlags, CellValueToStringFunc);
             var myTGF = new TextGridFormatter(myTGS);
+            myTGF.Indent = 0;
+            myTGF.ColumnSpacing = 1;
             myTGF.Generate(mlto);
         }
 
