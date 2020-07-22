@@ -19,6 +19,10 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
 
         public T3GridStats_OneVotePerCell LabelCellCountsClass { get; set; }
 
+        public T3GridStats_CellFlags<ulong> CellFlagsClass { get; set; }
+
+        public Dictionary<int, T3GridStats_SingleLabel> SingleLabelGridHistograms { get; set; } = new Dictionary<int, T3GridStats_SingleLabel>();
+
         public T3ClassifierThreshold Threshold { get; set; } = new T3ClassifierThreshold();
 
         public UniqueList<(Movement, Movement)> Movements => MovementsClass.Movements;
