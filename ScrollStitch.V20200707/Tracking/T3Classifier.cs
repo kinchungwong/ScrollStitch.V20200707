@@ -9,8 +9,6 @@ namespace ScrollStitch.V20200707.Tracking
     using ScrollStitch.V20200707.Collections;
     using ScrollStitch.V20200707.Collections.Specialized;
     using ScrollStitch.V20200707.Data;
-    using ScrollStitch.V20200707.Spatial;
-    using ScrollStitch.V20200707.Text;
     using ScrollStitch.V20200707.Utility;
 
     public class T3Classifier
