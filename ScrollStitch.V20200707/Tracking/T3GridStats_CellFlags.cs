@@ -83,6 +83,31 @@ namespace ScrollStitch.V20200707.Tracking
     }
 
     /// <summary>
+    /// <para>
+    /// This is an intermediate abstract class where <see cref="FlagType"/> is specified but
+    /// <see cref="FlagArith"/> is not specified.
+    /// <br/>
+    /// For the concrete implementations, refer to <see cref="T3GridStats_CellFlags{FlagType, FlagArith}"/>.
+    /// </para>
+    /// </summary>
+    /// <typeparam name="FlagType">
+    /// An integer type used as bit flag. Allowed integer types are: <br/>
+    /// <see cref="int"/>, for up to 31 trajectory labels, <br/>
+    /// <see cref="uint"/>, for up to 32 trajectory labels, <br/>
+    /// <see cref="ulong"/>, for up to 64 trajectory labels.
+    /// </typeparam>
+    /// 
+    public abstract class T3GridStats_CellFlags<FlagType>
+        : T3GridStats_Base<GridArray<FlagType>>
+        where FlagType : struct
+    {
+        protected T3GridStats_CellFlags(T3GridStats host)
+            : base(host)
+        {
+        }
+    }
+
+    /// <summary>
     /// Computes a <see cref="GridArray{FlagType}"/> containing bit flags which indicate the presence of samples 
     /// which confirm a particular set of trajectories inside each cell rectangle.
     /// 
@@ -112,7 +137,7 @@ namespace ScrollStitch.V20200707.Tracking
     /// </typeparam>
     /// 
     public sealed class T3GridStats_CellFlags<FlagType, FlagArith>
-        : T3GridStats_Base<GridArray<FlagType>>
+        : T3GridStats_CellFlags<FlagType>
         where FlagType : struct
         where FlagArith : struct, IBitFlagArith<FlagType>
     {
