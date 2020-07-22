@@ -314,36 +314,32 @@ namespace ScrollStitch.V20200707
             {
                 imageIndex - 2, imageIndex - 1, imageIndex
             };
-            var sz = ImageManager.ImageSizes[imageIndex];
-            var g = Grid.Factory.CreateApproxCellSize(sz, new Size(64, 64));
-            T3HashPoints t3hp;
-            T3Movements t3m;
-            T3GridStats t3gs;
-            T3GridStats_OneVotePerCell ovpc;
-            object _cellFlags;
+            int mainImageKey = imageIndex;
+            var threshold = new T3ClassifierThreshold()
+            { 
+            };
+            var approxCellSize = new Size(64, 64);
+            T3Main t3Main;
             using (var timer = new MethodTimer($"{nameof(Run_TrajectoryThree)}(imageIndex = {imageIndex})"))
             {
-                t3hp = T3HashPoints.Factory.Create(ImageManager, imageKeys);
-                t3m = T3Movements.Factory.Create(t3hp);
-                t3gs = new T3GridStats(t3m, imageIndex, g);
-                ovpc = new T3GridStats_OneVotePerCell(t3gs);
-                t3gs.Add(ovpc);
-                var cellFlags = T3GridStats_CellFlags.Create<ulong>(t3gs);
-                _cellFlags = cellFlags;
-                t3gs.Add(cellFlags);
-                t3gs.Process();
+                t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, approxCellSize);
+                t3Main.Process();
             }
             if (ShouldPrintThreeImageTrajectoryDiagnostics)
             {
                 var t3diag = new T3Diagnostics()
                 {
-                    MovementsClass = t3m,
-                    LabelCellCountsClass = ovpc
+                    MovementsClass = t3Main.SecondStageMovements,
+                    LabelCellCountsClass = t3Main.SecondStageCellVotes,
+                    //CellFlagsClass = cellFlags2nd
                 };
                 var mlto = new MultiLineTextOutput();
+                mlto.AppendLine(new string('-', 76));
                 t3diag.ReportMovementStats(mlto);
+                mlto.AppendLine(new string('-', 76));
+                //t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
+                //mlto.AppendLine(new string('-', 76));
                 mlto.ToConsole();
-                Console.WriteLine(new string('-', 76));
                 if (ShouldReadFromKeyboard)
                 {
                     Console.WriteLine("Press enter key to continue...");
