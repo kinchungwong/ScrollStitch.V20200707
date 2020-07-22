@@ -19,40 +19,7 @@ namespace ScrollStitch.V20200707.Text
             int minOutputWidth = 1,
             char? paddingCharOrDefault = null)
         {
-            Internals.BaseDigitsArray baseDigits;
-            switch (toBase)
-            {
-                case 2:
-                    baseDigits = Constants.Base2;
-                    break;
-                case 8:
-                    baseDigits = Constants.Base8;
-                    break;
-                case 10:
-                    baseDigits = Constants.Base10;
-                    break;
-                case 16:
-                    baseDigits = Constants.Base16;
-                    break;
-                case 26:
-                    baseDigits = Constants.BaseAZ;
-                    break;
-                case 52:
-                    baseDigits = Constants.BaseAZaz;
-                    break;
-                case 62:
-                    baseDigits = Constants.Base09AZaz;
-                    break;
-                case 85:
-                case 1924:
-                    baseDigits = Constants.RFC1924;
-                    break;
-                default:
-                    throw new NotImplementedException(
-                        message: 
-                        $"Method {nameof(IntegerBaseFormatter)}.{nameof(Format)}() " +
-                        $"is not implemented for base {toBase}.");
-            }
+            Internals.BaseDigitsArray baseDigits = GetBaseDigitsArrayForBase(toBase);
             return Format(value, baseDigits, minOutputWidth, paddingCharOrDefault);
         }
 
@@ -91,6 +58,36 @@ namespace ScrollStitch.V20200707.Text
             return new string(results, kout + 1, results.Length - kout - 1);
         }
 
+        public static Internals.BaseDigitsArray GetBaseDigitsArrayForBase(int toBase)
+        {
+            switch (toBase)
+            {
+                case 2:
+                    return Constants.Base2;
+                case 8:
+                    return Constants.Base8;
+                case 10:
+                    return Constants.Base10;
+                case 16:
+                    return Constants.Base16;
+                case 26:
+                    return Constants.BaseAZ;
+                case 52:
+                    return Constants.BaseAZaz;
+                case 62:
+                    return Constants.Base09AZaz;
+                case 64:
+                    return Constants.Base64;
+                case 85:
+                    return Constants.RFC1924;
+                default:
+                    throw new NotImplementedException(
+                        message:
+                        $"Method {nameof(IntegerBaseFormatter)}.{nameof(GetBaseDigitsArrayForBase)}() " +
+                        $"is not implemented for base {toBase}.");
+            }
+        }
+
         private static void _ThrowNull(string paramName)
         {
             throw new ArgumentNullException(paramName: paramName);
@@ -106,10 +103,15 @@ namespace ScrollStitch.V20200707.Text
             public static readonly Internals.BaseDigitsArray BaseAZ = new Internals.FromSlice(RFC1924, 10, 26);
             public static readonly Internals.BaseDigitsArray BaseAZaz = new Internals.FromSlice(RFC1924, 10, 52);
             public static readonly Internals.BaseDigitsArray Base09AZaz = new Internals.FromSlice(RFC1924, 0, 62);
+            public static readonly Internals.BaseDigitsArray Base64 = new Internals.Base64();
         }
 
         public static class Internals
         {
+            /// <summary>
+            /// <see cref="BaseDigitsArray"/> is an abstract base class that provides a unique set of characters for 
+            /// encoding an unsigned integer value in a non-standard integer base.
+            /// </summary>
             public abstract class BaseDigitsArray
             {
                 public int Base => _charArray.Length;
@@ -155,6 +157,11 @@ namespace ScrollStitch.V20200707.Text
                 }
             }
 
+            /// <summary>
+            /// The base digits for RFC1924, which is a base-85 encoding.
+            /// <br/>
+            /// <inheritdoc cref="BaseDigitsArray"/>
+            /// </summary>
             public sealed class RFC1924
                 : BaseDigitsArray
             {
@@ -209,6 +216,74 @@ namespace ScrollStitch.V20200707.Text
                 }
             }
 
+            /// <summary>
+            /// The base digits for Base64.
+            /// <br/>
+            /// Note that non-digit characters permitted in Base64, such as newlines, whitespaces,
+            /// padding, and line-continuation indicators, are not included in the returned array.
+            /// <br/>
+            /// Interpreters for Base64 should skip over non-digit characters and implement a 
+            /// delimiter handling strategy of its own.
+            /// <br/>
+            /// <inheritdoc cref="BaseDigitsArray"/>
+            /// </summary>
+            public sealed class Base64
+                : BaseDigitsArray
+            {
+                public Base64()
+                    : base(_CtorArgs())
+                {
+                }
+
+                private static (char[] charArray, bool[] boolArray) _CtorArgs()
+                {
+                    char[] charArray = new char[64];
+                    int kout = 0;
+                    for (char c = 'A'; c <= 'Z'; ++c)
+                    {
+                        charArray[kout++] = c;
+                    }
+                    for (char c = 'a'; c <= 'z'; ++c)
+                    {
+                        charArray[kout++] = c;
+                    }
+                    for (char c = '0'; c <= '9'; ++c)
+                    {
+                        charArray[kout++] = c;
+                    }
+                    char[] otherChars = new char[]
+                    {
+                        '+', '/'
+                    };
+                    foreach (char c in otherChars)
+                    {
+                        charArray[kout++] = c;
+                    }
+                    if (kout != charArray.Length)
+                    {
+                        _Throw(); // impossible
+                    }
+                    bool[] boolArray = new bool[128];
+                    foreach (char c in charArray)
+                    {
+                        int i = c;
+                        if (i < 0 || i >= boolArray.Length)
+                        {
+                            _Throw(); // impossible
+                        }
+                        boolArray[i] = true;
+                    }
+                    return (charArray, boolArray);
+                }
+            }
+
+            /// <summary>
+            /// <see cref="FromSlice"/> creates an array of characters to be used as digits 
+            /// in integer base conversion. The array of characters is created by taking a slice
+            /// (sub-sequence) from an existing instance of <see cref="BaseDigitsArray"/>.
+            /// <br/>
+            /// <inheritdoc cref="BaseDigitsArray"/>
+            /// </summary>
             public sealed class FromSlice
                 : BaseDigitsArray
             {
