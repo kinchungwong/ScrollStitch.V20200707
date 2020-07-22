@@ -9,7 +9,6 @@ namespace ScrollStitch.V20200707.Tracking
     using ScrollStitch.V20200707.Data;
     using ScrollStitch.V20200707.Spatial;
     using BitFlagArith;
-    using System.CodeDom;
 
     /// <summary>
     /// <inheritdoc cref="T3GridStats_CellFlags{FlagType, FlagArith}"/>
