@@ -33,12 +33,12 @@ namespace ScrollStitch.V20200707.Tracking
         /// An integer type used as bit flag.
         /// </typeparam>
         /// 
-        public static T3GridStats_Base<GridArray<FlagType>> Create<FlagType>(T3GridStats host)
+        public static T3GridStats_CellFlags<FlagType> Create<FlagType>(T3GridStats host)
             where FlagType : struct, IConvertible
         {
-            T3GridStats_Base<GridArray<FlagType>> AsReturnType<ArgType>(ArgType v)
+            T3GridStats_CellFlags<FlagType> AsReturnType<ArgType>(ArgType v)
             {
-                return v as T3GridStats_Base<GridArray<FlagType>>;
+                return v as T3GridStats_CellFlags<FlagType>;
             }
             switch (default(FlagType))
             {
