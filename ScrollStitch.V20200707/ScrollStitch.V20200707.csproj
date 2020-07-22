@@ -130,6 +130,7 @@
     <Compile Include="Spatial\RectList.cs" />
     <Compile Include="Spatial\RectTreeUtility.cs" />
     <Compile Include="TestSets\TestSet_ConsoleAsk.cs" />
+    <Compile Include="Text\IntegerBaseFormatter.cs" />
     <Compile Include="Text\IStringBuilder.cs" />
     <Compile Include="Text\IMultiLineTextOutput.cs" />
     <Compile Include="Text\ITextGridSource.cs" />
