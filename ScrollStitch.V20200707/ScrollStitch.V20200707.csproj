@@ -200,6 +200,7 @@
     <Compile Include="Tracking\T3GridStats_CellFlags.cs" />
     <Compile Include="Tracking\T3GridStats_OneVotePerCell.cs" />
     <Compile Include="Tracking\T3GridStats_SingleLabel.cs" />
+    <Compile Include="Tracking\T3Main.cs" />
     <Compile Include="Tracking\T3Movements.cs" />
     <Compile Include="Tracking\ThreeImageMovementCluster.cs" />
     <Compile Include="Arrays\ArrayWrapperUtility.cs" />
