@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Imaging.Hash2D
@@ -47,7 +48,8 @@ namespace ScrollStitch.V20200707.Imaging.Hash2D
         public void Process()
         {
             if (Host.Parallelize &&
-                _height >= Host.ParallelStripCount)
+                _height >= Host.ParallelStripCount &&
+                !Thread.CurrentThread.IsThreadPoolThread)
             {
                 _ProcessParallelize();
             }
