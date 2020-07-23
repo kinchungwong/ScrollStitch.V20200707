@@ -15,36 +15,6 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
 
     public class T3Diagnostics
     {
-        private static class Constants
-        {
-            internal static char[] Base64Digits { get; } = GenBase64DigitsStr();
-
-            private static char[] GenBase64DigitsStr()
-            {
-                char[] cs = new char[64];
-                int ko = 0;
-                for (char c = 'A'; c <= 'Z'; ++c)
-                {
-                    cs[ko++] = c;
-                }
-                for (char c = 'a'; c <= 'z'; ++c)
-                {
-                    cs[ko++] = c;
-                }
-                for (char c = '0'; c <= '9'; ++c)
-                {
-                    cs[ko++] = c;
-                }
-                cs[ko++] = '+';
-                cs[ko++] = '/';
-                if (ko != 64)
-                {
-                    throw new Exception();
-                }
-                return cs;
-            }
-        }
-
         public T3Movements MovementsClass { get; set; }
 
         public T3GridStats_OneVotePerCell LabelCellCountsClass { get; set; }
@@ -140,6 +110,13 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
             {
                 mlto.AppendLine($"({hiddenCount} rows hidden because of {nameof(HideSingleSamples)} flag.)");
             }
+            var unmatchedCounts = MovementsClass.HashPoints.UnmatchedPointCounts;
+            int umc0 = unmatchedCounts[ImageKey0];
+            int umc1 = unmatchedCounts[ImageKey1];
+            int umc2 = unmatchedCounts[ImageKey2];
+            mlto.AppendLine($"Image {ImageKey0} has {umc0} unmatched points.");
+            mlto.AppendLine($"Image {ImageKey1} has {umc1} unmatched points.");
+            mlto.AppendLine($"Image {ImageKey2} has {umc2} unmatched points.");
             mlto.AppendLine();
         }
 
