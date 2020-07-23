@@ -127,6 +127,11 @@ namespace ScrollStitch.V20200707.Text
                     _boolArray = boolArray;
                 }
 
+                protected BaseDigitsArray(char[] charArray)
+                    : this(charArray, _CtorCreateBoolArray(charArray))
+                {
+                }
+
                 protected BaseDigitsArray((char[] charArray, bool[] boolArray) args)
                     : this(args.charArray, args.boolArray)
                 { 
@@ -155,6 +160,21 @@ namespace ScrollStitch.V20200707.Text
                 {
                     throw new Exception();
                 }
+
+                private static bool[] _CtorCreateBoolArray(char[] charArray)
+                {
+                    int maxChar = 0;
+                    foreach (char c in charArray)
+                    {
+                        maxChar = Math.Max(maxChar, c);
+                    }
+                    bool[] boolArray = new bool[maxChar + 1];
+                    foreach (char c in charArray)
+                    {
+                        boolArray[c] = true;
+                    }
+                    return boolArray;
+                }
             }
 
             /// <summary>
@@ -170,7 +190,7 @@ namespace ScrollStitch.V20200707.Text
                 { 
                 }
 
-                private static (char[] charArray, bool[] boolArray) _CtorArgs()
+                private static char[] _CtorArgs()
                 {
                     char[] charArray = new char[85];
                     int kout = 0;
@@ -202,17 +222,7 @@ namespace ScrollStitch.V20200707.Text
                     {
                         _Throw(); // impossible
                     }
-                    bool[] boolArray = new bool[128];
-                    foreach (char c in charArray)
-                    {
-                        int i = c;
-                        if (i < 0 || i >= boolArray.Length)
-                        {
-                            _Throw(); // impossible
-                        }
-                        boolArray[i] = true;
-                    }
-                    return (charArray, boolArray);
+                    return charArray;
                 }
             }
 
@@ -235,7 +245,7 @@ namespace ScrollStitch.V20200707.Text
                 {
                 }
 
-                private static (char[] charArray, bool[] boolArray) _CtorArgs()
+                private static char[] _CtorArgs()
                 {
                     char[] charArray = new char[64];
                     int kout = 0;
@@ -263,17 +273,7 @@ namespace ScrollStitch.V20200707.Text
                     {
                         _Throw(); // impossible
                     }
-                    bool[] boolArray = new bool[128];
-                    foreach (char c in charArray)
-                    {
-                        int i = c;
-                        if (i < 0 || i >= boolArray.Length)
-                        {
-                            _Throw(); // impossible
-                        }
-                        boolArray[i] = true;
-                    }
-                    return (charArray, boolArray);
+                    return charArray;
                 }
             }
 
@@ -292,24 +292,14 @@ namespace ScrollStitch.V20200707.Text
                 { 
                 }
 
-                private static (char[] charArray, bool[] boolArray) _CtorArgs(BaseDigitsArray other, int offset, int count)
+                private static char[] _CtorArgs(BaseDigitsArray other, int offset, int count)
                 {
                     char[] charArray = new char[count];
                     for (int index = 0; index < count; ++index)
                     {
                         charArray[index] = other.ItemAt(offset + index);
                     }
-                    bool[] boolArray = new bool[128];
-                    foreach (char c in charArray)
-                    {
-                        int i = c;
-                        if (i < 0 || i >= boolArray.Length)
-                        {
-                            _Throw(); // impossible
-                        }
-                        boolArray[i] = true;
-                    }
-                    return (charArray, boolArray);
+                    return charArray;
                 }
             }
         }
