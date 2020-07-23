@@ -30,7 +30,7 @@ namespace ScrollStitch.V20200707
 
         public Func<IntBitmap, bool> ShouldSaveImage { get; set; }
 
-        public double MinCaptureIntervalMilliseconds { get; set; } = 125.0;
+        public double MinCaptureIntervalMilliseconds { get; set; } = 80.0;
 
         public bool VerifyOutputFolderIsNew { get; set; } = true;
 
@@ -196,7 +196,7 @@ namespace ScrollStitch.V20200707
         {
             var ampm = (timestamp.Hour >= 12 ? "pm" : "am");
             //string strTimestamp = timestamp.ToString("yyyy-MM-dd_HH.mm.ss.fff") + ampm;
-            string strTimestamp = capturedCount.ToString("D4") + "_" + timestamp.ToString("HHmmssf");
+            string strTimestamp = capturedCount.ToString("D4") + "_" + timestamp.ToString("HHmmssfff");
             string filename = strTimestamp + ".png";
             return filename;
         }
