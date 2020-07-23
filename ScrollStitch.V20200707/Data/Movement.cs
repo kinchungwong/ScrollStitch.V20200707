@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace ScrollStitch.V20200707.Data
         public int DeltaX { get; }
         public int DeltaY { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Movement(int deltaX, int deltaY)
         {
             DeltaX = deltaX;
@@ -37,27 +39,32 @@ namespace ScrollStitch.V20200707.Data
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Movement other)
         {
             return DeltaX == other.DeltaX &&
                 DeltaY == other.DeltaY;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Movement m1, Movement m2)
         {
             return m1.Equals(m2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Movement m1, Movement m2)
         {
             return !m1.Equals(m2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Movement operator +(Movement m1, Movement m2)
         {
             return new Movement(m1.DeltaX + m2.DeltaX, m1.DeltaY + m2.DeltaY);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Movement operator -(Movement m1, Movement m2)
         {
             return new Movement(m1.DeltaX - m2.DeltaX, m1.DeltaY - m2.DeltaY);

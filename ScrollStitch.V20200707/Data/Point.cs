@@ -20,27 +20,15 @@ namespace ScrollStitch.V20200707.Data
         public static Point Origin { get; } = new Point(0, 0);
 
         public int X { get; }
+
         public int Y { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Point(int x, int y)
         {
             X = x;
             Y = y;
         }
-
-#if false
-        public Point(HashPoint hashPoint)
-        {
-            X = hashPoint.X;
-            Y = hashPoint.Y;
-        }
-
-        public Point(ImageHashPoint hashPoint)
-        {
-            X = hashPoint.X;
-            Y = hashPoint.Y;
-        }
-#endif
 
         public override bool Equals(object obj)
         {
@@ -53,17 +41,20 @@ namespace ScrollStitch.V20200707.Data
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Point other)
         {
             return X == other.X &&
                 Y == other.Y;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Point p1, Point p2)
         {
             return p1.Equals(p2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Point p1, Point p2)
         {
             return !p1.Equals(p2);
@@ -133,16 +124,19 @@ namespace ScrollStitch.V20200707.Data
         /// The vector difference between the two arguments.
         /// </returns>
         /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Movement operator -(Point argLeft, Point argRight)
         {
             return new Movement(argLeft.X - argRight.X, argLeft.Y - argRight.Y);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point operator +(Point p, Movement m)
         {
             return new Point(p.X + m.DeltaX, p.Y + m.DeltaY);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Point operator -(Point p, Movement m)
         {
             return new Point(p.X - m.DeltaX, p.Y - m.DeltaY);

@@ -19,6 +19,7 @@ namespace ScrollStitch.V20200707.Data
         public int Count => Stop - Start;
         public bool IsEmpty => (Stop <= Start);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Range(int start, int stop)
         {
             Start = start;
@@ -50,9 +51,22 @@ namespace ScrollStitch.V20200707.Data
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Range other)
         {
             return Start == other.Start && Stop == other.Stop;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator ==(Range r1, Range r2)
+        {
+            return r1.Equals(r2);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool operator !=(Range r1, Range r2)
+        {
+            return !r1.Equals(r2);
         }
 
         public override string ToString()
