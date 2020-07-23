@@ -31,6 +31,7 @@ namespace ScrollStitch.V20200707.Config
             Add("StartDateTime", BuiltIns.StartDateTime);
             Add("StartTimeMsecs", BuiltIns.StartTimeMsecs);
             Add("StartDateTimeMsecs", BuiltIns.StartDateTimeMsecs);
+            Add("StartDateTimeYMDHM", BuiltIns.StartDateTimeYMDHM);
             Add("CurrentDate", BuiltIns.CurrentDate);
             Add("CurrentTime", BuiltIns.CurrentTime);
             Add("CurrentDateTime", BuiltIns.CurrentDateTime);
@@ -200,6 +201,11 @@ namespace ScrollStitch.V20200707.Config
             public static string StartDateTimeMsecs()
             {
                 return Timestamp.ToString("yyyy.MM.dd_HH.mm.ss.fff");
+            }
+
+            public static string StartDateTimeYMDHM()
+            {
+                return Timestamp.ToString("yyyy.MM.dd_HH.mm");
             }
 
             public static string CurrentDate()
