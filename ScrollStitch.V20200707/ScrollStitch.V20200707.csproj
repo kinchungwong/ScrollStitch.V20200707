@@ -87,6 +87,7 @@
     <Compile Include="Collections\Specialized\IntKeyIntRow.cs" />
     <Compile Include="Collections\Specialized\ITable.cs" />
     <Compile Include="Collections\UniqueList.cs" />
+    <Compile Include="Config\ConfigVariableSubstitutions.cs" />
     <Compile Include="Data\HorzOrVert.cs" />
     <Compile Include="Data\Movement.cs" />
     <Compile Include="Data\Point.cs" />
