@@ -10,6 +10,18 @@ namespace ScrollStitch.V20200707
 {
     class Program
     {
+        static Lazy<string> LazyOutputFolder = new Lazy<string>(
+            () =>
+            {
+                var cfgVarSub = Config.ConfigVariableSubstitutions.DefaultInstance;
+                cfgVarSub.AddBulitins();
+                string outputFolderPattern = @"$(UserProfile)\Screenshots\$(StartDate)\$(StartDateTimeYMDHM)_$(RandomFileName)";
+                string outputFolder = cfgVarSub.Process(outputFolderPattern);
+                return outputFolder;
+            });
+
+        static string OutputFolder => LazyOutputFolder.Value;
+
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void Main(string[] args)
         {
@@ -21,9 +33,8 @@ namespace ScrollStitch.V20200707
 #if false
                 var captureLoop = new Main_ScreenCaptureLoop();
                 //captureLoop.ScreenshotBaseFolder = @"C:\Users\kinch\Screenshots";
-                captureLoop.ScreenshotBaseFolder = @"C:\Users\kinch\Screenshots\2020-07-17";
-                //captureLoop.ScreenshotOutputFolder = null;
-                captureLoop.ConfigureFromInteractiveConsole();
+                //captureLoop.ConfigureFromInteractiveConsole();
+                captureLoop.ScreenshotOutputFolder = OutputFolder;
                 captureLoop.RunCaptureLoop();
 #endif
                 Console.WriteLine("Finished. No uncaught exceptions.");
