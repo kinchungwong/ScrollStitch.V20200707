@@ -38,6 +38,8 @@ namespace ScrollStitch.V20200707.Tracking
 
         public Grid MainGrid { get; private set; }
 
+        public T3CellLabels FirstStageCellLabels { get; private set; }
+
         public T3GridStats_OneVotePerCell FirstStageCellVotes { get; private set; }
 
         public T3Classifier Classifier { get; private set; }
@@ -47,6 +49,8 @@ namespace ScrollStitch.V20200707.Tracking
         public T3HashPoints SecondStageHashPoints { get; private set; }
 
         public T3Movements SecondStageMovements { get; private set; }
+
+        public T3CellLabels SecondStageCellLabels { get; private set; }
 
         public T3GridStats_OneVotePerCell SecondStageCellVotes { get; private set; }
 
@@ -79,6 +83,7 @@ namespace ScrollStitch.V20200707.Tracking
             FirstStageMovements = T3Movements.Factory.Create(FirstStageHashPoints);
             MainImageSize = ImageManager.ImageSizes[MainImageKey];
             MainGrid = Grid.Factory.CreateApproxCellSize(MainImageSize, ApproxCellSize);
+            FirstStageCellLabels = T3CellLabels.Factory.Create(FirstStageMovements, MainImageKey, MainGrid);
             var tempGridStat = new T3GridStats(FirstStageMovements, MainImageKey, MainGrid);
             FirstStageCellVotes = new T3GridStats_OneVotePerCell(tempGridStat);
             tempGridStat.Add(FirstStageCellVotes);
@@ -96,6 +101,7 @@ namespace ScrollStitch.V20200707.Tracking
             Filter.Process();
             SecondStageHashPoints = Filter.NewHashPoints;
             SecondStageMovements = Filter.NewMovements;
+            SecondStageCellLabels = T3CellLabels.Factory.Create(SecondStageMovements, MainImageKey, MainGrid);
             var tempGridStat = new T3GridStats(SecondStageMovements, MainImageKey, MainGrid);
             SecondStageCellVotes = new T3GridStats_OneVotePerCell(tempGridStat);
             tempGridStat.Add(SecondStageCellVotes);
