@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,12 +30,21 @@ namespace ScrollStitch.V20200707.Spatial
         public int CellX { get; }
         public int CellY { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CellIndex(int cellX, int cellY)
         {
             CellX = cellX;
             CellY = cellY;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public CellIndex((int cellX, int cellY) cellXY)
+        {
+            CellX = cellXY.cellX;
+            CellY = cellXY.cellY;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CellIndex(Point point)
         {
             CellX = point.X;
@@ -52,35 +62,60 @@ namespace ScrollStitch.V20200707.Spatial
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(CellIndex other)
         {
             return CellX == other.CellX &&
                 CellY == other.CellY;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(CellIndex p1, CellIndex p2)
         {
             return p1.Equals(p2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(CellIndex p1, CellIndex p2)
         {
             return !p1.Equals(p2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Point AsPoint()
         {
             return new Point(CellX, CellY);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator CellIndex(Point p)
         {
             return new CellIndex(p.X, p.Y);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Point(CellIndex ci)
         {
             return new Point(ci.CellX, ci.CellY);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator CellIndex((int cellX, int cellY) cellXY)
+        {
+            return new CellIndex(cellXY);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator (int, int)(CellIndex ci)
+        {
+            return (ci.CellX, ci.CellY);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Deconstruct(out int cellX, out int cellY)
+        {
+            cellX = CellX;
+            cellY = CellY;
         }
 
         public override int GetHashCode()
