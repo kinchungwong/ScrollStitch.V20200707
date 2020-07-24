@@ -26,6 +26,7 @@ namespace ScrollStitch.V20200707.Spatial
     /// </summary>
     public struct CellIndex
         : IEquatable<CellIndex>
+        , IComparable<CellIndex>
     {
         public int CellX { get; }
         public int CellY { get; }
@@ -67,6 +68,16 @@ namespace ScrollStitch.V20200707.Spatial
         {
             return CellX == other.CellX &&
                 CellY == other.CellY;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CompareTo(CellIndex other)
+        {
+            if (CellY > other.CellY) return 1;
+            if (CellY < other.CellY) return -1;
+            if (CellX > other.CellX) return 1;
+            if (CellX < other.CellX) return -1;
+            return 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
