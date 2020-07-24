@@ -113,6 +113,9 @@
     <Compile Include="Imaging\IScalarBitmapInfo.cs" />
     <Compile Include="Imaging\RowAccess\IBitmapRowDirect.cs" />
     <Compile Include="Imaging\RowAccess\IBitmapRowSource.cs" />
+    <Compile Include="Imaging\RowCompare\IBitmapComparer.cs" />
+    <Compile Include="Imaging\RowCompare\IBitmapRowComparer.cs" />
+    <Compile Include="Imaging\RowCompare\PixelMismatchCounter.cs" />
     <Compile Include="Imaging\ScreenCapture\ScreenCaptureUtility.cs" />
     <Compile Include="Logging\Sinks\LogMemorySink.cs" />
     <Compile Include="Logging\Structured\LoggingStringFormattingUtility.cs" />
