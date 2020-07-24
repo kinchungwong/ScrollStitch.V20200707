@@ -1,7 +1,4 @@
-﻿using ScrollStitch.V20200707.Collections;
-using ScrollStitch.V20200707.Data;
-using ScrollStitch.V20200707.Spatial;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Tracking
 {
+    using ScrollStitch.V20200707.Collections;
+    using ScrollStitch.V20200707.Data;
+    using ScrollStitch.V20200707.Spatial;
+
     /// <summary>
     /// The main algorithm for three-image trajectory segmentation.
     /// 
