@@ -147,6 +147,7 @@
     <Compile Include="Tracking\Diagnostics\T3Diagnostics.cs" />
     <Compile Include="Tracking\DiagViz\Diag_IPGM.cs" />
     <Compile Include="Tracking\FromTo.cs" />
+    <Compile Include="Tracking\T3CellLabels.cs" />
     <Compile Include="Tracking\T3Classifier.cs" />
     <Compile Include="Tracking\T3ClassifierFlags.cs" />
     <Compile Include="Tracking\T3ClassifierThreshold.cs" />
