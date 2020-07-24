@@ -14,7 +14,7 @@ namespace ScrollStitch.V20200707.Data
     /// 
     /// Refer to <code>Readme_Hash2D.Data_namespace.md</code>
     /// </summary>
-    public struct Point 
+    public struct Point
         : IEquatable<Point>
     {
         public static Point Origin { get; } = new Point(0, 0);
@@ -28,6 +28,13 @@ namespace ScrollStitch.V20200707.Data
         {
             X = x;
             Y = y;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Point((int x, int y) p)
+        {
+            X = p.x;
+            Y = p.y;
         }
 
         public override bool Equals(object obj)
@@ -68,6 +75,25 @@ namespace ScrollStitch.V20200707.Data
         public static implicit operator Point(System.Drawing.Point p)
         {
             return new Point(p.X, p.Y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator Point((int x, int y) p)
+        {
+            return new Point(p.x, p.y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static explicit operator (int, int)(Point p)
+        {
+            return (p.X, p.Y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Deconstruct(out int x, out int y)
+        {
+            x = X;
+            y = Y;
         }
 
 #if false
