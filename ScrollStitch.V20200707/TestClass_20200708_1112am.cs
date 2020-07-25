@@ -9,19 +9,18 @@ using System.Runtime.CompilerServices;
 
 namespace ScrollStitch.V20200707
 {
-    //using Bitwise;
     using Caching;
     using Collections;
+    using Config;
     using Data;
     using HashCode;
     using Imaging;
     using Imaging.Hash2D;
     using Imaging.IO;
-    //using Imaging.Plotting;
     using Logging;
     using Memory;
+    using ScrollStitch.V20200707.Config.Data;
     using Spatial;
-    using TestSets;
     using Text;
     using Tracking;
     using Tracking.Diagnostics;
@@ -51,7 +50,7 @@ namespace ScrollStitch.V20200707
             set; 
         } = new ImageManager();
 
-        public ITestSet TestSet
+        public IReadOnlyList<string> TestSet
         {
             get => ImageManager.TestSet;
             set => ImageManager.TestSet = value;
@@ -107,12 +106,13 @@ namespace ScrollStitch.V20200707
         [MethodImpl(MethodImplOptions.NoInlining)]
         public TestClass_20200708_1112am(string[] args)
         {
-            //TestSet = new Run_1(50);
-            //TestSet = new US_Death_Projections();
-            //TestSet = new Huge_Run(100);
-            //TestSet = new Huge_Run.Subset_49243();
-            //TestSet = new TestSet_ConsoleAsk();
-            TestSet = new Run_20200403(200);
+            var config = TestClassConfig.DefaultInstance;
+            var testSets = config.TestSets;
+            var currentTestSet = config.CurrentTestSet;
+            var testSet = testSets.Find((ts) => ts.Name.Equals(currentTestSet.TestSetName));
+            var testSetEnum = new TestSetEnumeratedFiles(testSet);
+            testSetEnum.EnumerateFiles();
+            TestSet = testSetEnum.Files.Take(currentTestSet.Take).ToList();
             // ======
             InputFileBlobs.FactoryFunc = _LoadInputBlob;
             // ======

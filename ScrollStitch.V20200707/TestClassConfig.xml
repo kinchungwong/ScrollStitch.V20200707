@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TestClassConfig>
+  <TestSets>
+    <TestSet>
+      <Name>Run_1</Name>
+      <LocalPath>$(UserProfile)\Screenshots\Run_1</LocalPath>
+    </TestSet>
+    <TestSet>
+      <Name>Run_20200403</Name>
+      <LocalPath>$(UserProfile)\Screenshots\Run_20200403</LocalPath>
+    </TestSet>
+    <TestSet>
+      <Name>US_Death_Projections</Name>
+      <LocalPath>$(UserProfile)\Screenshots\Run_20200407_US_Deaths_Projections</LocalPath>
+    </TestSet>
+    <TestSet>
+      <Name>Huge_Run</Name>
+      <LocalPath>$(UserProfile)\Screenshots\Huge_Run</LocalPath>
+    </TestSet>
+    <TestSet>
+      <Name>Huge_Run_subset_49243</Name>
+      <LocalPath>$(UserProfile)\Screenshots\Huge_Run</LocalPath>
+      <FilterList Flags="Include,Substring">
+        <FilterItem>17.01.48.828pm</FilterItem>
+        <FilterItem>17.01.49.243pm</FilterItem>
+        <FilterItem>17.01.49.635pm</FilterItem>
+        <FilterItem>17.01.50.057pm</FilterItem>
+        <FilterItem>17.01.50.489pm</FilterItem>
+      </FilterList>
+    </TestSet>
+  </TestSets>
+  <CurrentTestSet>
+    <TestSetName name="Run_1"/>
+    <Take value="50"/>
+  </CurrentTestSet>
+</TestClassConfig>

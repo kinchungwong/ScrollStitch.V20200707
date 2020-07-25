@@ -14,15 +14,21 @@ namespace ScrollStitch.V20200707.Config
     /// </summary>
     public class ConfigVariableSubstitutions
     {
-        public static ConfigVariableSubstitutions DefaultInstance 
-        { 
-            get; 
-        } = new ConfigVariableSubstitutions();
+        private static Lazy<ConfigVariableSubstitutions> _StaticLazy = 
+            new Lazy<ConfigVariableSubstitutions>(
+                () => new ConfigVariableSubstitutions());
+
+        public static ConfigVariableSubstitutions DefaultInstance => _StaticLazy.Value;
 
         #region private
         private Dictionary<string, string> _strings = new Dictionary<string, string>();
         private Dictionary<string, Func<string>> _funcs = new Dictionary<string, Func<string>>();
         #endregion
+
+        public ConfigVariableSubstitutions()
+        {
+            AddBulitins();
+        }
 
         public void AddBulitins()
         {

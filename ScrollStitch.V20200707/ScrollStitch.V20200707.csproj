@@ -88,6 +88,12 @@
     <Compile Include="Collections\Specialized\ITable.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Config\ConfigVariableSubstitutions.cs" />
+    <Compile Include="Config\Data\CurrentTestSet.cs" />
+    <Compile Include="Config\Data\FilterList.cs" />
+    <Compile Include="Config\Data\FilterListFlags.cs" />
+    <Compile Include="Config\Data\TestSet.cs" />
+    <Compile Include="Config\Data\TestSetEnumeratedFiles.cs" />
+    <Compile Include="Config\TestClassConfig.cs" />
     <Compile Include="Data\HorzOrVert.cs" />
     <Compile Include="Data\Movement.cs" />
     <Compile Include="Data\Point.cs" />
@@ -133,7 +139,6 @@
     <Compile Include="Spatial\PointTree.cs" />
     <Compile Include="Spatial\RectList.cs" />
     <Compile Include="Spatial\RectTreeUtility.cs" />
-    <Compile Include="TestSets\TestSet_ConsoleAsk.cs" />
     <Compile Include="Text\IntegerBaseFormatter.cs" />
     <Compile Include="Text\IStringBuilder.cs" />
     <Compile Include="Text\IMultiLineTextOutput.cs" />
@@ -194,12 +199,6 @@
     <Compile Include="Spatial\CellIndex.cs" />
     <Compile Include="Spatial\Grid.cs" />
     <Compile Include="TestClass_20200708_1112am.cs" />
-    <Compile Include="TestSets\Huge_Run.cs" />
-    <Compile Include="TestSets\ITestSet.cs" />
-    <Compile Include="TestSets\Run_1.cs" />
-    <Compile Include="TestSets\Run_20200403.cs" />
-    <Compile Include="TestSets\TestSetBase.cs" />
-    <Compile Include="TestSets\US_Death_Projections.cs" />
     <Compile Include="Tracking\MultiImageTracking.cs" />
     <Compile Include="Tracking\T3GridStats_Base.cs" />
     <Compile Include="Tracking\T3GridStats_CellFlags.cs" />
@@ -233,6 +232,11 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestClassConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

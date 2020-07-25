@@ -12,7 +12,6 @@ namespace ScrollStitch.V20200707
     using Data;
     using Imaging;
     using Imaging.Hash2D;
-    using TestSets;
     using Tracking;
     using Tracking.Bidirectional;
     using Utility;
@@ -22,7 +21,7 @@ namespace ScrollStitch.V20200707
         /// <summary>
         /// The list of test images.
         /// </summary>
-        public ITestSet TestSet { get; set; }
+        public IReadOnlyList<string> TestSet { get; set; }
 
         /// <summary>
         /// The compressed file loaded into memory as a byte array.
