@@ -29,6 +29,18 @@
       </FilterList>
     </TestSet>
   </TestSets>
+  <Hash2DSpecs>
+    <Hash2DSpec>
+      <Name>V66H666</Name>
+      <Hash2DPasses>
+        <Hash2DPass Direction="Vertical" WindowSize="6" SkipStep="1" FillValue="0"/>
+        <Hash2DPass Direction="Vertical" WindowSize="6" SkipStep="6" FillValue="0"/>
+        <Hash2DPass Direction="Horizontal" WindowSize="6" SkipStep="1" FillValue="0"/>
+        <Hash2DPass Direction="Horizontal" WindowSize="6" SkipStep="6" FillValue="0"/>
+        <Hash2DPass Direction="Horizontal" WindowSize="6" SkipStep="36" FillValue="0"/>
+      </Hash2DPasses>
+    </Hash2DSpec>
+  </Hash2DSpecs>
   <CurrentTestSet>
     <TestSetName name="Run_1"/>
     <Take value="50"/>

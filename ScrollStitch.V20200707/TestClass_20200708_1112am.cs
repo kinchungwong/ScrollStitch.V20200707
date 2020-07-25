@@ -165,12 +165,7 @@ namespace ScrollStitch.V20200707
             IntBitmap colorBitmap = InputColorBitmaps.Get(index);
             using (var timer = new MethodTimer($"{GetType().Name}.{nameof(_ComputeHashBitmap)}(index={index})"))
             {
-                var h2dp = new Hash2DProcessor();
-                h2dp.AddStage(direction: Direction.Vertical, windowSize: 6, skipStep: 1, fillValue: 0);
-                h2dp.AddStage(direction: Direction.Vertical, windowSize: 6, skipStep: 6, fillValue: 0);
-                h2dp.AddStage(direction: Direction.Horizontal, windowSize: 6, skipStep: 1, fillValue: 0);
-                h2dp.AddStage(direction: Direction.Horizontal, windowSize: 6, skipStep: 6, fillValue: 0);
-                h2dp.AddStage(direction: Direction.Horizontal, windowSize: 6, skipStep: 36, fillValue: 0);
+                var h2dp = Hash2DProcessorFactory.CreateFromConfigByName("V66H666");
                 IntBitmap hashBitmap = h2dp.Process(colorBitmap);
                 return hashBitmap;
             }

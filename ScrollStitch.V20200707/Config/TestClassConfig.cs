@@ -25,12 +25,14 @@ namespace ScrollStitch.V20200707.Config
 
         public List<TestSet> TestSets { get; set; }
         public CurrentTestSet CurrentTestSet { get; set; }
+        public List<Hash2DSpec> Hash2DSpecs { get; set; }
 
         public TestClassConfig()
         {
             _LoadXml();
             _ParseTestSets();
             _ParseCurrentTestSet();
+            _ParseHash2DSpecs();
             _Cleanup();
         }
 
@@ -76,6 +78,35 @@ namespace ScrollStitch.V20200707.Config
                 TestSetName = currentTestSetName,
                 Take = (string.IsNullOrEmpty(strTakeMaybe) ? int.MaxValue : int.Parse(strTakeMaybe))
             };
+        }
+
+        public void _ParseHash2DSpecs()
+        {
+            Hash2DSpecs = new List<Hash2DSpec>();
+            XmlNode specsNode = _xmlDoc.SelectSingleNode("//Hash2DSpecs");
+            XmlNodeList specNodes = specsNode.SelectNodes("Hash2DSpec");
+            foreach (XmlNode specNode in specNodes)
+            {
+                string name = specNode.SelectSingleNode("Name").InnerText;
+                XmlNodeList passNodes = specNode.SelectNodes("Hash2DPasses/Hash2DPass");
+                Hash2DSpec spec = new Hash2DSpec(name);
+                foreach (XmlNode passNode in passNodes)
+                {
+                    string strDirection = passNode.Attributes["Direction"].Value;
+                    int windowSize = int.Parse(passNode.Attributes["WindowSize"].Value);
+                    int skipStep = int.Parse(passNode.Attributes["SkipStep"].Value);
+                    int fillValue = int.Parse(passNode.Attributes["FillValue"].Value);
+                    Hash2DPass pass = new Hash2DPass()
+                    {
+                        Direction = strDirection,
+                        WindowSize = windowSize,
+                        SkipStep = skipStep,
+                        FillValue = fillValue
+                    };
+                    spec.Passes.Add(pass);
+                }
+                Hash2DSpecs.Add(spec);
+            }
         }
 
         public void _Cleanup()

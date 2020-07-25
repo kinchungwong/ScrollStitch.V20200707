@@ -91,6 +91,8 @@
     <Compile Include="Config\Data\CurrentTestSet.cs" />
     <Compile Include="Config\Data\FilterList.cs" />
     <Compile Include="Config\Data\FilterListFlags.cs" />
+    <Compile Include="Config\Data\Hash2DPass.cs" />
+    <Compile Include="Config\Data\Hash2DSpec.cs" />
     <Compile Include="Config\Data\TestSet.cs" />
     <Compile Include="Config\Data\TestSetEnumeratedFiles.cs" />
     <Compile Include="Config\TestClassConfig.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="Imaging\ByteBitmap.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
+    <Compile Include="Imaging\Hash2D\Hash2DProcessorFactory.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />
