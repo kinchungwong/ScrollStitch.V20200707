@@ -6,36 +6,43 @@ using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Tracking
 {
-    using ScrollStitch.V20200707.Collections;
-    using ScrollStitch.V20200707.Collections.Specialized;
-    using ScrollStitch.V20200707.Data;
-    using ScrollStitch.V20200707.Utility;
+    using Collections;
+    using Data;
+    using Utility;
 
     public class T3Classifier
     {
-        public T3Movements MovementsClass { get; set; }
+        public T3Movements MovementsClass { get; }
 
-        public T3GridStats_OneVotePerCell LabelCellCountsClass { get; set; }
+        public T3CellLabels CellLabelsClass { get; }
 
-        public T3ClassifierThreshold Threshold { get; set; } = new T3ClassifierThreshold();
+        public T3ClassifierThreshold Threshold { get; }
 
         public UniqueList<(Movement, Movement)> Movements => MovementsClass.Movements;
 
-        public UniqueList<int> ImageKeys => MovementsClass?.ImageKeys;
+        public UniqueList<int> ImageKeys => MovementsClass.ImageKeys;
 
-        public int ImageKey0 => ImageKeys?.ItemAt(0) ?? -1;
+        public int ImageKey0 => ImageKeys.ItemAt(0);
 
-        public int ImageKey1 => ImageKeys?.ItemAt(1) ?? -1;
+        public int ImageKey1 => ImageKeys.ItemAt(1);
 
-        public int ImageKey2 => ImageKeys?.ItemAt(2) ?? -1;
+        public int ImageKey2 => ImageKeys.ItemAt(2);
 
-        public IReadOnlyDictionary<int, int> LabelPointCounts => MovementsClass?.LabelPointCounts;
+        public IReadOnlyDictionary<int, int> LabelPointCounts => MovementsClass.LabelPointCounts;
 
-        public int LabelPointCountsTotal => MovementsClass?.HashValues.Count ?? 0;
+        public int LabelPointCountsTotal => MovementsClass.HashValues.Count;
 
-        public IHistogram<int, int> LabelCellCounts => LabelCellCountsClass?.GetResult();
+        public IReadOnlyDictionary<int, int> LabelCellCounts { get; private set; }
 
-        public int LabelCellCountsTotal => _StcArrayOfSize(LabelCellCountsClass?.Grid.GridSize ?? null);
+        public int LabelCellCountsTotal { get; private set; }
+
+        public T3Classifier(T3Movements movements, T3CellLabels cellLabels, T3ClassifierThreshold threshold)
+        {
+            MovementsClass = movements;
+            CellLabelsClass = cellLabels;
+            Threshold = threshold;
+            _CtorInitLabelCellCounts();
+        }
 
         public T3ClassifierFlags ClassifyMovement((Movement, Movement) m012)
         {
@@ -50,6 +57,12 @@ namespace ScrollStitch.V20200707.Tracking
         }
 
         public T3ClassifierFlags ClassifyMovement(int label, (Movement, Movement) m012)
+        {
+            var details = ClassifyMovementWithDetails(label, m012);
+            return details.Flags;
+        }
+
+        public Details ClassifyMovementWithDetails(int label, (Movement, Movement) m012)
         { 
             (Movement m01, Movement m12) = m012;
             int m01x = m01.DeltaX;
@@ -81,16 +94,52 @@ namespace ScrollStitch.V20200707.Tracking
             {
                 flags |= T3ClassifierFlags.Accepted;
             }
-            return flags;
+            return (flags, pointVoteRatio, cellVoteRatio);
         }
 
-        private int _StcArrayOfSize(Size? sz)
+        public struct Details
         {
-            if (!sz.HasValue)
+            public T3ClassifierFlags Flags { get; set; }
+
+            public PercentFromRatio PointVoteRatio { get; set; }
+
+            public PercentFromRatio CellVoteRatio { get; set; }
+
+            public void Deconstruct(out T3ClassifierFlags flags, out PercentFromRatio pointVoteRatio, out PercentFromRatio cellVoteRatio)
             {
-                return 0;
+                flags = Flags;
+                pointVoteRatio = PointVoteRatio;
+                cellVoteRatio = CellVoteRatio;
             }
-            return sz.Value.Width * sz.Value.Height;
+
+            public static implicit operator Details((T3ClassifierFlags Flags, PercentFromRatio PointVoteRatio, PercentFromRatio CellVoteRatio) value)
+            {
+                return new Details()
+                {
+                    Flags = value.Flags,
+                    PointVoteRatio = value.PointVoteRatio,
+                    CellVoteRatio = value.CellVoteRatio
+                };
+            }
+
+            public static implicit operator (T3ClassifierFlags Flags, PercentFromRatio PointVoteRatio, PercentFromRatio CellVoteRatio)(Details value)
+            {
+                return (value.Flags, value.PointVoteRatio, value.CellVoteRatio);
+            }
+        }
+
+        private void _CtorInitLabelCellCounts()
+        {
+            var gridSize = CellLabelsClass.MainGrid.GridSize;
+            LabelCellCountsTotal = gridSize.Width * gridSize.Height;
+            var labelCellCounts = new Dictionary<int, int>();
+            foreach (var kvp in CellLabelsClass.LabelCellList)
+            {
+                int label = kvp.Key;
+                var cellIndexList = kvp.Value;
+                labelCellCounts.Add(label, cellIndexList.Count);
+            }
+            LabelCellCounts = labelCellCounts.AsReadOnly();
         }
     }
 }

@@ -6,111 +6,162 @@ using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Tracking.Diagnostics
 {
-    using ScrollStitch.V20200707.Collections;
-    using ScrollStitch.V20200707.Collections.Specialized;
-    using ScrollStitch.V20200707.Data;
-    using ScrollStitch.V20200707.Spatial;
-    using ScrollStitch.V20200707.Text;
-    using ScrollStitch.V20200707.Utility;
+    using Collections;
+    using Collections.Specialized;
+    using Data;
+    using Spatial;
+    using Text;
+    using Utility;
+    using BaseDigitsArray = Text.IntegerBaseFormatter.Internals.BaseDigitsArray;
 
     public class T3Diagnostics
     {
-        public T3Movements MovementsClass { get; set; }
+        #region Properties
+        public T3Main MainClass { get; }
 
-        public T3GridStats_OneVotePerCell LabelCellCountsClass { get; set; }
+        public enum Stage
+        {
+            First = 1,
+            Second = 2
+        }
 
-        public T3GridStats_CellFlags<ulong> CellFlagsClass { get; set; }
+        public Stage Which { get; set; } = Stage.Second;
 
-        public Dictionary<int, T3GridStats_SingleLabel> SingleLabelGridHistograms { get; set; } = new Dictionary<int, T3GridStats_SingleLabel>();
+        public T3ClassifierThreshold Threshold => MainClass.FilterThreshold;
 
-        public T3ClassifierThreshold Threshold { get; set; } = new T3ClassifierThreshold();
+        public T3Classifier Classifier => MainClass.Classifier;
+
+        public UniqueList<int> ImageKeys => MainClass.ImageKeys;
+
+        public int ImageKey0 => ImageKeys.ItemAt(0);
+
+        public int ImageKey1 => ImageKeys.ItemAt(1);
+
+        public int ImageKey2 => ImageKeys.ItemAt(2);
+
+        public int MainImageKey => MainClass.MainImageKey;
+
+        public Grid MainGrid => MainClass.MainGrid;
+
+        public Size MainImageSize => MainClass.MainImageSize;
+
+        public T3Movements MovementsClass
+        {
+            get
+            {
+                switch (Which)
+                {
+                    case Stage.First:
+                        return MainClass.FirstStageMovements;
+                    case Stage.Second:
+                        return MainClass.SecondStageMovements;
+                    default:
+                        return null;
+                }
+            }
+        }
 
         public UniqueList<(Movement, Movement)> Movements => MovementsClass.Movements;
 
-        public UniqueList<int> ImageKeys => MovementsClass?.ImageKeys;
+        public T3CellLabels CellLabels
+        {
+            get
+            {
+                switch (Which)
+                {
+                    case Stage.First:
+                        return MainClass.FirstStageCellLabels;
+                    case Stage.Second:
+                        return MainClass.SecondStageCellLabels;
+                    default:
+                        return null;
+                }
+            }
+        }
 
-        public int ImageKey0 => ImageKeys?.ItemAt(0) ?? -1;
+        public IReadOnlyDictionary<CellIndex, IReadOnlyList<int>> CellLabelList => CellLabels.CellLabelList;
 
-        public int ImageKey1 => ImageKeys?.ItemAt(1) ?? -1;
+        public IReadOnlyDictionary<int, IReadOnlyList<CellIndex>> LabelCellList => CellLabels.LabelCellList;
+        #endregion
 
-        public int ImageKey2 => ImageKeys?.ItemAt(2) ?? -1;
-
-        public IReadOnlyDictionary<int, int> LabelPointCounts => MovementsClass?.LabelPointCounts;
-
-        public int LabelPointCountsTotal => MovementsClass?.HashValues.Count ?? 0;
-
-        public IHistogram<int, int> LabelCellCounts => LabelCellCountsClass?.GetResult();
-
-        public int LabelCellCountsTotal => _StcArrayOfSize(LabelCellCountsClass?.Grid.GridSize ?? null);
-
+        #region Execution Options
         /// <summary>
         /// To reduce clutter, movements that contain only one sample point can be suppressed from output.
         /// </summary>
         public bool HideSingleSamples { get; set; } = true;
+        #endregion
+
+        public T3Diagnostics(T3Main mainClass, Stage which)
+        {
+            MainClass = mainClass;
+            Which = which;
+        }
 
         public void ReportMovementStats(IMultiLineTextOutput mlto)
         {
-            var mltoZero = new MultiLineTextOutput();
-            var mltoAccept = new MultiLineTextOutput();
-            var mltoReject = new MultiLineTextOutput();
-            StringBuilder sb = new StringBuilder();
+            // ====== REMINDER ======
+            // This function requires that all statistics must come from either T3Main First Stage or 
+            // the Second Stage, without mixing up. 
+            // Mixing up will cause errors (IndexOutOfBounds, KeyNotFound, etc) and/or nonsensical results.
+            // ======
+            var movementsClass = MovementsClass;
+            var hashPointsClass = MovementsClass.HashPoints;
+            var classifier = Classifier;
+            var movements = movementsClass.Movements;
+            int movementCount = movements.Count;
+            int hiddenRowCount = 0;
+            var unmatchedCounts = hashPointsClass.UnmatchedPointCounts;
+            //
             mlto.AppendLine($"Three-image trajectories for images ({ImageKey0}, {ImageKey1}, {ImageKey2}):");
-            int movementCount = Movements.Count;
-            int hiddenCount = 0;
-            T3Classifier classifier = new T3Classifier()
-            {
-                MovementsClass = MovementsClass,
-                LabelCellCountsClass = LabelCellCountsClass,
-                Threshold = Threshold
-            };
+            var mltoStationary = new MultiLineTextOutput();
+            var mltoAccepted = new MultiLineTextOutput();
+            var mltoRejected = new MultiLineTextOutput();
+            //
+            StringBuilder sb = new StringBuilder();
             for (int label = 0; label < movementCount; ++label)
             {
-                var m012 = Movements.ItemAt(label);
-                (Movement m01, Movement m12) = m012;
-                int m01x = m01.DeltaX;
-                int m01y = m01.DeltaY;
-                int m12x = m12.DeltaX;
-                int m12y = m12.DeltaY;
-                var flags = classifier.ClassifyMovement(label, m012);
+                var m012 = movements.ItemAt(label);
+                var details = classifier.ClassifyMovementWithDetails(label, m012);
+                var flags = details.Flags;
+                var pointVoteRatio = details.PointVoteRatio;
+                var cellVoteRatio = details.CellVoteRatio;
                 bool isAccepted = flags.HasFlag(T3ClassifierFlags.Accepted);
                 bool isStationary = flags.HasFlag(T3ClassifierFlags.Stationary);
-                var pointVoteRatio = new PercentFromRatio(LabelPointCounts[label], LabelPointCountsTotal);
-                var cellVoteRatio = new PercentFromRatio(LabelCellCounts[label], LabelCellCountsTotal);
                 bool isSingleSample = 
-                    (pointVoteRatio.Numerator == 1 ||
-                    cellVoteRatio.Numerator == 1);
+                    pointVoteRatio.Numerator == 1 ||
+                    cellVoteRatio.Numerator == 1;
                 if (HideSingleSamples && isSingleSample && !isStationary)
                 {
-                    ++hiddenCount;
+                    ++hiddenRowCount;
                     continue;
                 }
-                sb.Append($"m01=({m01x}, {m01y}), ");
-                sb.Append($"m12=({m12x}, {m12y}), ");
+                (Movement m01, Movement m12) = m012;
+                sb.Append($"m01=({m01.DeltaX}, {m01.DeltaY}), ");
+                sb.Append($"m12=({m12.DeltaX}, {m12.DeltaY}), ");
                 sb.Append($"pointVotes={pointVoteRatio}), ");
                 sb.Append($"cellVotes={cellVoteRatio}), ");
                 sb.Append($"(flags={flags})");
                 if (isStationary)
                 {
-                    mltoZero.AppendLine(sb.ToString());
+                    mltoStationary.AppendLine(sb.ToString());
                 }
                 else if (isAccepted)
                 {
-                    mltoAccept.AppendLine(sb.ToString());
+                    mltoAccepted.AppendLine(sb.ToString());
                 }
                 else
                 {
-                    mltoReject.AppendLine(sb.ToString());
+                    mltoRejected.AppendLine(sb.ToString());
                 }
                 sb.Clear();
             }
-            mltoZero.CopyTo(mlto);
-            mltoAccept.CopyTo(mlto);
-            mltoReject.CopyTo(mlto);
-            if (HideSingleSamples && hiddenCount > 0)
+            mltoStationary.CopyTo(mlto);
+            mltoAccepted.CopyTo(mlto);
+            mltoRejected.CopyTo(mlto);
+            if (HideSingleSamples && hiddenRowCount > 0)
             {
-                mlto.AppendLine($"({hiddenCount} rows hidden because of {nameof(HideSingleSamples)} flag.)");
+                mlto.AppendLine($"({hiddenRowCount} rows hidden because of {nameof(HideSingleSamples)} flag.)");
             }
-            var unmatchedCounts = MovementsClass.HashPoints.UnmatchedPointCounts;
             int umc0 = unmatchedCounts[ImageKey0];
             int umc1 = unmatchedCounts[ImageKey1];
             int umc2 = unmatchedCounts[ImageKey2];
@@ -131,63 +182,48 @@ namespace ScrollStitch.V20200707.Tracking.Diagnostics
             RenderCellFlags(mlto, baseDigitsArray);
         }
 
-        public void RenderCellFlags(IMultiLineTextOutput mlto, IntegerBaseFormatter.Internals.BaseDigitsArray baseDigitsArray)
+        public void RenderCellFlags(IMultiLineTextOutput mlto, BaseDigitsArray baseDigitsArray)
         {
-            if (CellFlagsClass is null)
-            {
-                return;
-            }
-            GridArray<ulong> cellFlags = CellFlagsClass.GetResult();
-            if (cellFlags is null)
-            {
-                return;
-            }
+            var grid = MainGrid;
+            var cellLabelList = CellLabelList;
+            var labelCellList = LabelCellList;
+            // 
+            const int maxUsableBitsForUInt64 = 64;
             int toBase = baseDigitsArray.Base;
-            int maxUsableBitsForUInt64 = 64;
-            int labelCount = Math.Min(Movements.Count, maxUsableBitsForUInt64);
+            int labelCount = Math.Min(MovementsClass.Movements.Count, maxUsableBitsForUInt64);
             int formatWidth = (int)Math.Max(1, Math.Ceiling(Math.Log(2.0) * labelCount / Math.Log(toBase)));
-            string CellValueToStringFunc(ulong value)
+            //
+            ulong GetCellLabelAsUInt64(CellIndex ci)
             {
-                return IntegerBaseFormatter.Format(value, baseDigitsArray, formatWidth);
+                if (!cellLabelList.TryGetValue(ci, out var labels))
+                {
+                    return 0uL;
+                }
+                ulong result = 0uL;
+                foreach (int label in labels)
+                {
+                    if (label < 0 || label >= maxUsableBitsForUInt64)
+                    {
+                        continue;
+                    }
+                    result |= (1uL << label);
+                }
+                return result;
             }
-            var myTGS = new Internal_TextGridHook(cellFlags, CellValueToStringFunc);
-            var myTGF = new TextGridFormatter(myTGS);
-            myTGF.Indent = 0;
-            myTGF.ColumnSpacing = 1;
-            myTGF.Generate(mlto);
-        }
-
-        private class Internal_TextGridHook
-            : ITextGridSource
-        {
-            public GridArray<ulong> Array { get; }
-
-            public Func<ulong, string> ToStringFunc { get; }
-
-            public int RowCount => Array.GridHeight;
-
-            public int ColumnCount => Array.GridWidth;
-
-            internal Internal_TextGridHook(GridArray<ulong> array, Func<ulong, string> toStringFunc)
-            {
-                Array = array;
-                ToStringFunc = toStringFunc;
-            }
-
-            public string GetItem(int row, int column)
+            //
+            string GetRowColumnText(int row, int column)
             {
                 var ci = new CellIndex(column, row);
-                return ToStringFunc(Array[ci]);
+                ulong value = GetCellLabelAsUInt64(ci);
+                return IntegerBaseFormatter.Format(value, baseDigitsArray, formatWidth);
             }
-        }
-
-        private int _StcArrayOfSize(Size? sz)
-        {
-            if (!sz.HasValue)
-            {
-                return 0;
-            }
-            return sz.Value.Width * sz.Value.Height;
+            //
+            var tgs = TextGridSource.Create(rowCount: grid.GridHeight, columnCount: grid.GridWidth, 
+                getTextFunc: GetRowColumnText);
+            var tgf = new TextGridFormatter(tgs);
+            tgf.Indent = 0;
+            tgf.ColumnSpacing = 1;
+            tgf.Generate(mlto);
         }
     }
 }
