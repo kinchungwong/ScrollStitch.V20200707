@@ -310,35 +310,33 @@ namespace ScrollStitch.V20200707
             {
                 return;
             }
-            int[] imageKeys = new int[]
+            var imageKeys = new UniqueList<int>(new int[]
             {
                 imageIndex - 2, imageIndex - 1, imageIndex
-            };
+            });
             int mainImageKey = imageIndex;
             var threshold = new T3ClassifierThreshold()
             { 
             };
             var approxCellSize = new Size(64, 64);
+            //var approxCellSize = new Size(32, 32);
+            //var approxCellSize = new Size(128, 32);
             T3Main t3Main;
             using (var timer = new MethodTimer($"{nameof(Run_TrajectoryThree)}(imageIndex = {imageIndex})"))
             {
                 t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, approxCellSize);
                 t3Main.Process();
             }
+#if false
             if (ShouldPrintThreeImageTrajectoryDiagnostics)
             {
-                var t3diag = new T3Diagnostics()
-                {
-                    MovementsClass = t3Main.SecondStageMovements,
-                    LabelCellCountsClass = t3Main.SecondStageCellVotes,
-                    //CellFlagsClass = cellFlags2nd
-                };
+                var t3diag = new T3Diagnostics(t3Main, T3Diagnostics.Stage.Second);
                 var mlto = new MultiLineTextOutput();
                 mlto.AppendLine(new string('-', 76));
                 t3diag.ReportMovementStats(mlto);
                 mlto.AppendLine(new string('-', 76));
-                //t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
-                //mlto.AppendLine(new string('-', 76));
+                t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
+                mlto.AppendLine(new string('-', 76));
                 mlto.ToConsole();
                 if (ShouldReadFromKeyboard)
                 {
@@ -347,6 +345,7 @@ namespace ScrollStitch.V20200707
                     Console.WriteLine(new string('-', 76));
                 }
             }
+#endif
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
