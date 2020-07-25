@@ -22,6 +22,7 @@ namespace ScrollStitch.V20200707.Tracking
     /// </para>
     /// </summary>
     /// 
+    [Obsolete]
     public sealed class T3GridStats_OneVotePerCell 
         : T3GridStats_Base<IHistogram<int, int>>
     {

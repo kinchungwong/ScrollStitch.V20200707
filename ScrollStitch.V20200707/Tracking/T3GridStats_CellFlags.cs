@@ -14,6 +14,7 @@ namespace ScrollStitch.V20200707.Tracking
     /// <inheritdoc cref="T3GridStats_CellFlags{FlagType, FlagArith}"/>
     /// </summary>
     /// 
+    [Obsolete]
     public static class T3GridStats_CellFlags
     {
         /// <summary>

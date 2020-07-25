@@ -16,6 +16,8 @@ namespace ScrollStitch.V20200707.Tracking
     /// of <see cref="int"/> which contains, within each cell rectangle, the number of samples 
     /// confirming that particular trajectory.
     /// </summary>
+    /// 
+    [Obsolete]
     public sealed class T3GridStats_SingleLabel
         : T3GridStats_Base<GridArray<int>>
     {
