@@ -327,7 +327,6 @@ namespace ScrollStitch.V20200707
                 t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, approxCellSize);
                 t3Main.Process();
             }
-#if false
             if (ShouldPrintThreeImageTrajectoryDiagnostics)
             {
                 var t3diag = new T3Diagnostics(t3Main, T3Diagnostics.Stage.Second);
@@ -345,7 +344,6 @@ namespace ScrollStitch.V20200707
                     Console.WriteLine(new string('-', 76));
                 }
             }
-#endif
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
