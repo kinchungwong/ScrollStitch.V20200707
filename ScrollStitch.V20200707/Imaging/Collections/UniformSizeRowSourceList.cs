@@ -48,13 +48,43 @@ namespace ScrollStitch.V20200707.Imaging.Collections
 
         public IBitmapRowSource<T> this[int index] => _bitmaps[index];
 
+        public bool IsReadOnly { get; private set; }
+
         public UniformSizeRowSourceList()
         {
             _bitmaps = new List<IBitmapRowSource<T>>();
         }
 
+        public UniformSizeRowSourceList(IEnumerable<IBitmapRowSource<T>> items, bool isReadOnly)
+            : this()
+        {
+            foreach (var item in items)
+            {
+                Internal_Add(item);
+            }
+            IsReadOnly = isReadOnly;
+        }
+
+        public void SetReadOnly()
+        {
+            IsReadOnly = true;
+        }
+
         public void Add(IBitmapRowSource<T> bitmap)
         {
+            if (IsReadOnly)
+            {
+                throw new InvalidOperationException($"{GetType().Name} has been set to ReadOnly.");
+            }
+            Internal_Add(bitmap);
+        }
+
+        private void Internal_Add(IBitmapRowSource<T> bitmap)
+        {
+            // ====== Remark ======
+            // This private method bypasses the IsReadOnly check, to allow it to be called 
+            // from the constructor even if the flag is set.
+            // ======
             if (_bitmaps.Count == 0)
             {
                 BitmapSize = bitmap.Size;
