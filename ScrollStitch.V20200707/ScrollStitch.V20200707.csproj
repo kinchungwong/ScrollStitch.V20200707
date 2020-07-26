@@ -107,6 +107,8 @@
     <Compile Include="ImageManager.cs" />
     <Compile Include="Imaging\BitmapCopyUtility.cs" />
     <Compile Include="Imaging\ByteBitmap.cs" />
+    <Compile Include="Imaging\Collections\UniformSizeArrayBitmapList.cs" />
+    <Compile Include="Imaging\Collections\UniformSizeRowSourceList.cs" />
     <Compile Include="Imaging\ColorUtility.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
