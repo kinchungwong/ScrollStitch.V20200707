@@ -109,6 +109,12 @@
     <Compile Include="Imaging\ByteBitmap.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\Hash2DSingleRow.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\Hash2DVector.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\Hash2DVectorFactory.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\Hash2DVectorPool.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\IHash2DScalar.cs" />
+    <Compile Include="Imaging\Hash2D\Functional\IHash2DVector.cs" />
     <Compile Include="Imaging\Hash2D\Hash2DProcessorFactory.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
