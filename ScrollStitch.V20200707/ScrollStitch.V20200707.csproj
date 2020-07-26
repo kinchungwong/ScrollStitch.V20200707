@@ -111,6 +111,7 @@
     <Compile Include="Imaging\Collections\UniformSizeRowSourceList.cs" />
     <Compile Include="Imaging\ColorUtility.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
+    <Compile Include="Imaging\Compare\MultiImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DSingleRow.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DVector.cs" />
