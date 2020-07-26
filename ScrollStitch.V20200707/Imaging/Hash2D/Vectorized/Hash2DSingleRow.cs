@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScrollStitch.V20200707.Imaging.Hash2D.Functional
+namespace ScrollStitch.V20200707.Imaging.Hash2D.Vectorized
 {
     /// <summary>
     /// Processes a horizontal row for Hash2D.

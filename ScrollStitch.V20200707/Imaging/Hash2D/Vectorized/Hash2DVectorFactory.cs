@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScrollStitch.V20200707.Imaging.Hash2D.Functional
+namespace ScrollStitch.V20200707.Imaging.Hash2D.Vectorized
 {
     /// <summary>
     /// A static facility that initializes compile-time constant-size arrays for use 
