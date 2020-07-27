@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 
 namespace ScrollStitch.V20200707.Imaging.RowAccess
 {
@@ -33,16 +34,19 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 
         public bool CanWrite { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect)
             : this(target, rect, canWrite: false, allowOutOfBounds: false)
         {
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect, bool canWrite)
             : this(target, rect, canWrite: canWrite, allowOutOfBounds: false)
         { 
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect, bool canWrite, bool allowOutOfBounds, T outOfBoundsValue = default)
         {
             _CtorValidateTargetAndRect(target, rect, allowOutOfBounds);
@@ -52,6 +56,7 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             _oobValue = outOfBoundsValue;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void CopyRow(int row, T[] dest, int destStart)
         {
             _ValidateRow(row);
@@ -60,10 +65,14 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             if (targetRow < 0 ||
                 targetRow >= _target.Height)
             {
+#if true
+                Arrays.BuiltinArrayMethods.NoInline.ArrayFill(dest, _oobValue, destStart, _rect.Width);
+#else
                 for (int dx = 0; dx < _rect.Width; ++dx)
                 {
                     dest[destStart + dx] = _oobValue;
                 }
+#endif
                 return;
             }
             int targetRowStart = targetRow * _target.Width;
@@ -71,6 +80,24 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             int targetRight = _rect.Right;
             int targetLeftValid = Math.Max(targetLeft, 0);
             int targetRightValid = Math.Min(targetRight, _target.Width);
+#if true
+            Arrays.BuiltinArrayMethods.NoInline.ArrayFill(
+                dest, 
+                _oobValue, 
+                destStart, 
+                targetLeftValid - targetLeft);
+            System.Array.Copy(
+                _target.Data,
+                targetRowStart + targetLeftValid,
+                dest,
+                destStart + targetLeftValid - targetLeft,
+                targetRightValid - targetLeftValid);
+            Arrays.BuiltinArrayMethods.NoInline.ArrayFill(
+                dest,
+                _oobValue,
+                destStart + targetRightValid - targetLeft,
+                targetRight - targetRightValid);
+#else
             for (int targetX = targetLeft; targetX < targetLeftValid; ++targetX)
             {
                 dest[destStart + targetX - targetLeft] = _oobValue;
@@ -83,8 +110,10 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             {
                 dest[destStart + targetX - targetLeft] = _oobValue;
             }
+#endif
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void WriteRow(int row, T[] source, int sourceStart)
         {
             if (!CanWrite)
@@ -104,12 +133,22 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             int targetRight = _rect.Right;
             int targetLeftValid = Math.Max(targetLeft, 0);
             int targetRightValid = Math.Min(targetRight, _target.Width);
+#if true
+            System.Array.Copy(
+                source,
+                sourceStart + targetLeftValid - targetLeft,
+                _target.Data,
+                targetRowStart + targetLeftValid,
+                targetRightValid - targetLeftValid);
+#else
             for (int targetX = targetLeftValid; targetX < targetRightValid; ++targetX)
             {
                 _target.Data[targetRowStart + targetX] = source[sourceStart + targetX - targetLeft];
             }
+#endif
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void _CtorValidateTargetAndRect(IArrayBitmap<T> target, Rect rect, bool allowOutOfBounds)
         {
             if (target is null)
@@ -132,7 +171,6 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void _ValidateRow(int row)
         {
             if (row < 0 || row >= _rect.Height)
@@ -141,7 +179,6 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void _ValidateRowBuffer(T[] rowData, int rowDataStart)
         {
             int rowDataEnd = checked(rowDataStart + _rect.Width);

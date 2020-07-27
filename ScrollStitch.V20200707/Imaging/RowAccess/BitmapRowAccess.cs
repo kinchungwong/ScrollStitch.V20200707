@@ -51,11 +51,13 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 
         public bool CanWrite { get; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BitmapRowAccess(IArrayBitmap<T> target)
             : this(target, canWrite: false)
         {
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public BitmapRowAccess(IArrayBitmap<T> target, bool canWrite)
         {
             if (target is null)
@@ -66,19 +68,25 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             CanWrite = canWrite;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void CopyRow(int row, T[] dest, int destStart)
         {
             _ValidateRow(row);
-            _ValidateRowBuffer(dest, destStart);
+            _ValidateRowBuffer(dest, destStart, "dest");
             int targetWidth = _target.Width;
             var targetData = _target.Data;
             int targetRowStart = row * targetWidth;
+#if true
+            Array.Copy(targetData, targetRowStart, dest, destStart, targetWidth);
+#else
             for (int x = 0; x < targetWidth; ++x)
             {
                 dest[destStart + x] = targetData[targetRowStart + x];
             }
+#endif
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void WriteRow(int row, T[] source, int sourceStart)
         {
             if (!CanWrite)
@@ -86,14 +94,18 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
                 throw new InvalidOperationException();
             }
             _ValidateRow(row);
-            _ValidateRowBuffer(source, sourceStart);
+            _ValidateRowBuffer(source, sourceStart, "source");
             int targetWidth = _target.Width;
             var targetData = _target.Data;
             int targetRowStart = row * targetWidth;
+#if true
+            Array.Copy(source, sourceStart, targetData, targetRowStart, targetWidth);
+#else
             for (int x = 0; x < targetWidth; ++x)
             {
                 targetData[targetRowStart + x] = source[sourceStart + x];
             }
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,19 +113,36 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
         {
             if (row < 0 || row >= _target.Height)
             {
-                throw new ArgumentOutOfRangeException(nameof(row));
+                _ThrowArgumentOutOfRange(nameof(row));
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void _ValidateRowBuffer(T[] rowData, int rowDataStart)
+        private void _ValidateRowBuffer(T[] rowData, int rowDataStart, string name)
         {
+            if (_target.Width == 0)
+            {
+                return;
+            }
             int rowDataEnd = checked(rowDataStart + _target.Width);
             int rowDataLength = rowData?.Length ?? 0;
             if (rowDataEnd > rowDataLength)
             {
-                throw new IndexOutOfRangeException();
+                _ThrowIndexOutOfRange(name, rowDataEnd - 1);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void _ThrowArgumentOutOfRange(string name)
+        {
+            throw new ArgumentOutOfRangeException(name);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void _ThrowIndexOutOfRange(string name, int index)
+        {
+            throw new IndexOutOfRangeException(
+                message: $"Item index {name}[{index}] is out of range.");
         }
     }
 }
