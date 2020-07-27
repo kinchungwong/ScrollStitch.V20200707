@@ -68,6 +68,7 @@
     <Compile Include="Arrays\Array2Wrapper.cs" />
     <Compile Include="Arrays\ArrayCopyUtility.cs" />
     <Compile Include="Arrays\ArrayDimAdapter_2as1.cs" />
+    <Compile Include="Arrays\BuiltinArrayMethods.cs" />
     <Compile Include="Arrays\ArrayWrapper.cs" />
     <Compile Include="Arrays\IArray.cs" />
     <Compile Include="Arrays\IArray2.cs" />
