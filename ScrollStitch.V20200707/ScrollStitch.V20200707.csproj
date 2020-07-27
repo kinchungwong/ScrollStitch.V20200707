@@ -168,6 +168,7 @@
     <Compile Include="Tracking\BitFlagArith\BitFlagArith_UInt64.cs" />
     <Compile Include="Tracking\BitFlagArith\IBitFlagArith.cs" />
     <Compile Include="Tracking\Diagnostics\T3Diagnostics.cs" />
+    <Compile Include="Tracking\Diagnostics\T3UnmatchedContentRenderer.cs" />
     <Compile Include="Tracking\DiagViz\Diag_IPGM.cs" />
     <Compile Include="Tracking\FromTo.cs" />
     <Compile Include="Tracking\T3CellLabels.cs" />
