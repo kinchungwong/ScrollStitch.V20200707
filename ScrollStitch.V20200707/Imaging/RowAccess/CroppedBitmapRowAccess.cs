@@ -9,7 +9,43 @@ using System.Threading.Tasks;
 namespace ScrollStitch.V20200707.Imaging.RowAccess
 {
     using Data;
+    using static Specialized.SpecializedArrayMethods.NoInline;
+    using static Arrays.BuiltinArrayMethods.NoInline;
 
+    /// <summary>
+    /// <para>
+    /// This is a static class. To create an instance, use the generic <see cref="CroppedBitmapRowAccess{T}"/> 
+    /// class instead.
+    /// </para>
+    /// 
+    /// <para>
+    /// This static non-generic class only exists to allow a nested static class <see cref="DefaultSettings"/>
+    /// which allows new instances of <see cref="CroppedBitmapRowAccess{T}"/> to be created with certain
+    /// default settings. 
+    /// </para>
+    /// </summary>
+    public static class CroppedBitmapRowAccess
+    {
+        /// <summary>
+        /// Settings used to initialize every instance of <see cref="CroppedBitmapRowAccess{T}"/> created.
+        /// </summary>
+        public static class DefaultSettings
+        {
+            /// <inheritdoc cref="CroppedBitmapRowAccess{T}.RandomizeOutOfBoundValues"/>
+            /// 
+            public static bool RandomizeOutOfBoundValues { get; set; } = false;
+        }
+    }
+
+    /// <summary>
+    /// An implementation of the <see cref="IBitmapRowAccess{T}"/> interface which performs a
+    /// virtual "crop" of the underlying bitmap.
+    /// </summary>
+    /// 
+    /// <typeparam name="T">
+    /// The pixel type of the bitmap source.
+    /// </typeparam>
+    /// 
     public class CroppedBitmapRowAccess<T>
         : IBitmapRowAccess<T>
         where T : struct
@@ -34,18 +70,56 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 
         public bool CanWrite { get; }
 
+        /// <summary>
+        /// <para>
+        /// (Debug assistance feature.) <br/>
+        /// When this flag is set, attempts to copy out-of-bounds values from a target bitmap via 
+        /// <see cref="CopyRow(int, T[], int)"/> will result in those out-of-bounds pixels being
+        /// set to deterministically-generated pseudorandom values.
+        /// </para>
+        /// <para>
+        /// This flag defaults to false. When a new instance of <see cref="CroppedBitmapRowAccess{T}"/>
+        /// is created, its constructor copies the flag value from the 
+        /// <see cref="CroppedBitmapRowAccess.DefaultSettings"/> property of the same name.
+        /// </para>
+        /// </summary>
+        public bool RandomizeOutOfBoundValues 
+        { 
+            get; 
+            set; 
+        } = CroppedBitmapRowAccess.DefaultSettings.RandomizeOutOfBoundValues;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="rect"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect)
             : this(target, rect, canWrite: false, allowOutOfBounds: false)
         {
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="rect"></param>
+        /// <param name="canWrite"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect, bool canWrite)
             : this(target, rect, canWrite: canWrite, allowOutOfBounds: false)
         { 
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="rect"></param>
+        /// <param name="canWrite"></param>
+        /// <param name="allowOutOfBounds"></param>
+        /// <param name="outOfBoundsValue"></param>
         [MethodImpl(MethodImplOptions.NoInlining)]
         public CroppedBitmapRowAccess(IArrayBitmap<T> target, Rect rect, bool canWrite, bool allowOutOfBounds, T outOfBoundsValue = default)
         {
@@ -56,6 +130,8 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             _oobValue = outOfBoundsValue;
         }
 
+        /// <inheritdoc cref="IBitmapRowSource{T}.CopyRow(int, T[], int)"/>
+        /// 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void CopyRow(int row, T[] dest, int destStart)
         {
@@ -66,7 +142,13 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
                 targetRow >= _target.Height)
             {
 #if true
-                Arrays.BuiltinArrayMethods.NoInline.ArrayFill(dest, _oobValue, destStart, _rect.Width);
+                _StaticArrayFillImpl(
+                    array: dest, 
+                    value: _oobValue, 
+                    startIndex: destStart, 
+                    count: _rect.Width, 
+                    randomize: RandomizeOutOfBoundValues, 
+                    randomSeed: row);
 #else
                 for (int dx = 0; dx < _rect.Width; ++dx)
                 {
@@ -81,22 +163,29 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             int targetLeftValid = Math.Max(targetLeft, 0);
             int targetRightValid = Math.Min(targetRight, _target.Width);
 #if true
-            Arrays.BuiltinArrayMethods.NoInline.ArrayFill(
-                dest, 
-                _oobValue, 
-                destStart, 
-                targetLeftValid - targetLeft);
-            System.Array.Copy(
+            _StaticArrayFillImpl(
+                array: dest,
+                value: _oobValue,
+                startIndex: destStart,
+                count: targetLeftValid - targetLeft,
+                randomize: RandomizeOutOfBoundValues,
+                randomSeed: row);
+
+            Array.Copy(
                 _target.Data,
                 targetRowStart + targetLeftValid,
                 dest,
                 destStart + targetLeftValid - targetLeft,
                 targetRightValid - targetLeftValid);
-            Arrays.BuiltinArrayMethods.NoInline.ArrayFill(
-                dest,
-                _oobValue,
-                destStart + targetRightValid - targetLeft,
-                targetRight - targetRightValid);
+
+            _StaticArrayFillImpl(
+                array: dest,
+                value: _oobValue,
+                startIndex: destStart + targetRightValid - targetLeft,
+                count: targetRight - targetRightValid,
+                randomize: RandomizeOutOfBoundValues,
+                randomSeed: row);
+
 #else
             for (int targetX = targetLeft; targetX < targetLeftValid; ++targetX)
             {
@@ -113,6 +202,8 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 #endif
         }
 
+        /// <inheritdoc cref="IBitmapRowAccess{T}.WriteRow(int, T[], int)"/>
+        /// 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void WriteRow(int row, T[] source, int sourceStart)
         {
@@ -134,7 +225,7 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             int targetLeftValid = Math.Max(targetLeft, 0);
             int targetRightValid = Math.Min(targetRight, _target.Width);
 #if true
-            System.Array.Copy(
+            Array.Copy(
                 source,
                 sourceStart + targetLeftValid - targetLeft,
                 _target.Data,
@@ -146,6 +237,18 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
                 _target.Data[targetRowStart + targetX] = source[sourceStart + targetX - targetLeft];
             }
 #endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void _StaticArrayFillImpl(T[] array, T value, int startIndex, int count,
+            bool randomize, int randomSeed)
+        {
+            if (randomize && (array is int[] intArray))
+            {
+                ArrayFillNoise(intArray, randomSeed, startIndex, count);
+                return;
+            }
+            ArrayFill(array, value, startIndex, count);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
