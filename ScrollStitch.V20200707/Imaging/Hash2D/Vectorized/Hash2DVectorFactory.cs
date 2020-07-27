@@ -65,8 +65,7 @@ namespace ScrollStitch.V20200707.Imaging.Hash2D.Vectorized
                 ValidateElseThrow(sourceArray, sourceOffset, sourceCount);
                 int copyCount = Math.Min(sourceCount, Length);
 #if true
-                int bytesToCopy = copyCount * sizeof(int);
-                Buffer.BlockCopy(sourceArray, sourceOffset, buffer, 0, bytesToCopy);
+                Array.Copy(sourceArray, sourceOffset, buffer, 0, copyCount);
 #else
             for (int k = 0; k < copyCount; ++k)
             {
@@ -87,8 +86,7 @@ namespace ScrollStitch.V20200707.Imaging.Hash2D.Vectorized
                 ValidateElseThrow(destArray, destOffset, destCount);
                 int copyCount = Math.Min(destCount, Length);
 #if true
-                int bytesToCopy = copyCount * sizeof(int);
-                Buffer.BlockCopy(buffer, 0, destArray, destOffset, bytesToCopy);
+                Array.Copy(buffer, 0, destArray, destOffset, copyCount);
 #else
             for (int k = 0; k < copyCount; ++k)
             {
