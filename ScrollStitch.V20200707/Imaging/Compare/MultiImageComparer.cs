@@ -66,6 +66,8 @@ namespace ScrollStitch.V20200707.Imaging.Compare
         /// </summary>
         private bool UseParallel => false;
 
+        private bool CanUseParallel => BitmapSize.Height >= 256;
+
         /// <summary>
         /// Initializes <see cref="MultiImageComparer"/> with a reference bitmap and one or more target bitmaps.
         /// </summary>
@@ -103,7 +105,7 @@ namespace ScrollStitch.V20200707.Imaging.Compare
 
         public void Process()
         {
-            if (UseParallel)
+            if (UseParallel && CanUseParallel)
             {
                 Process_Parallel();
             }
