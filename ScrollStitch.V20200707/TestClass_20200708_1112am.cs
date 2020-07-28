@@ -107,25 +107,8 @@ namespace ScrollStitch.V20200707
         public TestClass_20200708_1112am(string[] args)
         {
             var config = TestClassConfig.DefaultInstance;
-            var testSets = config.TestSets;
-            var currentTestSet = config.CurrentTestSet;
-            var testSet = testSets.Find((ts) => ts.Name.Equals(currentTestSet.TestSetName));
-            var testSetEnum = new TestSetEnumeratedFiles(testSet);
-            testSetEnum.EnumerateFiles();
-            if (currentTestSet.Items?.Items?.Count > 0)
-            {
-                List<int> indexList = new List<int>(currentTestSet.Items.Enumerate());
-                List<string> selectedFiles = new List<string>();
-                foreach (int index in indexList)
-                {
-                    selectedFiles.Add(testSetEnum.Files[index]);
-                }
-                TestSet = selectedFiles;
-            }
-            else
-            {
-                TestSet = testSetEnum.Files.ToList();
-            }
+            var testSet = new TestSetEnumeratedFiles(config);
+            TestSet = testSet.EnumerateFiles();
             // ======
             InputFileBlobs.FactoryFunc = _LoadInputBlob;
             // ======
