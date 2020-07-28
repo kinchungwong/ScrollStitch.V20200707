@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrollStitch.V20200707.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,12 @@ namespace ScrollStitch.V20200707.Config.Data
     {
         public string TestSetName { get; set; }
 
-        public int Take { get; set; }
+        public IntegerExpandList Items { get; set; }
 
         public CurrentTestSet()
         {
-            Take = int.MaxValue;
+            // Do not assign Items by default.
+            // Where Items is null, the entire list of files should be used.
         }
     }
 }

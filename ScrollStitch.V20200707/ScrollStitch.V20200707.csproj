@@ -89,11 +89,15 @@
     <Compile Include="Collections\Specialized\ITable.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Config\ConfigVariableSubstitutions.cs" />
+    <Compile Include="Config\Data\ColonDelimitedNonEscaping.cs" />
+    <Compile Include="Config\Data\CommaDelimitedNonEscaping.cs" />
     <Compile Include="Config\Data\CurrentTestSet.cs" />
     <Compile Include="Config\Data\FilterList.cs" />
     <Compile Include="Config\Data\FilterListFlags.cs" />
     <Compile Include="Config\Data\Hash2DPass.cs" />
     <Compile Include="Config\Data\Hash2DSpec.cs" />
+    <Compile Include="Config\Data\IntegerExpandList.cs" />
+    <Compile Include="Config\Data\IntegerFirstLastSkip.cs" />
     <Compile Include="Config\Data\TestSet.cs" />
     <Compile Include="Config\Data\TestSetEnumeratedFiles.cs" />
     <Compile Include="Config\TestClassConfig.cs" />

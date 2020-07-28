@@ -9,6 +9,7 @@ using System.Xml;
 namespace ScrollStitch.V20200707.Config
 {
     using Data;
+    using ScrollStitch.V20200707.Data;
 
     public class TestClassConfig
     {
@@ -71,12 +72,25 @@ namespace ScrollStitch.V20200707.Config
         public void _ParseCurrentTestSet()
         {
             XmlNode currentTestSetNode = _xmlDoc.SelectSingleNode("//CurrentTestSet");
-            string currentTestSetName = currentTestSetNode.SelectSingleNode("TestSetName").Attributes["name"].Value;
-            string strTakeMaybe = currentTestSetNode.SelectSingleNode("Take")?.Attributes["value"]?.Value;
+            string currentTestSetName = currentTestSetNode.SelectSingleNode("TestSetName").InnerText;
+            string itemsTextMaybe = currentTestSetNode.SelectSingleNode("Items")?.InnerText;
+            IntegerExpandList items = null;
+            if (!string.IsNullOrEmpty(itemsTextMaybe))
+            {
+                bool parseOk = IntegerExpandList.TryParse(itemsTextMaybe, out items);
+                if (!parseOk)
+                {
+                    items = null;
+                }
+                if (items.Items?.Count == 0)
+                {
+                    items = null;
+                }
+            }
             CurrentTestSet = new CurrentTestSet()
             { 
                 TestSetName = currentTestSetName,
-                Take = (string.IsNullOrEmpty(strTakeMaybe) ? int.MaxValue : int.Parse(strTakeMaybe))
+                Items = items
             };
         }
 

@@ -28,6 +28,18 @@
         <FilterItem>17.01.50.489pm</FilterItem>
       </FilterList>
     </TestSet>
+    <!--<TestSet>
+      <Name>zzdk0hpa.xhf</Name>
+      <LocalPath>$(UserProfile)\Screenshots\2020.07.24\2020.07.24_02.52_zzdk0hpa.xhf</LocalPath>
+    </TestSet>-->
+    <!--<TestSet>
+      <Name>kk245i1l.0jk</Name>
+      <LocalPath>$(UserProfile)\Screenshots\2020.07.27\2020.07.27_20.12_kk245i1l.0jk</LocalPath>
+    </TestSet>-->
+    <!--<TestSet>
+      <Name>qaz5yzrm.2gu</Name>
+      <LocalPath>$(UserProfile)\Screenshots\2020.07.28\2020.07.28_01.39_qaz5yzrm.2gu</LocalPath>
+    </TestSet>-->
   </TestSets>
   <Hash2DSpecs>
     <Hash2DSpec>
@@ -42,7 +54,15 @@
     </Hash2DSpec>
   </Hash2DSpecs>
   <CurrentTestSet>
-    <TestSetName name="Run_1"/>
-    <Take value="50"/>
+    <TestSetName>Run_1</TestSetName>
+    <Items>0:49</Items>
   </CurrentTestSet>
+  <!--<CurrentTestSet>
+    <TestSetName>kk245i1l.0jk</TestSetName>
+    <Items>137:145</Items>
+  </CurrentTestSet>-->
+  <!--<CurrentTestSet>
+    <TestSetName>qaz5yzrm.2gu</TestSetName>
+    <Items>48:81</Items>
+  </CurrentTestSet>-->
 </TestClassConfig>
