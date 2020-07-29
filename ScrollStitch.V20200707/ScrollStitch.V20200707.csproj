@@ -158,6 +158,7 @@
     <Compile Include="Spatial\PointTree.cs" />
     <Compile Include="Spatial\RectList.cs" />
     <Compile Include="Spatial\RectTreeUtility.cs" />
+    <Compile Include="Text\CharArrayFilterUtility.cs" />
     <Compile Include="Text\IntegerBaseFormatter.cs" />
     <Compile Include="Text\IStringBuilder.cs" />
     <Compile Include="Text\IMultiLineTextOutput.cs" />
