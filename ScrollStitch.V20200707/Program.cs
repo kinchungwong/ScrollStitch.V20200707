@@ -44,6 +44,17 @@ namespace ScrollStitch.V20200707
                 Console.ReadLine();
                 return;
             }
+            if (true) 
+            {
+                // TODO this will be moved inside the class.
+                string keyName = "Imaging.RowAccess.CroppedBitmapRowAccess.DefaultSettings.RandomizeOutOfBoundValues";
+                var kvp = Config.TestClassConfig.DefaultInstance.DevelopmentSwitches.Find((_) => _.Key.Equals(keyName));
+                if (!(kvp.Key is null) &&
+                    bool.TryParse(kvp.Value, out bool boolValue))
+                {
+                    Imaging.RowAccess.CroppedBitmapRowAccess.DefaultSettings.RandomizeOutOfBoundValues = boolValue;
+                }
+            }
             try
             {
 #if true

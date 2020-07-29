@@ -30,6 +30,8 @@ namespace ScrollStitch.V20200707.Config
 
         public List<ClassParallelPermission> ClassParallelPermissions { get; set; }
 
+        public List<KeyValuePair<string, string>> DevelopmentSwitches { get; set; }
+
         public TestClassConfig()
         {
             _LoadXml();
@@ -37,6 +39,7 @@ namespace ScrollStitch.V20200707.Config
             _ParseCurrentTestSet();
             _ParseHash2DSpecs();
             _ParseClassParallelPermissions();
+            _ParseDevelopmentSwitches();
             _Cleanup();
         }
 
@@ -141,6 +144,28 @@ namespace ScrollStitch.V20200707.Config
                     string strProblem = Text.CharArrayFilterUtility.RemoveControlAndHighChars(permNode.InnerText);
                     Logging.Sinks.LogMemorySink.DefaultInstance.Add(DateTime.Now, 
                         "CONFIG WARNING: Cannot parse " + strProblem);
+                }
+            }
+        }
+
+        public void _ParseDevelopmentSwitches()
+        {
+            DevelopmentSwitches = new List<KeyValuePair<string, string>>();
+            XmlNodeList nodeList = _xmlDoc.SelectNodes("//DevelopmentSwitches/KeyValuePair");
+            foreach (XmlNode node in nodeList)
+            {
+                var keyAttr = node.Attributes["Key"];
+                var valueAttr = node.Attributes["Value"];
+                if (keyAttr is null ||
+                    valueAttr is null)
+                {
+                    string strProblem = Text.CharArrayFilterUtility.RemoveControlAndHighChars(node.InnerText);
+                    Logging.Sinks.LogMemorySink.DefaultInstance.Add(DateTime.Now,
+                        "CONFIG WARNING: Cannot parse " + strProblem);
+                }
+                else
+                {
+                    DevelopmentSwitches.Add(new KeyValuePair<string, string>(keyAttr.Value, valueAttr.Value));
                 }
             }
         }

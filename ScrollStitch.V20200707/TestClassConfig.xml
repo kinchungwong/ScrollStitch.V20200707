@@ -88,4 +88,7 @@
       </NormalProfile>
     </ClassParallelPermission>
   </ClassParallelPermissions>
+  <DevelopmentSwitches>
+    <KeyValuePair Key="Imaging.RowAccess.CroppedBitmapRowAccess.DefaultSettings.RandomizeOutOfBoundValues" Value="true" />
+  </DevelopmentSwitches>
 </TestClassConfig>
