@@ -28,12 +28,15 @@ namespace ScrollStitch.V20200707.Config
         public CurrentTestSet CurrentTestSet { get; set; }
         public List<Hash2DSpec> Hash2DSpecs { get; set; }
 
+        public List<ClassParallelPermission> ClassParallelPermissions { get; set; }
+
         public TestClassConfig()
         {
             _LoadXml();
             _ParseTestSets();
             _ParseCurrentTestSet();
             _ParseHash2DSpecs();
+            _ParseClassParallelPermissions();
             _Cleanup();
         }
 
@@ -120,6 +123,25 @@ namespace ScrollStitch.V20200707.Config
                     spec.Passes.Add(pass);
                 }
                 Hash2DSpecs.Add(spec);
+            }
+        }
+
+        public void _ParseClassParallelPermissions()
+        {
+            ClassParallelPermissions = new List<ClassParallelPermission>();
+            XmlNodeList permNodeList = _xmlDoc.SelectNodes("//ClassParallelPermissions/ClassParallelPermission");
+            foreach (XmlNode permNode in permNodeList)
+            {
+                if (ClassParallelPermission.TryParseXml(permNode, out var perm))
+                {
+                    ClassParallelPermissions.Add(perm);
+                }
+                else
+                {
+                    string strProblem = Text.CharArrayFilterUtility.RemoveControlAndHighChars(permNode.InnerText);
+                    Logging.Sinks.LogMemorySink.DefaultInstance.Add(DateTime.Now, 
+                        "CONFIG WARNING: Cannot parse " + strProblem);
+                }
             }
         }
 

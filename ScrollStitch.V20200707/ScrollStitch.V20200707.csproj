@@ -89,6 +89,8 @@
     <Compile Include="Collections\Specialized\ITable.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Config\ConfigVariableSubstitutions.cs" />
+    <Compile Include="Config\Data\ClassParallelPermission.cs" />
+    <Compile Include="Config\Data\ClassParallelPermissionProfile.cs" />
     <Compile Include="Config\Data\ColonDelimitedNonEscaping.cs" />
     <Compile Include="Config\Data\CommaDelimitedNonEscaping.cs" />
     <Compile Include="Config\Data\CurrentTestSet.cs" />
