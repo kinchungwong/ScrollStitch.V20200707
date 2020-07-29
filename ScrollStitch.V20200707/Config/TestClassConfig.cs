@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
 namespace ScrollStitch.V20200707.Config
 {
     using Data;
-    using ScrollStitch.V20200707.Data;
 
     public class TestClassConfig
     {
-        private static Lazy<TestClassConfig> _StaticLazy = 
+        private static Lazy<TestClassConfig> _StaticLazy =
             new Lazy<TestClassConfig>(
                 () => new TestClassConfig());
 
@@ -28,7 +28,7 @@ namespace ScrollStitch.V20200707.Config
         public CurrentTestSet CurrentTestSet { get; set; }
         public List<Hash2DSpec> Hash2DSpecs { get; set; }
 
-        public List<ClassParallelPermission> ClassParallelPermissions { get; set; }
+        public Dictionary<string, ClassParallelPermission> ClassParallelPermissions { get; set; }
 
         public List<KeyValuePair<string, string>> DevelopmentSwitches { get; set; }
 
@@ -94,7 +94,7 @@ namespace ScrollStitch.V20200707.Config
                 }
             }
             CurrentTestSet = new CurrentTestSet()
-            { 
+            {
                 TestSetName = currentTestSetName,
                 Items = items
             };
@@ -131,21 +131,40 @@ namespace ScrollStitch.V20200707.Config
 
         public void _ParseClassParallelPermissions()
         {
-            ClassParallelPermissions = new List<ClassParallelPermission>();
+            ClassParallelPermissions = new Dictionary<string, ClassParallelPermission>();
             XmlNodeList permNodeList = _xmlDoc.SelectNodes("//ClassParallelPermissions/ClassParallelPermission");
             foreach (XmlNode permNode in permNodeList)
             {
                 if (ClassParallelPermission.TryParseXml(permNode, out var perm))
                 {
-                    ClassParallelPermissions.Add(perm);
+                    ClassParallelPermissions.Add(perm.ClassName, perm);
                 }
                 else
                 {
                     string strProblem = Text.CharArrayFilterUtility.RemoveControlAndHighChars(permNode.InnerText);
-                    Logging.Sinks.LogMemorySink.DefaultInstance.Add(DateTime.Now, 
+                    Logging.Sinks.LogMemorySink.DefaultInstance.Add(DateTime.Now,
                         "CONFIG WARNING: Cannot parse " + strProblem);
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the parallel permission profile for the specified class name and the current thread.
+        /// 
+        /// <para>
+        /// Important: thread-specific behavior. <br/>
+        /// This method returns one of the several profiles depending on the caller's thread.
+        /// </para>
+        /// </summary>
+        /// <param name="className"></param>
+        /// <returns></returns>
+        public ClassParallelPermissionProfile GetParallelPermissionProfileForCurrentClassAndThread(string className)
+        {
+            if (!ClassParallelPermissions.TryGetValue(className, out var perm))
+            {
+                return null;
+            }
+            return Thread.CurrentThread.IsThreadPoolThread ? perm.ThreadPoolProfile : perm.NormalProfile;
         }
 
         public void _ParseDevelopmentSwitches()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Imaging.Compare
@@ -13,6 +14,8 @@ namespace ScrollStitch.V20200707.Imaging.Compare
     using IntRgbx = ColorUtility.IntRgbx;
     using ColorInt = ColorUtility.ColorInt;
     using SourceList = Collections.UniformSizeRowSourceList<int>;
+    using TestClassConfig = Config.TestClassConfig;
+    using ClassParallelPermissionProfile = Config.Data.ClassParallelPermissionProfile;
 
     /// <summary>
     /// Compares one reference bitmap against a list of target bitmaps, and produces an output bitmap
@@ -21,6 +24,16 @@ namespace ScrollStitch.V20200707.Imaging.Compare
     /// </summary>
     public class MultiImageComparer
     {
+        public static class Config
+        {
+            public static readonly string KeyName = "Imaging.Compare.MultiImageComparer";
+
+            public static ClassParallelPermissionProfile GetParallelPermissionProfileForCurrentThread()
+            {
+                return TestClassConfig.DefaultInstance.GetParallelPermissionProfileForCurrentClassAndThread(KeyName);
+            }
+        }
+
         /// <summary>
         /// The size of bitmaps.
         /// </summary>
@@ -61,12 +74,14 @@ namespace ScrollStitch.V20200707.Imaging.Compare
         public IntBitmap NearestDifferenceBitmap { get; private set; }
 
         /// <summary>
-        /// Experimental feature. <br/>
-        /// DO NOT set to true, except during development testing.
+        /// Use parallel processing if allowed by config and work size.
+        /// 
+        /// <para>
+        /// To see the XML config key name that controls this feature, navigate to the source code of 
+        /// <see cref="Config.KeyName"/>.
+        /// </para>
         /// </summary>
-        private bool UseParallel => false;
-
-        private bool CanUseParallel => BitmapSize.Height >= 256;
+        public bool TryUseParallel { get; set; } = true;
 
         /// <summary>
         /// Initializes <see cref="MultiImageComparer"/> with a reference bitmap and one or more target bitmaps.
@@ -105,9 +120,9 @@ namespace ScrollStitch.V20200707.Imaging.Compare
 
         public void Process()
         {
-            if (UseParallel && CanUseParallel)
+            if (TryUseParallel && _ShouldUseParallel(out int approxStripCount))
             {
-                Process_Parallel();
+                Process_Parallel(approxStripCount);
             }
             else
             {
@@ -122,10 +137,10 @@ namespace ScrollStitch.V20200707.Imaging.Compare
             _ProcessRowRange(fullRowRange);
         }
 
-        private void Process_Parallel()
+        private void Process_Parallel(int approxStripCount)
         {
             Size size = BitmapSize;
-            var subdiv = Spatial.AxisSubdivFactory.CreateNearlyUniform(size.Height, 16);
+            var subdiv = Spatial.AxisSubdivFactory.CreateNearlyUniform(size.Height, approxStripCount);
             var ranges = subdiv.Ranges;
             int rangeCount = ranges.Count;
             Task[] tasks = new Task[rangeCount];
@@ -284,6 +299,33 @@ namespace ScrollStitch.V20200707.Imaging.Compare
                 }
                 os.Array[os.Offset + index] = bestColorDiff;
             }
+        }
+
+        private bool _ShouldUseParallel(out int approxStripCount)
+        {
+            approxStripCount = 1;
+            var profile = Config.GetParallelPermissionProfileForCurrentThread();
+            if (profile is null ||
+                !profile.UseParallel)
+            {
+                return false;
+            }
+            long workSize = BitmapSize.Width * BitmapSize.Height;
+            if (profile.MinWorkSizePerPartition.HasValue &&
+                profile.MinWorkSizePerPartition.Value >= 1)
+            {
+                if (workSize < 2 * profile.MinWorkSizePerPartition)
+                {
+                    return false;
+                }
+                approxStripCount = (int)Math.Round((double)workSize / profile.MinWorkSizePerPartition.Value);
+            }
+            if (profile.MaxWorkPartitionCount.HasValue &&
+                profile.MaxWorkPartitionCount.Value >= 1)
+            {
+                approxStripCount = Math.Min(approxStripCount, profile.MaxWorkPartitionCount.Value);
+            }
+            return (approxStripCount >= 2);
         }
 
         private static void _ValidateNotNull<T>(T arg, string paramName)
