@@ -27,6 +27,25 @@ namespace ScrollStitch.V20200707
         {
             try
             {
+                // ======
+                // Trigger config parsing.
+                // Must happen at beginning of Application Main.
+                // Not having a valid config will cause everything, including self-care 
+                // (e.g. error logging) to fail, or failure to cleanly shutdown.
+                // ======
+                var _ = Config.TestClassConfig.DefaultInstance; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Exception during configuration parsing.");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("Execution finished. Press enter key to terminate.");
+                Console.ReadLine();
+                return;
+            }
+            try
+            {
 #if true
                 new TestClass_20200708_1112am(args).Run();
 #endif
