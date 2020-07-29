@@ -65,4 +65,27 @@
     <TestSetName>qaz5yzrm.2gu</TestSetName>
     <Items>48:81</Items>
   </CurrentTestSet>-->
+  <ClassParallelPermissions>
+    <ClassParallelPermission>
+      <ClassName>Imaging.Hash2D.Hash2DProcessor</ClassName>
+      <NormalProfile>
+        <UseParallel>true</UseParallel>
+        <WorkSizeUnit>Pixels</WorkSizeUnit>
+        <MinWorkSizePerPartition>32768</MinWorkSizePerPartition>
+        <MaxWorkPartitionCount>32</MaxWorkPartitionCount>
+      </NormalProfile>
+      <ThreadPoolProfile>
+        <UseParallel>false</UseParallel>
+      </ThreadPoolProfile>
+    </ClassParallelPermission>
+    <ClassParallelPermission>
+      <ClassName>Imaging.Compare.MultiImageComparer</ClassName>
+      <NormalProfile>
+        <UseParallel>true</UseParallel>
+        <WorkSizeUnit>Pixels</WorkSizeUnit>
+        <MinWorkSizePerPartition>262144</MinWorkSizePerPartition>
+        <MaxWorkPartitionCount>4</MaxWorkPartitionCount>
+      </NormalProfile>
+    </ClassParallelPermission>
+  </ClassParallelPermissions>
 </TestClassConfig>
