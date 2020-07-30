@@ -73,7 +73,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Invoke<FuncType>(FuncType func)
-            where FuncType : struct, IFunc, IFunc<FuncType, int, int, int>
+            where FuncType : struct, IFuncInline, IFuncInline<FuncType>, IFuncInline<FuncType, int, int, int>
         {
             if (_hasDegreeCheck)
             {
@@ -101,7 +101,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void InvokeSector<FuncType>(FuncType func)
-            where FuncType : struct, IFunc, IFunc<FuncType, int, int, int>
+            where FuncType : struct, IFuncInline, IFuncInline<FuncType>, IFuncInline<FuncType, int, int, int>
         {
             int y2 = 0;
             for (int y = 0; y < _radiusMax; ++y)
@@ -125,7 +125,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void InvokeWithRadius<FuncType>(FuncType func)
-            where FuncType : struct, IFunc, IFunc<FuncType, int, int, int>
+            where FuncType : struct, IFuncInline, IFuncInline<FuncType>, IFuncInline<FuncType, int, int, int>
         {
             int y2 = 0;
             for (int y = 0; y < _radiusMax; ++y)
@@ -153,7 +153,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void InvokeWithDegree<FuncType>(FuncType func)
-            where FuncType : struct, IFunc, IFunc<FuncType, int, int, int>
+            where FuncType : struct, IFuncInline, IFuncInline<FuncType>, IFuncInline<FuncType, int, int, int>
         {
             int y2 = 0;
             for (int y = 0; y < _radiusMax; ++y)
@@ -191,7 +191,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void InvokeWithRadiusAndDegree<FuncType>(FuncType func)
-            where FuncType : struct, IFunc, IFunc<FuncType, int, int, int>
+            where FuncType : struct, IFuncInline, IFuncInline<FuncType>, IFuncInline<FuncType, int, int, int>
         {
             int y2 = 0;
             for (int y = 0; y < _radiusMax; ++y)

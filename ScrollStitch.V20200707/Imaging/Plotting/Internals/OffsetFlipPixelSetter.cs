@@ -11,7 +11,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
     using ScrollStitch.V20200707.Data;
 
     public struct OffsetFlipPixelSetter
-        : IFunc<OffsetFlipPixelSetter, int, int, int>
+        : IFuncInline<OffsetFlipPixelSetter, int, int, int>
     {
         private readonly int[] _array;
         private readonly int _width;

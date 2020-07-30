@@ -11,7 +11,7 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
     using ScrollStitch.V20200707.Data;
 
     public struct PixelSetter
-        : IFunc<PixelSetter, int, int, int>
+        : IFuncInline<PixelSetter, int, int, int>
     {
         private readonly int[] _array;
         private readonly int _width;

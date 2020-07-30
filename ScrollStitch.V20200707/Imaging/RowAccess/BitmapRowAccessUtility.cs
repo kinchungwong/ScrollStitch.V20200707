@@ -101,7 +101,7 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 
         public static void Modify<T, TFunc>(IBitmapRowSource<T> source, IBitmapRowAccess<T> dest, TFunc modifyFunc)
             where T : struct
-            where TFunc : struct, IFunc, IFunc<TFunc, T, T>
+            where TFunc : struct, IFuncInline, IFuncInline<TFunc>, IFuncInline<TFunc, T, T>
         {
             _ValidateSourceDest(source, dest);
             int width = source.Width;

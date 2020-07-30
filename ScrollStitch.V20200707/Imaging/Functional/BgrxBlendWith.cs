@@ -15,7 +15,7 @@ namespace ScrollStitch.V20200707.Imaging.Functional
     using ScrollStitch.V20200707.Functional;
 
     public struct BgrxBlendWith
-        : IFunc<BgrxBlendWith, int, int, int>
+        : IFuncInline<BgrxBlendWith, int, int, int>
     {
         private const int _denomBits = 16;
         private const int _halfDenomBits = _denomBits - 1;

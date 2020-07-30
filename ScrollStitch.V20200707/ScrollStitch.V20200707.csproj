@@ -110,7 +110,7 @@
     <Compile Include="Data\Range.cs" />
     <Compile Include="Data\Rect.cs" />
     <Compile Include="Data\Size.cs" />
-    <Compile Include="Functional\IFunc.cs" />
+    <Compile Include="Functional\IFuncInline.cs" />
     <Compile Include="HashCode\HashCodeBuilder.cs" />
     <Compile Include="ImageManager.cs" />
     <Compile Include="Imaging\BitmapCopyUtility.cs" />
