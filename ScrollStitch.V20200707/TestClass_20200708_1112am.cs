@@ -32,6 +32,7 @@ namespace ScrollStitch.V20200707
         public const bool Verbose = true;
         public const bool ShouldReadFromKeyboard = true;
         public const double HashPointSampleRate = 0.05;
+        public readonly Size T3MainApproxGridSize = new Size(128, 32);
         #endregion
 
         #region diagnstics flags
@@ -39,9 +40,11 @@ namespace ScrollStitch.V20200707
         public const bool ShouldPrintArrayPoolDiagnostics = true;
         public const bool ShouldPrintLogging = true;
         public const bool ShouldPrintThreeImageTrajectoryDiagnostics = true;
+        public const bool ShouldRunT3UnmatchedContentRenderer = false;
         public const bool ShouldSaveT3UnmatchedContentRenderer = false;
         public const bool ShouldT3RenderCellFlags = false;
         public const bool ShouldPrintLongRangeHashPoints = true;
+        public const bool ShouldPauseAfterEachPrint = false;
         #endregion
 
         /// <summary>
@@ -101,6 +104,12 @@ namespace ScrollStitch.V20200707
             set;
         } = new ItemFactory<ImagePairMovement>();
 
+        public ItemFactory<T3Main> T3MainClasses
+        {
+            get => ImageManager.T3MainClasses;
+            set => ImageManager.T3MainClasses = value;
+        }
+
 #if true
         public HashSet<int> HasSavedDiagnostics { get; private set; } = new HashSet<int>();
         public HashSet<int> HasSavedIPGM { get; private set; } = new HashSet<int>();
@@ -124,6 +133,8 @@ namespace ScrollStitch.V20200707
             InputHashPoints.FactoryFunc = _ComputeHashPoints;
             // ======
             ImagePairMovements.FactoryFunc = _ComputeTwoImageMovements;
+            // ======
+            T3MainClasses.FactoryFunc = _ComputeT3Main;
             // ======
             ImageManager.LongRangeHashPoints.ImageSizes = new ItemSource<Size>(ImageManager.ImageSizes);
             ImageManager.LongRangeHashPoints.ImageHashPointSource = ImageManager.InputHashPoints;
@@ -203,6 +214,39 @@ namespace ScrollStitch.V20200707
                 twoImageMovement.Process();
                 return twoImageMovement;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private T3Main _ComputeT3Main(int imageIndex)
+        {
+            if (imageIndex < 2)
+            {
+                return null;
+            }
+            var imageKeys = new UniqueList<int>(new int[]
+            {
+                imageIndex - 2, imageIndex - 1, imageIndex
+            });
+            int mainImageKey = imageIndex;
+            var threshold = new T3ClassifierThreshold()
+            {
+            };
+            // ====== Ensure all dependencies are pre-fetched ======
+            using (var timer = new MethodTimer($"{GetType().Name}.{nameof(_ComputeT3Main)}.Prefetch({imageIndex})"))
+            {
+                foreach (int imageKey in imageKeys)
+                {
+                    ImageManager.InputHashPoints.Get(imageKey);
+                }
+            }
+            // ====== Actual computation of T3Main ======
+            T3Main t3Main;
+            using (var timer = new MethodTimer($"{GetType().Name}.{nameof(_ComputeT3Main)}({imageIndex})"))
+            {
+                t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, T3MainApproxGridSize);
+                t3Main.Process();
+            }
+            return t3Main;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -288,10 +332,11 @@ namespace ScrollStitch.V20200707
                 var shortName = Path.GetFileNameWithoutExtension(TestSet[imageIndex]);
                 Console.WriteLine($"Image [{imageIndex}] {shortName}");
             }
-            using (var timer = new MethodTimer())
+            using (var timer = new MethodTimer($"{GetType().Name}.{nameof(Run)}(imageIndex = {imageIndex})"))
             {
                 InputHashPoints.Get(imageIndex);
                 //ImagePairMovements.Get(imageIndex);
+                T3MainClasses.Get(imageIndex);
             }
             Run_TrajectoryThree(imageIndex);
             Run_LongRangeHashPoints(imageIndex);
@@ -304,66 +349,67 @@ namespace ScrollStitch.V20200707
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Run_TrajectoryThree(int imageIndex)
         {
-            if (imageIndex < 2)
+            // Triggers the actual computation.
+            T3Main t3Main = ImageManager.T3MainClasses.Get(imageIndex);
+            if (t3Main is null)
             {
                 return;
             }
-            var imageKeys = new UniqueList<int>(new int[]
-            {
-                imageIndex - 2, imageIndex - 1, imageIndex
-            });
-            int mainImageKey = imageIndex;
-            var threshold = new T3ClassifierThreshold()
-            { 
-            };
-            var approxCellSize = new Size(64, 64);
-            //var approxCellSize = new Size(32, 32);
-            //var approxCellSize = new Size(128, 32);
-            T3Main t3Main;
-            using (var timer = new MethodTimer($"{nameof(Run_TrajectoryThree)}(imageIndex = {imageIndex})"))
-            {
-                t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, approxCellSize);
-                t3Main.Process();
-            }
+            var imageKeys = t3Main.ImageKeys;
+            var mainImageKey = t3Main.MainImageKey;
+            var mainImageSize = t3Main.MainImageSize;
+            var mainGrid = t3Main.MainGrid;
             var mlto = new MultiLineTextOutput();
+            T3Diagnostics t3diag = null;
             if (ShouldPrintThreeImageTrajectoryDiagnostics)
             {
-                var t3diag = new T3Diagnostics(t3Main, T3Diagnostics.Stage.Second);
+                t3diag = new T3Diagnostics(t3Main, T3Diagnostics.Stage.Second);
                 mlto.AppendLine(new string('-', 76));
                 t3diag.ReportMovementStats(mlto);
                 mlto.AppendLine(new string('-', 76));
-                if (ShouldT3RenderCellFlags)
+            }
+            if (ShouldT3RenderCellFlags && !(t3diag is null))
+            {
+                t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
+                mlto.AppendLine(new string('-', 76));
+            }
+            string EnsureOutputFolderCreated()
+            {
+                var outFolder_0 = Path.Combine(
+                    ConfigVariableSubstitutions.DefaultInstance.Process(@"$(UserProfile)\Screenshots\Logs_20200727"),
+                    TestClassConfig.DefaultInstance.CurrentTestSet.TestSetName + "_" +
+                    ConfigVariableSubstitutions.DefaultInstance.Process(@"$(StartTimeMsecs)"));
+                if (!Directory.Exists(outFolder_0))
                 {
-                    t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
-                    mlto.AppendLine(new string('-', 76));
+                    Directory.CreateDirectory(outFolder_0);
                 }
+                return outFolder_0;
+            }
+            string outFolder = null;
+            T3UnmatchedContentRenderer umcr = null;
+            IntBitmap umcrBitmap = null;
+            if (ShouldRunT3UnmatchedContentRenderer)
+            {
+                umcr = new T3UnmatchedContentRenderer(t3Main);
+                umcrBitmap = umcr.Render();
+            }
+            if (ShouldSaveT3UnmatchedContentRenderer && !(umcrBitmap is null))
+            {
+                outFolder = EnsureOutputFolderCreated();
+                var shortName = Path.GetFileNameWithoutExtension(TestSet[imageIndex - 1]);
+                umcrBitmap.SaveToFile(Path.Combine(outFolder, $"UMCR_{imageIndex}_{shortName}.png"));
+            }
+            if (!(umcrBitmap is null))
+            {
+                umcrBitmap.Dispose();
             }
             mlto.ToConsole();
             bool hasPrintedSomething = mlto.LineCount > 0;
-            if (ShouldReadFromKeyboard && hasPrintedSomething)
+            if (ShouldReadFromKeyboard && ShouldPauseAfterEachPrint && hasPrintedSomething)
             {
                 Console.WriteLine("Press enter key to continue...");
                 Console.ReadLine();
                 Console.WriteLine(new string('-', 76));
-            }
-            if (ShouldSaveT3UnmatchedContentRenderer)
-            {
-                T3UnmatchedContentRenderer umcr = new T3UnmatchedContentRenderer(t3Main);
-                IntBitmap umcrBitmap = umcr.Render();
-                if (true)
-                {
-                    var shortName = Path.GetFileNameWithoutExtension(TestSet[imageIndex - 1]);
-                    var outFolder = Path.Combine(
-                        ConfigVariableSubstitutions.DefaultInstance.Process(@"$(UserProfile)\Screenshots\Logs_20200727"),
-                        TestClassConfig.DefaultInstance.CurrentTestSet.TestSetName + "_" +
-                        ConfigVariableSubstitutions.DefaultInstance.Process(@"$(StartTimeMsecs)"));
-                    if (!Directory.Exists(outFolder))
-                    {
-                        Directory.CreateDirectory(outFolder);
-                    }
-                    umcrBitmap.SaveToFile(Path.Combine(outFolder, $"UMCR_{imageIndex}_{shortName}.png"));
-                }
-                umcrBitmap.Dispose();
             }
         }
 
@@ -387,7 +433,7 @@ namespace ScrollStitch.V20200707
             }
             mlto.ToConsole();
             bool hasPrintedSomething = mlto.LineCount > 0;
-            if (ShouldReadFromKeyboard && hasPrintedSomething)
+            if (ShouldReadFromKeyboard && ShouldPauseAfterEachPrint && hasPrintedSomething)
             {
                 Console.WriteLine("Press enter key to continue...");
                 Console.ReadLine();

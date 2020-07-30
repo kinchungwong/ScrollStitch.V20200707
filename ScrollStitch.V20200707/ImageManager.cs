@@ -54,6 +54,11 @@ namespace ScrollStitch.V20200707
         public Dictionary<FromTo, ImageMovementGrid> ImageMovementGrids { get; set; } = new Dictionary<FromTo, ImageMovementGrid>();
 
         /// <summary>
+        /// The collection of three-image trajectory (T3) main classes
+        /// </summary>
+        public ItemFactory<T3Main> T3MainClasses { get; set; } = new ItemFactory<T3Main>();
+
+        /// <summary>
         /// A further-subsampled list of hash points obtained from each image.
         /// </summary>
         public LongRangeHashPoints LongRangeHashPoints { get; set; } = new LongRangeHashPoints();
