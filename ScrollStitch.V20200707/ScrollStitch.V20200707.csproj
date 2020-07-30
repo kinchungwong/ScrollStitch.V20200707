@@ -77,6 +77,7 @@
     <Compile Include="Bitwise\BitwiseUtility.cs" />
     <Compile Include="Caching\IItemSource.cs" />
     <Compile Include="Caching\ItemSource.cs" />
+    <Compile Include="Collections\ReadOnlyEnumerableCollection.cs" />
     <Compile Include="Collections\ReadOnlyUtility.cs" />
     <Compile Include="Collections\Specialized\Histogram.cs" />
     <Compile Include="Collections\Specialized\IHistogram.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Compare\MultiImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
+    <Compile Include="Imaging\Hash2D\ImageHashPoint.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DSingleRow.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DVector.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DVectorFactory.cs" />

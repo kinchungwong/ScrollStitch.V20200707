@@ -1,5 +1,4 @@
-﻿using ScrollStitch.V20200707.Data;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Imaging.Hash2D
 {
+    using Data;
+    using V20200707.Collections;
+
     public class ImageHashPointList 
         : IReadOnlyList<HashPoint>
     {
@@ -48,6 +50,27 @@ namespace ScrollStitch.V20200707.Imaging.Hash2D
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)HashPoints).GetEnumerator();
+        }
+
+        public IReadOnlyCollection<ImageHashPoint> AsImageHashPoints()
+        {
+            IEnumerable<ImageHashPoint> EnumeratorFunc()
+            {
+                for (int k = 0; k < Count; ++k)
+                {
+                    var hp = HashPoints[k];
+                    yield return new ImageHashPoint(ImageIndex, hp.HashValue, hp.Point);
+                }
+            }
+            return new ReadOnlyEnumerableCollection<ImageHashPoint>(Count, EnumeratorFunc());
+        }
+
+        public List<ImageHashPoint> ToImageHashPointList()
+        {
+            var imageHashPoints = AsImageHashPoints();
+            List<ImageHashPoint> list = new List<ImageHashPoint>(capacity: imageHashPoints.Count);
+            list.AddRange(imageHashPoints);
+            return list;
         }
     }
 }
