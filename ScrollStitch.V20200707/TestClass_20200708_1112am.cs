@@ -39,6 +39,9 @@ namespace ScrollStitch.V20200707
         public const bool ShouldPrintArrayPoolDiagnostics = true;
         public const bool ShouldPrintLogging = true;
         public const bool ShouldPrintThreeImageTrajectoryDiagnostics = true;
+        public const bool ShouldSaveT3UnmatchedContentRenderer = false;
+        public const bool ShouldT3RenderCellFlags = false;
+        public const bool ShouldPrintLongRangeHashPoints = true;
         #endregion
 
         /// <summary>
@@ -121,6 +124,9 @@ namespace ScrollStitch.V20200707
             InputHashPoints.FactoryFunc = _ComputeHashPoints;
             // ======
             ImagePairMovements.FactoryFunc = _ComputeTwoImageMovements;
+            // ======
+            ImageManager.LongRangeHashPoints.ImageSizes = new ItemSource<Size>(ImageManager.ImageSizes);
+            ImageManager.LongRangeHashPoints.ImageHashPointSource = ImageManager.InputHashPoints;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -288,6 +294,7 @@ namespace ScrollStitch.V20200707
                 //ImagePairMovements.Get(imageIndex);
             }
             Run_TrajectoryThree(imageIndex);
+            Run_LongRangeHashPoints(imageIndex);
             //Run_ThreeImageMovementFilter(imageIndex);
             //Run_MultiImageTracking(imageIndex);
             //Run_IPGM(imageIndex);
@@ -318,22 +325,73 @@ namespace ScrollStitch.V20200707
                 t3Main = new T3Main(ImageManager, imageKeys, mainImageKey, threshold, approxCellSize);
                 t3Main.Process();
             }
+            var mlto = new MultiLineTextOutput();
             if (ShouldPrintThreeImageTrajectoryDiagnostics)
             {
                 var t3diag = new T3Diagnostics(t3Main, T3Diagnostics.Stage.Second);
-                var mlto = new MultiLineTextOutput();
                 mlto.AppendLine(new string('-', 76));
                 t3diag.ReportMovementStats(mlto);
                 mlto.AppendLine(new string('-', 76));
-                t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
-                mlto.AppendLine(new string('-', 76));
-                mlto.ToConsole();
-                if (ShouldReadFromKeyboard)
+                if (ShouldT3RenderCellFlags)
                 {
-                    Console.WriteLine("Press enter key to continue...");
-                    Console.ReadLine();
-                    Console.WriteLine(new string('-', 76));
+                    t3diag.RenderCellFlags(mlto, IntegerBaseFormatter.Constants.RFC1924);
+                    mlto.AppendLine(new string('-', 76));
                 }
+            }
+            mlto.ToConsole();
+            bool hasPrintedSomething = mlto.LineCount > 0;
+            if (ShouldReadFromKeyboard && hasPrintedSomething)
+            {
+                Console.WriteLine("Press enter key to continue...");
+                Console.ReadLine();
+                Console.WriteLine(new string('-', 76));
+            }
+            if (ShouldSaveT3UnmatchedContentRenderer)
+            {
+                T3UnmatchedContentRenderer umcr = new T3UnmatchedContentRenderer(t3Main);
+                IntBitmap umcrBitmap = umcr.Render();
+                if (true)
+                {
+                    var shortName = Path.GetFileNameWithoutExtension(TestSet[imageIndex - 1]);
+                    var outFolder = Path.Combine(
+                        ConfigVariableSubstitutions.DefaultInstance.Process(@"$(UserProfile)\Screenshots\Logs_20200727"),
+                        TestClassConfig.DefaultInstance.CurrentTestSet.TestSetName + "_" +
+                        ConfigVariableSubstitutions.DefaultInstance.Process(@"$(StartTimeMsecs)"));
+                    if (!Directory.Exists(outFolder))
+                    {
+                        Directory.CreateDirectory(outFolder);
+                    }
+                    umcrBitmap.SaveToFile(Path.Combine(outFolder, $"UMCR_{imageIndex}_{shortName}.png"));
+                }
+                umcrBitmap.Dispose();
+            }
+        }
+
+        public void Run_LongRangeHashPoints(int imageIndex)
+        {
+            using (var timer = new MethodTimer($"{nameof(Run_LongRangeHashPoints)}(imageIndex = {imageIndex})"))
+            {
+                ImageManager.LongRangeHashPoints.ProcessImage(imageIndex);
+            }
+            var mlto = new MultiLineTextOutput();
+            if (ShouldPrintLongRangeHashPoints)
+            {
+                int count = ImageManager.LongRangeHashPoints.LongRangeHashPointList.Count;
+                int uniqueCount = ImageManager.LongRangeHashPoints.HashValuePresence.Count;
+                int repeatCount = ImageManager.LongRangeHashPoints.HashValueRepeatCount;
+                mlto.AppendLine(
+                    $"LongRangeHashPoints[{imageIndex}] = (" + 
+                    $"Count = {count}, " + 
+                    $"UniqueCount = {uniqueCount}, " + 
+                    $"RepeatCount = {repeatCount})");   
+            }
+            mlto.ToConsole();
+            bool hasPrintedSomething = mlto.LineCount > 0;
+            if (ShouldReadFromKeyboard && hasPrintedSomething)
+            {
+                Console.WriteLine("Press enter key to continue...");
+                Console.ReadLine();
+                Console.WriteLine(new string('-', 76));
             }
         }
 
