@@ -465,7 +465,7 @@ namespace ScrollStitch.V20200707
                 return;
             }
             InputFileBlobs.Remove(imageIndex);
-            InputColorBitmaps.Remove(imageIndex);
+            InputColorBitmaps.Remove(imageIndex - 3);
             InputHashBitmaps.Remove(imageIndex - 3);
             InputHashPoints.Remove(imageIndex - 3);
         }
