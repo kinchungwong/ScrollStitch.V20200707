@@ -104,9 +104,13 @@ namespace ScrollStitch.V20200707.Functional
     /// 
     public interface IFuncInline<TImpl, TResult>
         : IFuncInline<TImpl>
-        where TImpl: struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<TResult>
+        where TImpl: struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, TResult>
     {
-        TResult Invoke();
+        #region inherited from IFunc<TResult>
+        // Because of CS0108, the function signature which is found on IFunc<TResult> need not be repeated here.
+        // TResult Invoke();
+        #endregion
     }
 
     /// <summary>
@@ -125,43 +129,67 @@ namespace ScrollStitch.V20200707.Functional
     /// 
     public interface IFuncInline<TImpl, T1, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, TResult>
     {
-        TResult Invoke(T1 t1);
+        #region inherited from IFunc<T1, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1);
+        #endregion
     }
 
     public interface IFuncInline<TImpl, T1, T2, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, T2, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, T2, TResult>
     {
-        TResult Invoke(T1 t1, T2 t2);
+        #region inherited from IFunc<T1, T2, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, T2, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1, T2 t2);
+        #endregion
     }
 
     public interface IFuncInline<TImpl, T1, T2, T3, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, T2, T3, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, T2, T3, TResult>
     {
-        TResult Invoke(T1 t1, T2 t2, T3 t3);
+        #region inherited from IFunc<T1, T2, T3, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, T2, T3, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1, T2 t2, T3 t3);
+        #endregion
     }
 
     public interface IFuncInline<TImpl, T1, T2, T3, T4, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, T2, T3, T4, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, T2, T3, T4, TResult>
     {
-        TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4);
+        #region inherited from IFunc<T1, T2, T3, T4, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, T2, T3, T4, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4);
+        #endregion
     }
 
     public interface IFuncInline<TImpl, T1, T2, T3, T4, T5, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, T2, T3, T4, T5, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, T2, T3, T4, T5, TResult>
     {
-        TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
+        #region inherited from IFunc<T1, T2, T3, T4, T5, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, T2, T3, T4, T5, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
+        #endregion
     }
 
     public interface IFuncInline<TImpl, T1, T2, T3, T4, T5, T6, TResult>
         : IFuncInline<TImpl>
-        where TImpl : struct, IFuncInline, IFuncInline<TImpl>
+        , IFunc<T1, T2, T3, T4, T5, T6, TResult>
+        where TImpl : struct, IFuncInline, IFuncInline<TImpl>, IFuncInline<TImpl, T1, T2, T3, T4, T5, T6, TResult>
     {
-        TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6);
+        #region inherited from IFunc<T1, T2, T3, T4, T5, T6, TResult>
+        // Because of CS0108, the function signature which is found on IFunc<T1, T2, T3, T4, T5, T6, TResult> need not be repeated here.
+        //TResult Invoke(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6);
+        #endregion
     }
 }
