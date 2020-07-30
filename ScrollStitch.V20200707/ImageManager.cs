@@ -52,5 +52,10 @@ namespace ScrollStitch.V20200707
         /// The collection of 
         /// </summary>
         public Dictionary<FromTo, ImageMovementGrid> ImageMovementGrids { get; set; } = new Dictionary<FromTo, ImageMovementGrid>();
+
+        /// <summary>
+        /// A further-subsampled list of hash points obtained from each image.
+        /// </summary>
+        public LongRangeHashPoints LongRangeHashPoints { get; set; } = new LongRangeHashPoints();
     }
 }
