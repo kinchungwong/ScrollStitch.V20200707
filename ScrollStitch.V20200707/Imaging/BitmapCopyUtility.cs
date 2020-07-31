@@ -40,6 +40,14 @@ namespace ScrollStitch.V20200707.Imaging
             }
         }
 
+        public static IntBitmap CropRect(IntBitmap source, Rect sourceRect)
+        {
+            _ValidateRectInSizeElseThrow(source.Size, sourceRect);
+            IntBitmap dest = new IntBitmap(sourceRect.Size);
+            CopyRect(source, sourceRect, dest, Point.Origin);
+            return dest;
+        }
+
         public static IntBitmap Clone(IntBitmap source)
         {
             int width = source.Width;
