@@ -32,5 +32,25 @@ namespace ScrollStitch.V20200707.Collections.Specialized
         Dictionary<TKey, TBin> ToDictionary();
 
         List<KeyValuePair<TKey, TBin>> ToList();
+
+        /// <summary>
+        /// Returns the histogram key(s) which receive the highest votes.
+        /// 
+        /// Return a list of <see cref="KeyValuePair"/> containing the highest voted histogram keys.
+        /// </summary>
+        /// 
+        /// <returns>
+        /// A list of <see cref="KeyValuePair{TKey, TValue}"/>. 
+        /// <br/>
+        /// If the histogram is empty, an empty list is returned. 
+        /// <br/>
+        /// If there is one histogram key with the highest vote, a list containing that key and vote 
+        /// is returned. 
+        /// <br/>
+        /// If there are multiple histogram keys that tie for the highest vote, a list containing 
+        /// such keys and their votes is returned.
+        /// </returns>
+        ///
+        List<KeyValuePair<TKey, TBin>> GetPeaks();
     }
 }

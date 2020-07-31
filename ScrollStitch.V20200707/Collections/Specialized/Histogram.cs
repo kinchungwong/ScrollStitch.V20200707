@@ -121,6 +121,30 @@ namespace ScrollStitch.V20200707.Collections.Specialized
             return list;
         }
 
+        public List<KeyValuePair<TKey, TBin>> GetPeaks()
+        {
+            var list = new List<KeyValuePair<TKey, TBin>>();
+            void func(TKey key, TBin value)
+            {
+                int compareResult = 0;
+                if (list.Count > 0)
+                {
+                    TBin listValue = list[0].Value;
+                    compareResult = Comparer<TBin>.Default.Compare(value, listValue);
+                }
+                if (compareResult > 0)
+                {
+                    list.Clear();
+                }
+                if (compareResult >= 0)
+                {
+                    list.Add(new KeyValuePair<TKey, TBin>(key, value));
+                }
+            }
+            ForEach(func);
+            return list;
+        }
+
         public IEnumerator<KeyValuePair<TKey, TBin>> GetEnumerator()
         {
             return ToList().GetEnumerator();
