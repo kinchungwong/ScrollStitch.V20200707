@@ -132,11 +132,14 @@
     <Compile Include="Imaging\Hash2D\Vectorized\IHash2DVector.cs" />
     <Compile Include="Imaging\Hash2D\Hash2DProcessorFactory.cs" />
     <Compile Include="Imaging\Plotting\AnnulusSector.cs" />
+    <Compile Include="Imaging\Plotting\CircleCmd.cs" />
     <Compile Include="Imaging\Plotting\FilledCircle.cs" />
     <Compile Include="Imaging\Plotting\Internals\AnnulusSectorQuadrantLoop.cs" />
     <Compile Include="Imaging\Plotting\Internals\OffsetFlipPixelHalfMixer.cs" />
     <Compile Include="Imaging\Plotting\Internals\OffsetFlipPixelSetter.cs" />
     <Compile Include="Imaging\Plotting\Internals\PixelSetter.cs" />
+    <Compile Include="Imaging\Plotting\Internals\QuadrantArcPointGenerator.cs" />
+    <Compile Include="Imaging\Plotting\Internals\QuadrantPixelSetter.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />

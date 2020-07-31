@@ -29,9 +29,13 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.Internals
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Invoke(int x, int y)
         {
-            if (unchecked((uint)x < (uint)_width && (uint)y < (uint)_height))
+            int index = y * _width + x;
+            if (unchecked(
+                (uint)x < (uint)_width && 
+                (uint)y < (uint)_height &&
+                (uint)index < (uint)_array.Length))
             {
-                _array[y * _width + x] = _colorValue;
+                _array[index] = _colorValue;
             }
             return 0;
         }
