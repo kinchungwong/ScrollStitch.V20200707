@@ -69,6 +69,12 @@ namespace ScrollStitch.V20200707.Data
             return !r1.Equals(r2);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Contains(int value)
+        {
+            return (value >= Start && value < Stop);
+        }
+
         public override string ToString()
         {
             return $"(Range start={Start} stop={Stop})";
