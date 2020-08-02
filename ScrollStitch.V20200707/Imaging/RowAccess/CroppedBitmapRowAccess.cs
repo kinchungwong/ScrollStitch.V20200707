@@ -182,13 +182,16 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             int targetLeftValid = Math.Max(targetLeft, 0);
             int targetRightValid = Math.Min(targetRight, _target.Width);
 #if true
-            _StaticArrayFillImpl(
-                array: dest,
-                value: _oobValue,
-                startIndex: destStart,
-                count: targetLeftValid - targetLeft,
-                randomize: RandomizeOutOfBoundValues,
-                randomSeed: row);
+            if (targetLeftValid - targetLeft > 0)
+            {
+                _StaticArrayFillImpl(
+                    array: dest,
+                    value: _oobValue,
+                    startIndex: destStart,
+                    count: targetLeftValid - targetLeft,
+                    randomize: RandomizeOutOfBoundValues,
+                    randomSeed: row);
+            }
 
             Array.Copy(
                 _target.Data,
@@ -197,13 +200,16 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
                 destStart + targetLeftValid - targetLeft,
                 targetRightValid - targetLeftValid);
 
-            _StaticArrayFillImpl(
-                array: dest,
-                value: _oobValue,
-                startIndex: destStart + targetRightValid - targetLeft,
-                count: targetRight - targetRightValid,
-                randomize: RandomizeOutOfBoundValues,
-                randomSeed: row);
+            if (targetRight - targetRightValid > 0)
+            {
+                _StaticArrayFillImpl(
+                    array: dest,
+                    value: _oobValue,
+                    startIndex: destStart + targetRightValid - targetLeft,
+                    count: targetRight - targetRightValid,
+                    randomize: RandomizeOutOfBoundValues,
+                    randomSeed: row);
+            }
 
 #else
             for (int targetX = targetLeft; targetX < targetLeftValid; ++targetX)
