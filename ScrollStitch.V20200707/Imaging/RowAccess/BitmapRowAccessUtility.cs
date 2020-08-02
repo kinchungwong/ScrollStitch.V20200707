@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -101,7 +102,7 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
 
         public static void Modify<T, TFunc>(IBitmapRowSource<T> source, IBitmapRowAccess<T> dest, TFunc modifyFunc)
             where T : struct
-            where TFunc : struct, IFuncInline, IFuncInline<TFunc>, IFuncInline<TFunc, T, T>
+            where TFunc : struct, IFuncInline<TFunc, T, T>
         {
             _ValidateSourceDest(source, dest);
             int width = source.Width;
@@ -118,17 +119,74 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
             }
         }
 
-        public static void Blend(IBitmapRowSource<int> source, IBitmapRowAccess<int> dest, double destFrac)
+        /// <summary>
+        /// Modifies the destination bitmap rows using a function that takes both source and dest
+        /// bitmap pixels as input.
+        /// 
+        /// <para>
+        /// For each row and column to be processed, the source pixel and the dest pixel will be passed 
+        /// into the function, and the function's output will be written to the destination bitmap.
+        /// </para>
+        /// 
+        /// <para>
+        /// This function is designed to facilitate inlining during JIT code generation. Refer to the
+        /// documentation for the <paramref name="blendFunc"/> for correct usage.
+        /// </para>
+        /// 
+        /// <para>
+        /// See also: <br/>
+        /// ... <see cref="IFunc{T, T, T}"/> <br/>
+        /// ... <see cref="IFunc{T, T, T}.Invoke(T, T)"/> <br/>
+        /// ... <see cref="IFuncInline{TFunc, T, T, T}"/> <br/>
+        /// ... <see cref="MethodImplAttribute"/> <br/>
+        /// ... <see cref="MethodImplOptions.AggressiveInlining"/> <br/>
+        /// </para>
+        /// </summary>
+        /// 
+        /// <typeparam name="T">
+        /// The bitmap pixel type. This method requires the source and dest bitmaps to have the same type.
+        /// </typeparam>
+        /// <typeparam name="TFunc">
+        /// The concrete type of the pixel-blending function.
+        /// </typeparam>
+        /// <param name="source">
+        /// The source bitmap rows.
+        /// </param>
+        /// <param name="dest">
+        /// The destination bitmap rows.
+        /// </param>
+        /// 
+        /// <param name="blendFunc">
+        /// An instance of the pixel-blending functor.
+        /// 
+        /// <para>
+        /// The function must implement <see cref="IFuncInline{TFunc, T, T, T}"/>, and must contain
+        /// an <c>Invoke</c> method with the following signature:
+        /// </para>
+        /// 
+        /// <para>
+        /// <c>int Invoke(int sourcePixelValue, int destPixelValue)</c>
+        /// </para>
+        /// 
+        /// <para>
+        /// For best performance, it is recommended to mark the <c>Invoke</c> method as <c>AggressiveInlining</c>.
+        /// </para>
+        /// 
+        /// <para>
+        /// If the functor has no state and can be parameterless constructed, the caller may use 
+        /// <see langword="default"/> to avoid having to instantiate one.
+        /// </para>
+        /// </param>
+        /// 
+        public static void Blend<T, TFunc>(IBitmapRowSource<T> source, IBitmapRowAccess<T> dest, TFunc blendFunc)
+            where T : struct
+            where TFunc : struct, IFuncInline<TFunc, T, T, T>
         {
-            var blendFunc = new BgrxBlendWith()
-            {
-                Frac = destFrac
-            };
             _ValidateSourceDest(source, dest);
             int width = source.Width;
             int height = source.Height;
-            int[] sourceBuffer = new int[width];
-            int[] destBuffer = new int[width];
+            T[] sourceBuffer = new T[width];
+            T[] destBuffer = new T[width];
             for (int row = 0; row < height; ++row)
             {
                 source.CopyRow(row, sourceBuffer, 0);
@@ -139,6 +197,15 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
                 }
                 dest.WriteRow(row, destBuffer, 0);
             }
+        }
+
+        public static void Blend(IBitmapRowSource<int> source, IBitmapRowAccess<int> dest, double destFrac)
+        {
+            var blendFunc = new BgrxBlendWith()
+            {
+                Frac = destFrac
+            };
+            Blend(source, dest, blendFunc);
         }
 
         private static void _ValidateSourceDest<T>(IBitmapRowSource<T> source, IBitmapRowAccess<T> dest)
