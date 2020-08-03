@@ -122,19 +122,44 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
             }
         }
 
-        public static Range CharRange { get; } = new Range(32, 128);
+        /// <summary>
+        /// <para>
+        /// Remark. Some applications do not handle char 127 correctly. 
+        /// Therefore, we had to exclude char 127 from the CharRange. The 
+        /// CharRange is therefore from 32 to 126 inclusive.
+        /// </para>
+        /// 
+        /// <para>
+        /// During some troubleshooting scenarios, allowing the blank (char 32) 
+        /// in the CharRange will increase the difficulty by triggering some sanity checks.
+        /// Therefore, we simply exclude them for now.
+        /// </para>
+        /// </summary>
+        public static Range CharRange { get; } = new Range(33, 127);
 
         public static int CoreRowCount => 6;
 
         public static int CoreColumnCount => 16;
 
+        public static int CoreShuffleSeed => 12345678;
+
+        public static char CoreFillChar => '+';
+
+        public static char PaddedCornerMarker => '+';
+
+        public static char PaddedMarginMarker => '+';
+
         public static readonly Lazy<CoreCharArrayInfo> CoreInfoLazy =
             new Lazy<CoreCharArrayInfo>(() =>
             {
-                return new CoreCharArrayInfo(
+                var coreInfo = new CoreCharArrayInfo(
                     CharRange, 
                     rowCount: CoreRowCount, 
-                    columnCount: CoreColumnCount);
+                    columnCount: CoreColumnCount,
+                    fillChar: CoreFillChar,
+                    shuffleSeed: CoreShuffleSeed);
+                coreInfo.Process();
+                return coreInfo;
             });
 
         public static CoreCharArrayInfo CoreInfo => CoreInfoLazy.Value;
@@ -142,7 +167,12 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
         public static readonly Lazy<PaddedCharArrayInfo> PaddedInfoLazy =
             new Lazy<PaddedCharArrayInfo>(() =>
             {
-                return new PaddedCharArrayInfo(CoreInfo);
+                var paddedInfo = new PaddedCharArrayInfo(
+                    CoreInfo,
+                    cornerMarker: PaddedCornerMarker,
+                    marginMarker: PaddedMarginMarker);
+                paddedInfo.Process();
+                return paddedInfo;
             });
 
         public static PaddedCharArrayInfo PaddedInfo => PaddedInfoLazy.Value;

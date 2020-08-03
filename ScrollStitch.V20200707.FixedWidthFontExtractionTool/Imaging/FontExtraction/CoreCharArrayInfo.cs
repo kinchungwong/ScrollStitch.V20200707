@@ -48,7 +48,11 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
 
         public char[,] CharArray { get; }
 
-        public CoreCharArrayInfo(Range charRange, int rowCount, int columnCount)
+        public int? ShuffleSeed { get; }
+
+        public char FillChar { get; }
+
+        public CoreCharArrayInfo(Range charRange, int rowCount, int columnCount, char fillChar = ' ', int? shuffleSeed = null)
         {
             if (rowCount < 1)
             {
@@ -67,14 +71,49 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
             RowCount = rowCount;
             ColumnCount = columnCount;
             CharArray = new char[rowCount, columnCount];
-            for (int row = 0; row < rowCount; ++row)
+            ShuffleSeed = shuffleSeed;
+            FillChar = fillChar;
+        }
+
+        public void Process()
+        {
+            int rows = RowCount;
+            int cols = ColumnCount;
+            int cellCount = rows * cols;
+            char[] cs = new char[cellCount];
+            for (int charOffset = 0; charOffset < cellCount; ++charOffset)
             {
-                for (int col = 0; col < columnCount; ++col)
+                cs[charOffset] = 
+                    (charOffset < CharRange.Count) 
+                    ? (char)(charOffset + CharRange.Start) 
+                    : FillChar;
+            }
+            if (ShuffleSeed.HasValue)
+            {
+                _Shuffle(cs, ShuffleSeed.Value);
+            }
+            for (int row = 0; row < rows; ++row)
+            {
+                for (int col = 0; col < cols; ++col)
                 {
-                    int offset = row * columnCount + col;
-                    int charValue = charRange.Start + offset;
-                    char c = (charValue < charRange.Stop) ? (char)charValue : ' ';
-                    CharArray[row, col] = c;
+                    int charOffset = row * cols + col;
+                    CharArray[row, col] = cs[charOffset];
+                }
+            }
+        }
+
+        private static void _Shuffle(char[] cs, int seed)
+        {
+            var random = new Random(seed);
+            int length = cs.Length;
+            for (int ko = 1; ko < length; ++ko)
+            {
+                int ki = random.Next(ko + 1);
+                if (ki != ko)
+                {
+                    char swap = cs[ki];
+                    cs[ki] = cs[ko];
+                    cs[ko] = swap;
                 }
             }
         }

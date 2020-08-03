@@ -52,9 +52,13 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
 
         public int ColumnCount { get; }
 
-        public char[,] CharArray { get; }
+        public char CornerMarker { get; }
 
-        public PaddedCharArrayInfo(CoreCharArrayInfo coreInfo)
+        public char MarginMarker { get; }
+
+        public char[,] CharArray { get; private set; }
+
+        public PaddedCharArrayInfo(CoreCharArrayInfo coreInfo, char cornerMarker = '+', char marginMarker = ' ')
         {
             if (coreInfo is null)
             {
@@ -63,6 +67,12 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
             CoreInfo = coreInfo;
             RowCount = CoreInfo.RowCount + PaddingThickness * 2;
             ColumnCount = CoreInfo.ColumnCount + PaddingThickness * 2;
+            CornerMarker = cornerMarker;
+            MarginMarker = marginMarker;
+        }
+
+        public void Process()
+        {
             CharArray = new char[RowCount, ColumnCount];
             bool CheckIsPaddingRow(int row) => (row == 0 || row == RowCount - 1);
             bool CheckIsPaddingCol(int col) => (col == 0 || col == ColumnCount - 1);
@@ -72,13 +82,15 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
                 for (int col = 0; col < ColumnCount; ++col)
                 {
                     bool padC = CheckIsPaddingCol(col);
-                    if (padR && padC)
+                    bool isCorner = padR && padC;
+                    bool isMargin = !isCorner && (padR || padC);
+                    if (isCorner)
                     {
-                        CharArray[row, col] = '+';
+                        CharArray[row, col] = CornerMarker;
                     }
-                    else if (padR || padC)
+                    else if (isMargin)
                     {
-                        CharArray[row, col] = ' ';
+                        CharArray[row, col] = MarginMarker;
                     }
                     else
                     {
