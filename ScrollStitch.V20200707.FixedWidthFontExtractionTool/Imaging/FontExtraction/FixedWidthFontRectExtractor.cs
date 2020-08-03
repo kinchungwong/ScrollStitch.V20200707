@@ -328,7 +328,7 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
                 {
                     int x = rect.X + dx;
                     var point = new Point(x, y);
-                    var color = CharTableBitmap[point];
+                    var color = bitmap[point];
                     if (color != background)
                     {
                         rowColoredCounts[dy] += 1;
