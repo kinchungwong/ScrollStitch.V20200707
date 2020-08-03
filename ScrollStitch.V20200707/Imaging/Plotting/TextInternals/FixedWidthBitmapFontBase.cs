@@ -16,9 +16,23 @@ namespace ScrollStitch.V20200707.Imaging.Plotting.TextInternals
 
         public Range CharRange { get; protected set; }
 
-        public IntBitmap SingleColumnImage => _SingleColumnImageFunc();
+        public IntBitmap SingleColumnImage => _SingleColumnImageLazy.Value;
+
+        protected Lazy<IntBitmap> _SingleColumnImageLazy { get; }
 
         protected Func<IntBitmap> _SingleColumnImageFunc { get; set; }
+
+        protected FixedWidthBitmapFontBase()
+        {
+            // ====== Reminder ======
+            // The property _SingleColumnImageFunc is typically not assigned at construction time.
+            // Therefore, the only way to correctly capture access to a valid function, 
+            // is to capture the class instance itself, and then to access the function via the
+            // captured class instance.
+            // ======
+            var capturedThis = this;
+            _SingleColumnImageLazy = new Lazy<IntBitmap>(() => capturedThis._SingleColumnImageFunc());
+        }
 
         public Rect GetRectForChar(int charValue)
         {
