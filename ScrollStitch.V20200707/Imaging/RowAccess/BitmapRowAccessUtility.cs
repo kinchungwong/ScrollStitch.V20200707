@@ -34,12 +34,24 @@ namespace ScrollStitch.V20200707.Imaging.RowAccess
         public static IBitmapRowAccess<T> WrapRead<T>(IArrayBitmap<T> bitmap, Rect rect)
             where T : struct
         {
+            if (rect.Left == 0 &&
+                rect.Top == 0 &&
+                rect.Size.Equals(bitmap.Size))
+            {
+                return new BitmapRowAccess<T>(bitmap, canWrite: false);
+            }
             return new CroppedBitmapRowAccess<T>(bitmap, rect, canWrite: false, allowOutOfBounds: false);
         }
 
         public static IBitmapRowAccess<T> WrapWrite<T>(IArrayBitmap<T> bitmap, Rect rect)
             where T : struct
         {
+            if (rect.Left == 0 &&
+                rect.Top == 0 &&
+                rect.Size.Equals(bitmap.Size))
+            {
+                return new BitmapRowAccess<T>(bitmap, canWrite: true);
+            }
             return new CroppedBitmapRowAccess<T>(bitmap, rect, canWrite: true, allowOutOfBounds: false);
         }
 
