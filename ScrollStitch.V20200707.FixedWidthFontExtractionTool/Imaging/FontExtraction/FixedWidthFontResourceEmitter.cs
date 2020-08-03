@@ -41,6 +41,8 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
 
         public string EncodedBase64 { get; private set; }
 
+        public string CodeFragment { get; private set; }
+
         public FixedWidthFontResourceEmitter(FixedWidthFontRectExtractor rectExtractor)
         {
             RectExtractor = rectExtractor;
@@ -53,6 +55,7 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
             _GenerateImage();
             _EncodeImageFileBytes();
             _EncodeBase64String();
+            _GenerateCodeFragment();
         }
 
         private void _FindCharValueRects()
@@ -114,6 +117,16 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
             EncodedBase64 = Convert.ToBase64String(ImageFileBytes, 0, ImageFileBytes.Length);
         }
 
+        private void _GenerateCodeFragment()
+        {
+            int charWidth = UniformCharCropSize.Width;
+            int charHeight = UniformCharCropSize.Height;
+            string uniqueID = _ComputeMD5(ImageFileBytes).Substring(0, 8);
+            string fontClassName = $"FixedWidthFont_{charWidth}x{charHeight}_{uniqueID}";
+            var fragment = new FixedWidthBitmapFontCodeFragment(fontClassName, UniformCharCropSize, CharRange, EncodedBase64);
+            CodeFragment = fragment.Generate();
+        }
+
         private void _FillBackgroundColor(IntBitmap dest)
         {
             BuiltinArrayMethods.NoInline.ArrayFill(SingleColumnImage.Data, BackgroundColor, 0, SingleColumnImage.Data.Length);
@@ -134,6 +147,18 @@ namespace ScrollStitch.V20200707.Imaging.FontExtraction
             }
             RowCount = rectRows;
             ColumnCount = rectCols;
+        }
+
+        private static string _ComputeMD5(byte[] bytes)
+        {
+            var md5 = System.Security.Cryptography.MD5.Create();
+            byte[] hashBytes = md5.ComputeHash(bytes);
+            string hashHex = string.Empty;
+            foreach (var b in hashBytes)
+            {
+                hashHex += b.ToString("x2");
+            }
+            return hashHex;
         }
     }
 }

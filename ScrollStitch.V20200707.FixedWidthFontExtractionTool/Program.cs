@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
 
     public class Program
     {
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void PrintHelp(string[] args)
         {
             Console.WriteLine(new string('-', 76));
@@ -74,6 +76,7 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
         };
 #endif
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Main(string[] args)
         {
             if (!(InjectedArguments is null))
@@ -168,6 +171,7 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
 
         public static CharArrayFormatter CharArrayFormatter => CharArrayFormatterLazy.Value;
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void PrintTemplate(string[] args)
         {
             var formatter = CharArrayFormatter;
@@ -191,6 +195,7 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void ProcessImage(string[] args)
         {
             string screenshotFilename = args[1];
@@ -228,9 +233,8 @@ namespace ScrollStitch.V20200707.FixedWidthFontExtractionTool
             emitter.SingleColumnImage.SaveToFile(outputBitmapFilename);
             Console.WriteLine("Writing Base64-encoded string to: " + outputBase64Filename);
             File.WriteAllText(outputBase64Filename, emitter.EncodedBase64);
-            // ====== TODO ======
-            // Implement saving C# code fragment to outputCodeFragmentFilename.
-            // ======
+            Console.WriteLine("Writing source code fragment to: " + outputCodeFragmentFilename);
+            File.WriteAllText(outputCodeFragmentFilename, emitter.CodeFragment);
         }
     }
 }

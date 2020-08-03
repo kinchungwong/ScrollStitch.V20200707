@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Imaging\FontExtraction\FixedWidthBitmapFontCodeFragment.cs" />
     <Compile Include="Imaging\FontExtraction\FixedWidthFontRectExtractor.cs" />
     <Compile Include="Imaging\FontExtraction\FixedWidthFontResourceEmitter.cs" />
     <Compile Include="Text\ICharArray.cs" />
