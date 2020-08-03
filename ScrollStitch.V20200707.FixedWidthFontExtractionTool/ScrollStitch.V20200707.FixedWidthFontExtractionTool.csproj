@@ -48,6 +48,7 @@
     <Compile Include="Imaging\FontExtraction\FixedWidthBitmapFontCodeFragment.cs" />
     <Compile Include="Imaging\FontExtraction\FixedWidthFontRectExtractor.cs" />
     <Compile Include="Imaging\FontExtraction\FixedWidthFontResourceEmitter.cs" />
+    <Compile Include="Imaging\Plotting\TextInternals\FixedWidthFont_10x13_1f4d3fb5.cs" />
     <Compile Include="Text\ICharArray.cs" />
     <Compile Include="Imaging\FontExtraction\CoreCharArrayInfo.cs" />
     <Compile Include="Imaging\FontExtraction\DuplexCharArrayInfo.cs" />
@@ -73,5 +74,6 @@
   <ItemGroup>
     <None Include="Usage.md" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
