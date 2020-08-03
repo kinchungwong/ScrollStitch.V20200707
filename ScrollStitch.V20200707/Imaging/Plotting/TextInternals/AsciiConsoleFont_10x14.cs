@@ -7,66 +7,31 @@ using System.Threading.Tasks;
 
 namespace ScrollStitch.V20200707.Imaging.Plotting.TextInternals
 {
-    using Data;
-    using Imaging.IO;
-    using Imaging.RowAccess;
+    using ScrollStitch.V20200707.Data;
+    using ScrollStitch.V20200707.Imaging.IO;
 
-    public class AsciiConsoleFont_10x14
-        : IFixedWidthBitmapFont
+    public sealed class AsciiConsoleFont_10x14
+        : FixedWidthBitmapFontBase
     {
-        public static Lazy<IntBitmap> LazySingleColumnImage = new Lazy<IntBitmap>(() =>
-        {
-            return StaticResource.LoadImageFromResource();
-        });
-
         public static AsciiConsoleFont_10x14 DefaultInstance { get; } = new AsciiConsoleFont_10x14();
 
-        public Size CharSize { get; } = new Size(10, 14);
-
-        public Range CharRange { get; } = new Range(32, 128);
-
-        public IntBitmap SingleColumnImage => LazySingleColumnImage.Value;
+        #region properties implemented by FixedWidthBitmapFontBase
+        // public Size CharSize { get; }
+        // public Range CharRange { get; }
+        // public IntBitmap SingleColumnImage { get; }
+        #endregion
 
         public AsciiConsoleFont_10x14()
         {
+            CharSize = new Size(10, 14);
+            CharRange = new Range(32, 128);
+            _SingleColumnImageFunc = () => StaticResource.LoadImageFromResource();
         }
 
-        public Rect GetRectForChar(int charValue)
-        {
-            if (!CharRange.Contains(charValue))
-            {
-                throw new ArgumentOutOfRangeException(nameof(charValue));
-            }
-            int charRowStart = (charValue - CharRange.Start) * CharSize.Height;
-            return new Rect(0, charRowStart, CharSize.Width, CharSize.Height);
-        }
-
-        public List<KeyValuePair<int, Rect>> GetAllCharRects()
-        {
-            var list = new List<KeyValuePair<int, Rect>>(capacity: CharRange.Count);
-            CharRange.ForEach((int charValue) =>
-            {
-                list.Add(new KeyValuePair<int, Rect>(charValue, GetRectForChar(charValue)));
-            });
-            return list;
-        }
-
-        public IntBitmap GetImageForChar(int charValue)
-        {
-            var rect = GetRectForChar(charValue);
-            return BitmapCopyUtility.CropRect(SingleColumnImage, rect);
-        }
-
-        public void CopyTo(int charValue, IBitmapRowAccess<int> dest)
-        {
-            BitmapRowAccessUtility.Copy(GetBitmapRowsForChar(charValue), dest);
-        }
-
-        public IBitmapRowAccess<int> GetBitmapRowsForChar(int charValue)
-        {
-            var rect = GetRectForChar(charValue);
-            return BitmapRowAccessUtility.Wrap(SingleColumnImage, rect, false, false);
-        }
+        #region methods implemented by FixedWidthBitmapFontBase
+        // public void CopyTo(int charValue, IBitmapRowAccess<int> dest);
+        // public IBitmapRowAccess<int> GetBitmapRowsForChar(int charValue);
+        #endregion
 
         #region static resource
         public static class StaticResource

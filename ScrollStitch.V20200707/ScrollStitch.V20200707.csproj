@@ -145,6 +145,7 @@
     <Compile Include="Imaging\Plotting\TextAnchor.cs" />
     <Compile Include="Imaging\Plotting\TextCmd.cs" />
     <Compile Include="Imaging\Plotting\TextInternals\AsciiConsoleFont_10x14.cs" />
+    <Compile Include="Imaging\Plotting\TextInternals\FixedWidthBitmapFontBase.cs" />
     <Compile Include="Imaging\Plotting\VertAlign.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
