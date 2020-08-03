@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.FixedWidthFontExtractionTool", "ScrollStitch.V20200707.FixedWidthFontExtractionTool\ScrollStitch.V20200707.FixedWidthFontExtractionTool.csproj", "{643BA734-7D90-4D00-B46F-3B589AB289D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.RectTreeDev", "ScrollStitch.V20200707.RectTreeDev\ScrollStitch.V20200707.RectTreeDev.csproj", "{62CCE13C-0579-47C7-A991-83343C445A15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{643BA734-7D90-4D00-B46F-3B589AB289D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{643BA734-7D90-4D00-B46F-3B589AB289D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{643BA734-7D90-4D00-B46F-3B589AB289D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62CCE13C-0579-47C7-A991-83343C445A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62CCE13C-0579-47C7-A991-83343C445A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62CCE13C-0579-47C7-A991-83343C445A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62CCE13C-0579-47C7-A991-83343C445A15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
