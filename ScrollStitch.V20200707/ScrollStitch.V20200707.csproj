@@ -176,7 +176,7 @@
     <Compile Include="Spatial\GridArray_DoNotUse.cs" />
     <Compile Include="Spatial\GridCollectionUtility_DoNotUse.cs" />
     <Compile Include="Spatial\IGridCollection.cs" />
-    <Compile Include="Spatial\IRectTree.cs" />
+    <Compile Include="Spatial\IRectCollection.cs" />
     <Compile Include="Spatial\PointTree.cs" />
     <Compile Include="Spatial\RectList.cs" />
     <Compile Include="Spatial\RectTreeUtility.cs" />

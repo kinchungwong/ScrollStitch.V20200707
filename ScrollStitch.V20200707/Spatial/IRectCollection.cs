@@ -25,7 +25,7 @@ namespace ScrollStitch.V20200707.Spatial
     /// </para>
     /// </summary>
     /// <typeparam name="RecordType"></typeparam>
-    public interface IRectTree<RecordType>
+    public interface IRectCollection<RecordType>
         : IEnumerable<RecordType>
     {
         /// <summary>

@@ -11,11 +11,11 @@ namespace ScrollStitch.V20200707.Spatial
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// An implementation of <see cref="IRectTree{RecordType}"/> 
+    /// An implementation of <see cref="IRectCollection{RecordType}"/> 
     /// </summary>
     /// <typeparam name="RecordType"></typeparam>
     public class RectList<RecordType>
-        : IRectTree<RecordType>
+        : IRectCollection<RecordType>
     {
         #region
         private List<RecordType> _records;
