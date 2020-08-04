@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace ScrollStitch.V20200707.Spatial
 {
     using Data;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// An implementation of <see cref="IRectTree{RecordType}"/> 
@@ -125,13 +126,22 @@ namespace ScrollStitch.V20200707.Spatial
         }
 
         /// <inheritdoc/>
-        public IEnumerator<RecordType> GetEnumerator(Rect searchRect)
+        public IEnumerable<RecordType> Enumerate()
+        {
+            foreach (var record in _records)
+            {
+                yield return record;
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<RecordType> Enumerate(Rect searchRect)
         {
             foreach (var record in _records)
             {
                 if (!RectTreeUtility.HasPositiveOverlap(searchRect, RecordToRectFunc(record)))
-                { 
-                    continue; 
+                {
+                    continue;
                 }
                 yield return record;
             }

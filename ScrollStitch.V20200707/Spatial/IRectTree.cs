@@ -107,8 +107,7 @@ namespace ScrollStitch.V20200707.Spatial
         RecordType[] ToArray(Rect searchRect);
 
         /// <summary>
-        /// Returns an enumerator that yields all items that have a positive-area overlap with
-        /// the search rectangle.
+        /// Enumerates all items.
         /// 
         /// <para>
         /// The enumerator is invalidated if the collection is modified.
@@ -116,7 +115,18 @@ namespace ScrollStitch.V20200707.Spatial
         /// </summary>
         /// <param name="searchRect"></param>
         /// <returns></returns>
-        IEnumerator<RecordType> GetEnumerator(Rect searchRect);
+        IEnumerable<RecordType> Enumerate();
+
+        /// <summary>
+        /// Enumerates all items that have a positive-area overlap with the search rectangle.
+        /// 
+        /// <para>
+        /// The enumerator is invalidated if the collection is modified.
+        /// </para>
+        /// </summary>
+        /// <param name="searchRect"></param>
+        /// <returns></returns>
+        IEnumerable<RecordType> Enumerate(Rect searchRect);
 
         /// <summary>
         /// Resets the collection by removing all items.
