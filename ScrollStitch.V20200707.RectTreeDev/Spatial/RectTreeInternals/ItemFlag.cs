@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
 {
     [Flags]
-    public enum ItemFlags
+    public enum ItemFlag
     {
         None = 0,
         OutsideLeft = 1,

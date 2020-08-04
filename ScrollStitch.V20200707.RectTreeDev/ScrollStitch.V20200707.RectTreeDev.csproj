@@ -47,9 +47,14 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Spatial\RectTreeInternals\ItemFlags.cs" />
+    <Compile Include="Spatial\RectTreeInternals\ItemFlag.cs" />
+    <Compile Include="Spatial\RectTreeInternals\Node.cs" />
     <Compile Include="Spatial\RectTreeInternals\NodeBounds.cs" />
-    <Compile Include="Spatial\RectTreeInternals\NodeFlags.cs" />
+    <Compile Include="Spatial\RectTreeInternals\NodeSettings.cs" />
+    <Compile Include="Spatial\RectTreeInternals\Record.cs" />
+    <Compile Include="Spatial\RectTreeInternals\RecursiveDiagnostics.cs" />
+    <Compile Include="Spatial\RectTreeInternals\WhichChild.cs" />
+    <Compile Include="Test_0001.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

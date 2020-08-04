@@ -21,6 +21,20 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
         
         public Size HalfSize { get; }
 
+        #region automatic properties
+        public int Left => Rect.Left;
+
+        public int Center => Rect.Left + HalfSize.Width;
+
+        public int Right => Rect.Right;
+
+        public int Top => Rect.Top;
+
+        public int Middle => Rect.Top + HalfSize.Height;
+
+        public int Bottom => Rect.Bottom;
+        #endregion
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public NodeBounds(Rect rect)
             : this(rect, new Size(rect.Width / 2, rect.Height / 2))
@@ -35,22 +49,33 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
             HalfSize = halfSize;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Deconstruct(out int left, out int center, out int right, out int top, out int middle, out int bottom)
+        {
+            left = Left;
+            center = Center;
+            right = Right;
+            top = Top;
+            middle = Middle;
+            bottom = Bottom;
+        }
+
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public ItemFlags ClassifyItem(Rect itemRect) 
+        public ItemFlag ClassifyItem(Rect itemRect) 
         {
             if (!itemRect.IsPositive)
             {
                 _ThrowNonPositiveRect(itemRect, nameof(itemRect));
             }
-            ItemFlags leftFlag = ClassifyItemLeft(itemRect.Left);
-            ItemFlags rightFlag = ClassifyItemRight(itemRect.Right);
-            ItemFlags topFlag = ClassifyItemTop(itemRect.Top);
-            ItemFlags bottomFlag = ClassifyItemBottom(itemRect.Bottom);
+            ItemFlag leftFlag = ClassifyItemLeft(itemRect.Left);
+            ItemFlag rightFlag = ClassifyItemRight(itemRect.Right);
+            ItemFlag topFlag = ClassifyItemTop(itemRect.Top);
+            ItemFlag bottomFlag = ClassifyItemBottom(itemRect.Bottom);
             return (leftFlag & rightFlag) | (topFlag & bottomFlag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ItemFlags ClassifyItemLeft(int itemLeft)
+        public ItemFlag ClassifyItemLeft(int itemLeft)
         {
             //const ItemFlags hhhh = ItemFlags.HorizontalMask;
             //const ItemFlags _hhh = ItemFlags.InsideLeft | ItemFlags.RightMask;
@@ -63,28 +88,28 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
             {
                 if (itemLeft >= boundRight)
                 {
-                    return ItemFlags.OutsideRight;
+                    return ItemFlag.OutsideRight;
                 }
                 else
                 {
-                    return ItemFlags.RightMask;
+                    return ItemFlag.RightMask;
                 }
             }
             else
             {
                 if (itemLeft >= boundLeft)
                 {
-                    return ItemFlags.InsideLeft | ItemFlags.RightMask;
+                    return ItemFlag.InsideLeft | ItemFlag.RightMask;
                 }
                 else
                 {
-                    return ItemFlags.HorizontalMask;
+                    return ItemFlag.HorizontalMask;
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ItemFlags ClassifyItemRight(int itemRight)
+        public ItemFlag ClassifyItemRight(int itemRight)
         {
             //const ItemFlags h___ = ItemFlags.OutsideLeft;
             //const ItemFlags hh__ = ItemFlags.LeftMask;
@@ -97,28 +122,28 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
             {
                 if (itemRight > boundRight)
                 {
-                    return ItemFlags.HorizontalMask;
+                    return ItemFlag.HorizontalMask;
                 }
                 else
                 {
-                    return ItemFlags.LeftMask | ItemFlags.InsideRight;
+                    return ItemFlag.LeftMask | ItemFlag.InsideRight;
                 }
             }
             else
             {
                 if (itemRight > boundLeft)
                 {
-                    return ItemFlags.LeftMask;
+                    return ItemFlag.LeftMask;
                 }
                 else
                 {
-                    return ItemFlags.OutsideLeft;
+                    return ItemFlag.OutsideLeft;
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ItemFlags ClassifyItemTop(int itemTop)
+        public ItemFlag ClassifyItemTop(int itemTop)
         {
             //const ItemFlags vvvv = ItemFlags.VerticalMask;
             //const ItemFlags _vvv = ItemFlags.InsideTop | ItemFlags.BottomMask;
@@ -131,28 +156,28 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
             {
                 if (itemTop >= boundBottom)
                 {
-                    return ItemFlags.OutsideBottom;
+                    return ItemFlag.OutsideBottom;
                 }
                 else
                 {
-                    return ItemFlags.BottomMask;
+                    return ItemFlag.BottomMask;
                 }
             }
             else
             {
                 if (itemTop >= boundTop)
                 {
-                    return ItemFlags.InsideTop | ItemFlags.BottomMask;
+                    return ItemFlag.InsideTop | ItemFlag.BottomMask;
                 }
                 else
                 {
-                    return ItemFlags.VerticalMask;
+                    return ItemFlag.VerticalMask;
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ItemFlags ClassifyItemBottom(int itemBottom)
+        public ItemFlag ClassifyItemBottom(int itemBottom)
         {
             //const ItemFlags v___ = ItemFlags.OutsideTop;
             //const ItemFlags vv__ = ItemFlags.TopMask;
@@ -165,22 +190,22 @@ namespace ScrollStitch.V20200707.Spatial.RectTreeInternals
             {
                 if (itemBottom > boundBottom)
                 {
-                    return ItemFlags.VerticalMask;
+                    return ItemFlag.VerticalMask;
                 }
                 else
                 {
-                    return ItemFlags.TopMask | ItemFlags.InsideBottom;
+                    return ItemFlag.TopMask | ItemFlag.InsideBottom;
                 }
             }
             else
             {
                 if (itemBottom > boundTop)
                 {
-                    return ItemFlags.TopMask;
+                    return ItemFlag.TopMask;
                 }
                 else
                 {
-                    return ItemFlags.OutsideTop;
+                    return ItemFlag.OutsideTop;
                 }
             }
         }
