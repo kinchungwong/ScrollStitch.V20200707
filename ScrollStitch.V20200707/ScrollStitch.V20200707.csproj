@@ -176,6 +176,13 @@
     <Compile Include="Spatial\GridArray_DoNotUse.cs" />
     <Compile Include="Spatial\GridCollectionUtility_DoNotUse.cs" />
     <Compile Include="Spatial\IGridCollection.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\ItemFlag.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\Node.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\NodeBounds.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\NodeSettings.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\Record.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\RecursiveDiagnostics.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV1\WhichChild.cs" />
     <Compile Include="Spatial\IRectQuery.cs" />
     <Compile Include="Spatial\IRectCollectionEx.cs" />
     <Compile Include="Spatial\PointTree.cs" />
