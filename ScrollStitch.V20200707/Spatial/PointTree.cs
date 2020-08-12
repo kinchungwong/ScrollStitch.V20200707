@@ -11,7 +11,7 @@ namespace ScrollStitch.V20200707.Spatial
     public class PointTree<T>
     {
         #region private
-        private IRectCollection<(Point, T)> _rectTree;
+        private IRectCollectionEx<(Point, T)> _rectTree;
         #endregion
 
         public PointTree()

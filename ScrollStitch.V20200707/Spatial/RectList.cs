@@ -15,7 +15,7 @@ namespace ScrollStitch.V20200707.Spatial
     /// </summary>
     /// <typeparam name="RecordType"></typeparam>
     public class RectList<RecordType>
-        : IRectCollection<RecordType>
+        : IRectCollectionEx<RecordType>
     {
         #region
         private List<RecordType> _records;
