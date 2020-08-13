@@ -11,9 +11,12 @@ namespace ScrollStitch.V20200707.RectTreeDev
     public class Program
     {
         public static readonly string Banner = new string('-', 76);
+        public static bool PrintCriticalTiming = true;
         public static bool PrintVerbose = false;
         public static bool IsInteractive = Debugger.IsAttached;
+        public static bool AllowDebuggerBreak = true;
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void PauseIfInteractive()
         {
             if (!IsInteractive)
@@ -27,11 +30,29 @@ namespace ScrollStitch.V20200707.RectTreeDev
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
+        public static void BreakIfDebuggerAttached()
+        {
+            if (!AllowDebuggerBreak)
+            {
+                return;
+            }
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Main(string[] args)
         {
             try
             {
-                new Test_0001().Run();
+                //new Test_0001().Run();
+                //new Test_0002().Run();
+                //new Test_0003().Run();
+                //new Test_0004_RectBoundBitEncoder().Run();
+                //new Test_0005().Run();
+                new Test_0006_FastRectList().Run();
             }
             catch (Exception ex)
             {

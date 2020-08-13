@@ -47,6 +47,16 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomRectGenerator.cs" />
+    <Compile Include="Spatial\Internals\FastRectList.cs" />
+    <Compile Include="Spatial\Internals\InternalRectUtility.cs" />
+    <Compile Include="Spatial\Internals\IRectMaskArith.cs" />
+    <Compile Include="Spatial\Internals\RectBoundBitEncoder.cs" />
+    <Compile Include="Spatial\Internals\RectMask.cs" />
+    <Compile Include="Spatial\Internals\RectMaskUtility.cs" />
+    <Compile Include="Spatial\Internals\SpatialBitMaskUtility.cs" />
+    <Compile Include="Spatial\IRectKeyDictionary.cs" />
+    <Compile Include="Spatial\RectDictionary.cs" />
     <Compile Include="Spatial\RectTreeInternals\ItemFlag.cs" />
     <Compile Include="Spatial\RectTreeInternals\Node.cs" />
     <Compile Include="Spatial\RectTreeInternals\NodeBounds.cs" />
@@ -55,6 +65,11 @@
     <Compile Include="Spatial\RectTreeInternals\RecursiveDiagnostics.cs" />
     <Compile Include="Spatial\RectTreeInternals\WhichChild.cs" />
     <Compile Include="Test_0001.cs" />
+    <Compile Include="Test_0002.cs" />
+    <Compile Include="Test_0003.cs" />
+    <Compile Include="Test_0004_RectBoundBitEncoder.cs" />
+    <Compile Include="Test_0005.cs" />
+    <Compile Include="Test_0006_FastRectList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -68,6 +83,8 @@
   <ItemGroup>
     <None Include="Readme.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Spatial\Internals\RectTreeV2\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
