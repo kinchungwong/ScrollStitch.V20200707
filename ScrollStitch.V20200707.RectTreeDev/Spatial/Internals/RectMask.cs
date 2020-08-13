@@ -14,6 +14,9 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     public struct RectMask8 
         : IRectMaskArith<RectMask8>
     {
+        /// <summary>
+        /// An 8-bit mask with lower 4 bits for x-axis and upper 4 bits for y-axis.
+        /// </summary>
         public byte XYValue { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,9 +32,9 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask8 first, RectMask8 second)
+        public bool Test(RectMask8 other)
         {
-            uint xyandxy = (uint)first.XYValue & second.XYValue;
+            uint xyandxy = (uint)XYValue & other.XYValue;
             uint xandx = xyandxy & 0x0Fu;
             uint yandy = (xyandxy >> 4) & 0x0Fu;
             // TOOD the following can be further optimized to reduce number of branches.
@@ -57,10 +60,10 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask16 first, RectMask16 second)
+        public bool Test(RectMask16 other)
         {
-            uint xandx = (uint)first.XValue & second.XValue;
-            uint yandy = (uint)first.YValue & second.YValue;
+            uint xandx = (uint)XValue & other.XValue;
+            uint yandy = (uint)YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
@@ -84,10 +87,10 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask32 first, RectMask32 second)
+        public bool Test(RectMask32 other)
         {
-            uint xandx = (uint)first.XValue & second.XValue;
-            uint yandy = (uint)first.YValue & second.YValue;
+            uint xandx = (uint)XValue & other.XValue;
+            uint yandy = (uint)YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
@@ -111,10 +114,10 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask64 first, RectMask64 second)
+        public bool Test(RectMask64 other)
         {
-            uint xandx = first.XValue & second.XValue;
-            uint yandy = first.YValue & second.YValue;
+            uint xandx = XValue & other.XValue;
+            uint yandy = YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
@@ -138,10 +141,10 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask128 first, RectMask128 second)
+        public bool Test(RectMask128 other)
         {
-            ulong xandx = first.XValue & second.XValue;
-            ulong yandy = first.YValue & second.YValue;
+            ulong xandx = XValue & other.XValue;
+            ulong yandy = YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0uL) && (yandy != 0uL);
         }

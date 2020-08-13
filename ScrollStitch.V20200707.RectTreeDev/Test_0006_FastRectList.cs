@@ -39,10 +39,14 @@ namespace ScrollStitch.V20200707.RectTreeDev
                 rects.Add(rectGen.NextRect());
             }
             DateTime timestamp1 = DateTime.Now;
+#if false
             for (int k = 0; k < rectCount; ++k)
             {
                 fastRectList.Add(rects[k]);
             }
+#else
+            fastRectList.AddRange(rects);
+#endif
             DateTime timestamp2 = DateTime.Now;
             int testCount = 0;
             int overlapCount = 0;
@@ -99,7 +103,9 @@ namespace ScrollStitch.V20200707.RectTreeDev
                 if (VerificationMode &&
                     (overlapCount != verifyOverlapCount))
                 {
-                    Console.WriteLine("FAILED VERIFICATION.");
+                    Console.WriteLine(Program.Banner);
+                    Console.WriteLine("###### FAILED VERIFICATION ######");
+                    Console.WriteLine(Program.Banner);
                 }
                 // 
                 double encodeTimeFloat = encodeTime.TotalMilliseconds;

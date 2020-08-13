@@ -31,7 +31,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     /// 
     /// <para>
     /// The X-axis and Y-axis is subdivided into some bands of interest. Each band on each axis is assigned a bit. 
-    /// This allows fast overlap checking for two rectangles via bit testing. The <see cref="Test(T, T)"/> 
+    /// This allows fast overlap checking for two rectangles via bit testing. The <see cref="Test(T)"/> 
     /// function tests whether overlapping bits are set on at least one horizontal band and at least one vertical band.
     /// </para>
     /// </summary>
@@ -44,7 +44,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     /// </para>
     /// 
     /// <para>
-    /// It is highly recommended that the <see cref="Test(T, T)"/> method on concrete implementation be 
+    /// It is highly recommended that the <see cref="Test(T)"/> method on concrete implementation be 
     /// marked with <see cref="MethodImplOptions.AggressiveInlining"/>.
     /// </para>
     /// </typeparam>
@@ -54,11 +54,26 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         where T : struct, IRectMaskArith<T>
     {
         /// <summary>
-        /// Performs the rect mask intersection test between the two given rect masks.
+        /// Performs the rect mask intersection test.
         /// </summary>
-        /// <param name="first"></param>
-        /// <param name="second"></param>
-        /// <returns></returns>
-        bool Test(T first, T second);
+        /// 
+        /// <param name="other">
+        /// A second instance of the same type.
+        /// </param>
+        /// 
+        /// <returns>
+        /// <para>
+        /// True if there are overlaps in their horizontal and vertical bands. <br/>
+        /// The caller should proceed to test the actual rectangle coordinates to check for
+        /// intersection.
+        /// </para>
+        /// <para>
+        /// False if there are no overlaps in their horizontal and vertical bands. <br/>
+        /// The caller will not need to perform tests on the actual rectangle coordinates
+        /// because they cannot possibly intersect.
+        /// </para>
+        /// </returns>
+        /// 
+        bool Test(T other);
     }
 }
