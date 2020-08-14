@@ -15,6 +15,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     {
         public Rect BoundingRect { get; }
         public FastRectNodeSettings Settings { get; }
+        public bool HasComputedChildRects { get; private set; }
         public bool CanCreateChildNodes => (BoundingRect.Width >= 4 && BoundingRect.Height >= 4);
 
         #region private
@@ -36,22 +37,28 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         {
             BoundingRect = boundingRect;
             Settings = settings;
+            HasComputedChildRects = false;
             _newRects = new FastRectList(boundingRect);
             _newData = new List<T>();
-            _childRects = new FastRectList(boundingRect);
-            _childNodes = new List<FastRectNode<T>>();
-            _straddleRects = new FastRectList(boundingRect);
-            _straddleData = new List<T>();
+            _childRects = null;
+            _childNodes = null;
+            _straddleRects = null;
+            _straddleData = null;
         }
 
         public void Clear()
         {
             _newRects.Clear();
             _newData.Clear();
-            _childRects.Clear();
-            _childNodes.Clear();
-            _straddleRects.Clear();
-            _straddleData.Clear();
+            _childRects?.Clear();
+            _childRects = null;
+            _childNodes?.Clear();
+            _childNodes = null;
+            _straddleRects?.Clear();
+            _straddleRects = null;
+            _straddleData?.Clear();
+            _straddleData = null;
+            HasComputedChildRects = false;
             _CheckClassInvariantElseThrow();
         }
 
@@ -282,42 +289,106 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             {
                 return;
             }
-            _EnsureChildListsCreated();
-            //
-            // This function should only be executed once.
-            //
-            if (_childRects.Count > 0)
+            if (HasComputedChildRects)
             {
+                // This function should only be executed once.
                 return;
             }
+            HasComputedChildRects = true;
             // ====== Developer advice ======
             // Use graphical child node visualizer to compare between these configurations.
             // ======
-#if true
-            if (BoundingRect.Width >= 2 && BoundingRect.Height >= 2)
-            {
-                _PreallocateChildNodeList(axisCellCount: 2, cellHorzCount: 1, cellVertCount: 1);
-                return;
-            }
-#elif false
-            if (BoundingRect.Width >= 4 && BoundingRect.Height >= 4)
-            {
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 1);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 2);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 2, cellVertCount: 1);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 2, cellVertCount: 2);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 4);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 4, cellVertCount: 1);
-                return;
-            }
-#elif false
-            if (BoundingRect.Width >= 8 && BoundingRect.Height >= 8)
+            bool canInsert2x2 = (BoundingRect.Width >= 2 && BoundingRect.Height >= 2);
+            bool canInsert4x4 = (BoundingRect.Width >= 4 && BoundingRect.Height >= 4);
+            bool canInsert5x5 = (BoundingRect.Width >= 5 && BoundingRect.Height >= 5);
+            bool canInsert7x7 = (BoundingRect.Width >= 7 && BoundingRect.Height >= 7);
+            bool canInsert8x8 = (BoundingRect.Width >= 8 && BoundingRect.Height >= 8);
+            //
+            // ====== Order of child rectangle insertion ======
+            // During item processing in _ProcessNewData(), each item is sent to the first 
+            // child node on the list whose bounding rectangle encompasses the item's rectangle.
+            //
+            // Thus, to maximize specificity (query efficiency), the most specific (tiniest)
+            // rectangles should be inserted upfront so that they are preferentially selected.
+            // ======
+            //
+            _EnsureChildListsCreated();
+            if (Settings.ChildGrid_8x8_1x1 && canInsert8x8)
             {
                 _PreallocateChildNodeList(axisCellCount: 8, cellHorzCount: 1, cellVertCount: 1);
-                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 2, cellVertCount: 2);
-                return;
             }
-#endif
+            if (Settings.ChildGrid_5x5_1x1 && canInsert5x5)
+            {
+                _PreallocateChildNodeList(axisCellCount: 5, cellHorzCount: 1, cellVertCount: 1);
+            }
+            if (Settings.ChildGrid_4x4_1x1 && canInsert4x4)
+            {
+                // Small (1x1 inside a grid of 4x4)
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 1);
+            }
+            if (Settings.ChildGrid_8x8_2x2 && canInsert8x8)
+            {
+                _PreallocateChildNodeList(axisCellCount: 8, cellHorzCount: 2, cellVertCount: 2);
+            }
+            if (Settings.ChildGrid_5x5_2x2 && canInsert5x5)
+            {
+                _PreallocateChildNodeList(axisCellCount: 5, cellHorzCount: 2, cellVertCount: 2);
+            }
+            if (Settings.ChildGrid_4x4_1x2 && canInsert4x4)
+            {
+                // Straddles (1x2 or 2x1 inside a grid of 4x4, overlapping)
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 2);
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 2, cellVertCount: 1);
+            }
+            if (Settings.ChildGrid_8x8_3x3 && canInsert8x8)
+            {
+                _PreallocateChildNodeList(axisCellCount: 8, cellHorzCount: 3, cellVertCount: 3);
+            }
+            if (Settings.ChildGrid_7x7_3x3 && canInsert7x7)
+            {
+                // This one requires special handling.
+                for (int cellY = 0; cellY <= 4; cellY += 2)
+                {
+                    for (int cellX = 0; cellX <= 4; cellX += 2)
+                    {
+                        _PreallocateChildNodeList(axisCellCount: 7, cellHorzCount: 3, cellVertCount: 3, cellX: cellX, cellY: cellY);
+                    }
+                }
+            }
+            if (Settings.ChildGrid_5x5_3x3 && canInsert5x5)
+            {
+                // This one requires special handling.
+                for (int cellY = 0; cellY <= 2; cellY += 2)
+                {
+                    for (int cellX = 0; cellX <= 2; cellX += 2)
+                    {
+                        _PreallocateChildNodeList(axisCellCount: 5, cellHorzCount: 3, cellVertCount: 3, cellX: cellX, cellY: cellY);
+                    }
+                }
+            }
+            if (Settings.ChildGrid_2x2_1x1 && canInsert2x2)
+            {
+                // Mimics a traditional quadtree, with 4 children, one for each quadrant.
+                // Not recommended - performance is not as good.
+                _PreallocateChildNodeList(axisCellCount: 2, cellHorzCount: 1, cellVertCount: 1);
+            }
+            if (Settings.ChildGrid_4x4_2x2 && canInsert4x4)
+            {
+                // Medium (2x2 inside a grid of 4x4, overlapping)
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 2, cellVertCount: 2);
+            }
+            if (Settings.ChildGrid_4x4_3x3 && canInsert4x4)
+            {
+                // Somewhat big (3x3 inside a grid of 4x4, overlapping)
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 3, cellVertCount: 3);
+            }
+            if (Settings.ChildGrid_4x4_1x4 && canInsert4x4)
+            {
+                // High aspect ratio (1:4)
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 1, cellVertCount: 4);
+                _PreallocateChildNodeList(axisCellCount: 4, cellHorzCount: 4, cellVertCount: 1);
+            }
+            _CheckChildRectsUniqueElseThrow();
         }
 
         private void _PreallocateChildNodeList(int axisCellCount, int cellHorzCount, int cellVertCount)
@@ -362,12 +433,32 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             int startY = boundY + (boundHeight * cellY) / axisCellCount;
             int stopY = boundY + (boundHeight * (cellY + cellVertCount)) / axisCellCount;
             var childRect = new Rect(startX, startY, stopX - startX, stopY - startY);
+            // ====== Class invariant and runtime behavior ======
+            // Class invariant requires the child rect list and child node list to have same Count.
+            //
+            // However, the elements in the child node list shall be null, initially, to prevent
+            // egregious upfront allocation which can consume resources explosively.
+            //
+            // Actual child node instantiation is handled by _EnsureChildNodeCreated(childIndex).
+            // ======
             int childIndex = _childRects.Add(childRect);
             while (childIndex >= _childNodes.Count)
             {
                 _childNodes.Add(null);
             }
-            _childNodes[childIndex] = new FastRectNode<T>(childRect, Settings);
+        }
+
+        private void _CheckChildRectsUniqueElseThrow()
+        {
+            var hashedChildRects = new HashSet<Rect>(capacity: _childRects.Count);
+            foreach (var childRect in _childRects)
+            {
+                if (hashedChildRects.Contains(childRect))
+                {
+                    throw new Exception("Class invariant violation: all computed child rects must be unique.");
+                }
+                hashedChildRects.Add(childRect);
+            }
         }
 
         private void _CheckClassInvariantElseThrow()
