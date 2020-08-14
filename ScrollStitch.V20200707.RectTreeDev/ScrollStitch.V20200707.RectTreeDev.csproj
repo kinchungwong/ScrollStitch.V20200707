@@ -72,6 +72,7 @@
     <Compile Include="Test_0004_RectBoundBitEncoder.cs" />
     <Compile Include="Test_0005.cs" />
     <Compile Include="Test_0006_FastRectList.cs" />
+    <Compile Include="Test_0007_FastRectNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

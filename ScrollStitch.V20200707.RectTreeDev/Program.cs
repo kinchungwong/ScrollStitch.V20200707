@@ -53,7 +53,8 @@ namespace ScrollStitch.V20200707.RectTreeDev
                 //new Test_0004_RectBoundBitEncoder().Run();
                 //new Test_0005().Run();
                 //new Test_0006_FastRectList().Run_AddTest();
-                new Test_0006_FastRectList().Run_SearchTest();
+                //new Test_0006_FastRectList().Run_SearchTest();
+                new Test_0007_FastRectNode().Run_AdditionTest();
             }
             catch (Exception ex)
             {

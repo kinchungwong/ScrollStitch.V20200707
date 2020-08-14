@@ -68,14 +68,15 @@ namespace ScrollStitch.V20200707.RectTreeDev
 #elif false
             fastRectList.AddRange(rects);
 #else
-            for (int repeatIndex = 0; repeatIndex < 20; ++repeatIndex)
+            int repeatCount = 1;
+            for (int repeatIndex = 0; repeatIndex < repeatCount; ++repeatIndex)
             {
                 fastRectList.Clear();
                 fastRectList.AddRange(rects);
             }
 #endif
             DateTime timestamp2 = DateTime.Now;
-            TimeSpan encodeTime = (timestamp2 - timestamp1);
+            TimeSpan additionTime = (timestamp2 - timestamp1);
             if (VerificationMode)
             {
                 if (fastRectList.Count != rectCount)
@@ -94,9 +95,9 @@ namespace ScrollStitch.V20200707.RectTreeDev
             }
             if (Program.PrintCriticalTiming)
             {
-                double encodeTimeFloat = encodeTime.TotalMilliseconds;
-                double encodePerCall = encodeTimeFloat / rectCount;
-                Console.WriteLine($"{nameof(encodeTime)}: {encodeTimeFloat:F6} msecs / {rectCount} = {encodePerCall:F9}");
+                double additionTimeFloat = additionTime.TotalMilliseconds;
+                double additionPerCall = additionTimeFloat / rectCount;
+                Console.WriteLine($"{nameof(additionTime)}: {additionTimeFloat:F6} msecs / {rectCount} = {additionPerCall:F9}");
             }
             Program.PauseIfInteractive();
         }
