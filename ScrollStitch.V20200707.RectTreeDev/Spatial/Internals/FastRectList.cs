@@ -140,7 +140,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public int FindFirstIntersect(Rect queryRect)
         {
             _CheckClassInvariantElseThrow();
@@ -175,7 +174,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// <c>-1</c> is returned.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public int FindFirstEncompassing(Rect queryRect)
         {
             _CheckClassInvariantElseThrow();
@@ -210,7 +208,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// <c>-1</c> is returned.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public int FindFirstEncompassedBy(Rect queryRect)
         {
             _CheckClassInvariantElseThrow();
@@ -245,7 +242,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// An enumeration of all rectangle items that intersect with the query rectangle.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public IEnumerable<int> Enumerate(Rect queryRect)
         {
             _CheckClassInvariantElseThrow();
