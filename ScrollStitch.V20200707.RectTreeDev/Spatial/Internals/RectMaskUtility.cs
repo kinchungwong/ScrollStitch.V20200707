@@ -62,13 +62,18 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             // Converts the minimum and maximum X and Y values (all inclusive) into their cell index.
             //
 #if false
-            var ciLT = Internal_TryFindCell(boundingRect, stepSize, new Point(interMinX, interMinY));
-            var ciRB = Internal_TryFindCell(boundingRect, stepSize, new Point(interMaxX, interMaxY));
+            CellIndex ciLT = Internal_TryFindCell(boundingRect, stepSize, new Point(interMinX, interMinY));
+            CellIndex ciRB = Internal_TryFindCell(boundingRect, stepSize, new Point(interMaxX, interMaxY));
             int cellMinX = ciLT.CellX;
             int cellMinY = ciLT.CellY;
             int cellMaxX = ciRB.CellX;
             int cellMaxY = ciRB.CellY;
 #else
+            // (PERF OPT) Not using Point and CellIndex made the code run much faster based on benchmark.
+            // 
+            // (NOTE) The use of Internal_TryFindCell_Deconstructed() requires all arguments to be
+            // pre-validated. Refer to validation source code above.
+            //
             Internal_TryFindCell_Deconstructed(
                 boundingRect.X, boundingRect.Y, boundingRect.Width, boundingRect.Height, 
                 stepSize, interMinX, interMinY, 

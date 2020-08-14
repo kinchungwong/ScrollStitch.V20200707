@@ -97,6 +97,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public int Add(Rect rect)
         {
+            _CheckClassInvariantElseThrow();
             if (!RectMaskUtility.TryEncodeRect(BoundingRect, _stepSize, rect, out ulong xmask, out ulong ymask))
             {
                 // all bits set, which forces a bruteforce comparison.
@@ -129,14 +130,125 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
+        /// Returns the index of the first rectangle item that intersects with the query rectangle.
+        /// </summary>
+        /// <param name="queryRect">
+        /// The query rectangle.
+        /// </param>
+        /// <returns>
+        /// The index of the first rectangle item that intersects with the query rectangle. <br/>
+        /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public int FindFirstIntersect(Rect queryRect)
+        {
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            int count = _masks.Count;
+            for (int index = 0; index < count; ++index)
+            {
+                var itemMask = _masks[index];
+                if (!queryMask.Test(itemMask))
+                {
+                    continue;
+                }
+                var itemRect = _rects[index];
+                if (!InternalRectUtility.NoInline.HasIntersect(queryRect, itemRect))
+                {
+                    continue;
+                }
+                return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first rectangle item that encompasses the query rectangle.
+        /// </summary>
+        /// <param name="queryRect">
+        /// The query rectangle.
+        /// </param>
+        /// <returns>
+        /// The index of the first rectangle item that encompasses the query rectangle. <br/>
+        /// If none of the rectangle items encompasses the query rectangle, a negative value 
+        /// <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public int FindFirstEncompassing(Rect queryRect)
+        {
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            int count = _masks.Count;
+            for (int index = 0; index < count; ++index)
+            {
+                var itemMask = _masks[index];
+                if (!queryMask.Test(itemMask))
+                {
+                    continue;
+                }
+                var itemRect = _rects[index];
+                if (!InternalRectUtility.NoInline.ContainsWithin(rectOuter: itemRect, rectInner: queryRect))
+                {
+                    continue;
+                }
+                return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first rectangle item that is encompassed by the query rectangle.
+        /// </summary>
+        /// <param name="queryRect">
+        /// The query rectangle.
+        /// </param>
+        /// <returns>
+        /// The index of the first rectangle item that is encompassed by the query rectangle. <br/>
+        /// If none of the rectangle items are encompassed by the query rectangle, a negative value 
+        /// <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public int FindFirstEncompassedBy(Rect queryRect)
+        {
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            int count = _masks.Count;
+            for (int index = 0; index < count; ++index)
+            {
+                var itemMask = _masks[index];
+                if (!queryMask.Test(itemMask))
+                {
+                    continue;
+                }
+                var itemRect = _rects[index];
+                if (!InternalRectUtility.NoInline.ContainsWithin(rectOuter: queryRect, rectInner: itemRect))
+                {
+                    continue;
+                }
+                return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Enumerates all rectangle items that intersect with the query rectangle.
         /// </summary>
-        /// <param name="queryRect"></param>
-        /// <returns></returns>
+        /// 
+        /// <param name="queryRect">
+        /// The query rectangle.
+        /// </param>
+        /// 
+        /// <returns>
+        /// An enumeration of all rectangle items that intersect with the query rectangle.
+        /// </returns>
         /// 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public IEnumerable<int> Enumerate(Rect queryRect)
         {
+            _CheckClassInvariantElseThrow();
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
             int count = _masks.Count;
             for (int index = 0; index < count; ++index)
@@ -196,6 +308,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         public void ForEach<TFuncInline>(Rect queryRect, TFuncInline func)
             where TFuncInline : struct, IFuncInline<TFuncInline, int, Rect, bool>
         {
+            _CheckClassInvariantElseThrow();
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
             int count = _masks.Count;
             for (int index = 0; index < count; ++index)
@@ -295,11 +408,13 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         public IEnumerator<Rect> GetEnumerator()
         {
+            _CheckClassInvariantElseThrow();
             return ((IEnumerable<Rect>)_rects).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
+            _CheckClassInvariantElseThrow();
             return ((IEnumerable)_rects).GetEnumerator();
         }
 
@@ -322,6 +437,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public IReadOnlyList<Rect> AsReadOnly()
         {
+            _CheckClassInvariantElseThrow();
             return _rects.AsReadOnly();
         }
 
@@ -335,6 +451,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public Rect[] ToArray()
         {
+            _CheckClassInvariantElseThrow();
             return _rects.ToArray();
         }
 
@@ -363,6 +480,16 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
             RectMask128 queryMask = new RectMask128(xmask, ymask);
             return queryMask;
+        }
+
+        private void _CheckClassInvariantElseThrow()
+        {
+            if (_rects is null ||
+                _masks is null ||
+                _rects.Count != _masks.Count)
+            {
+                throw new Exception("Class invariant violation.");
+            }
         }
 
         private static class HelperClasses

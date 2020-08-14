@@ -47,14 +47,50 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
 
             /// <summary>
+            /// Computes the intersecting rectangle between the two input rectangles.
+            /// 
+            /// <para>
+            /// This method does not throw any exception.
+            /// </para>
+            /// </summary>
+            /// 
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// 
+            /// <returns>
+            /// A nullable <see cref="Rect"/>, which may be: <br/>
+            /// The intersection of the two rectangles, if it exists (as a positive rectangle). <br/>
+            /// Null, if the two rectangles do not intersect, if their intersection is empty 
+            /// (zero width or height), or if any of the rectangles are non-positive.
+            /// </returns>
+            /// 
+            public static Rect? TryComputeIntersection(Rect a, Rect b)
+            {
+                if (a.Width <= 0 || a.Height <= 0 ||
+                    b.Width <= 0 || b.Height <= 0)
+                {
+                    return null;
+                }
+                int maxLeft = Math.Max(a.Left, b.Left);
+                int minRight = Math.Min(a.Right, b.Right);
+                int maxTop = Math.Max(a.Top, b.Top);
+                int minBottom = Math.Min(a.Bottom, b.Bottom);
+                if ((maxLeft < minRight) && (maxTop < minBottom))
+                {
+                    return new Rect(maxLeft, maxTop, minRight - maxLeft, minBottom - maxTop);
+                }
+                return null;
+            }
+
+            /// <summary>
             /// Checks whether the second rectangle fits completely inside the first rectangle.
             /// </summary>
             /// 
-            /// <param name="checkOuter">
+            /// <param name="rectOuter">
             /// The supposedly larger rectangle to be tested.
             /// </param>
             /// 
-            /// <param name="checkInner">
+            /// <param name="rectInner">
             /// The supposedly smaller rectangle to be tested.
             /// </param>
             /// 
@@ -68,17 +104,17 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// </exception>
             /// 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static bool ContainsWithin(Rect checkOuter, Rect checkInner)
+            public static bool ContainsWithin(Rect rectOuter, Rect rectInner)
             {
-                if (checkOuter.Width <= 0 || checkOuter.Height <= 0 ||
-                    checkInner.Width <= 0 || checkInner.Height <= 0)
+                if (rectOuter.Width <= 0 || rectOuter.Height <= 0 ||
+                    rectInner.Width <= 0 || rectInner.Height <= 0)
                 {
                     return NoInline.Throw<bool>();
                 }
-                return (checkOuter.Left <= checkInner.Left) &&
-                    (checkOuter.Top <= checkInner.Top) &&
-                    (checkOuter.Right >= checkInner.Right) &&
-                    (checkOuter.Bottom >= checkInner.Bottom);
+                return (rectOuter.Left <= rectInner.Left) &&
+                    (rectOuter.Top <= rectInner.Top) &&
+                    (rectOuter.Right >= rectInner.Right) &&
+                    (rectOuter.Bottom >= rectInner.Bottom);
             }
         }
 
@@ -91,9 +127,9 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
-            public static bool ContainsWithin(Rect checkOuter, Rect checkInner)
+            public static bool ContainsWithin(Rect rectOuter, Rect rectInner)
             {
-                return Inline.ContainsWithin(checkOuter, checkInner);
+                return Inline.ContainsWithin(rectOuter: rectOuter, rectInner: rectInner);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
