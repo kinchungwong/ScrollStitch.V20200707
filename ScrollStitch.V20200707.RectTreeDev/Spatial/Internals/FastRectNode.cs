@@ -18,18 +18,18 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         public bool CanCreateChildNodes => (BoundingRect.Width >= 4 && BoundingRect.Height >= 4);
 
         #region private
-        private readonly FastRectList _newRects;
-        private readonly List<T> _newData;
+        private FastRectList _newRects;
+        private List<T> _newData;
         #endregion
 
         #region private
-        private readonly FastRectList _childRects;
-        private readonly List<FastRectNode<T>> _childNodes;
+        private FastRectList _childRects;
+        private List<FastRectNode<T>> _childNodes;
         #endregion
 
         #region private
-        private readonly FastRectList _straddleRects;
-        private readonly List<T> _straddleData;
+        private FastRectList _straddleRects;
+        private List<T> _straddleData;
         #endregion
 
         public FastRectNode(Rect boundingRect, FastRectNodeSettings settings)
@@ -42,7 +42,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             _childNodes = new List<FastRectNode<T>>();
             _straddleRects = new FastRectList(boundingRect);
             _straddleData = new List<T>();
-            _PreallocateChildNodeList();
         }
 
         public void Clear()
@@ -53,7 +52,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             _childNodes.Clear();
             _straddleRects.Clear();
             _straddleData.Clear();
-            _PreallocateChildNodeList();
             _CheckClassInvariantElseThrow();
         }
 
@@ -189,7 +187,10 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         private void _ProcessNewData()
         {
-            if (!CanCreateChildNodes)
+            _EnsureStraddleListsCreated();
+            _EnsureChildRectsComputed();
+            if (!CanCreateChildNodes ||
+                (_childRects?.Count ?? 0) == 0)
             {
                 // Treats everything as straddle; clear up the new data queue.
                 int requiredStraddleCapacity = _straddleRects.Count + _newRects.Count;
@@ -224,13 +225,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 {
                     // Goes to a child.
                     //
-                    var childRect = _childRects[childIndex];
-                    var childNode = _childNodes[childIndex];
-                    if (childNode is null)
-                    {
-                        childNode = new FastRectNode<T>(childRect, Settings);
-                        _childNodes[childIndex] = childNode;
-                    }
+                    var childNode = _EnsureChildNodeCreated(childIndex);
                     childNode.Add(itemRect, itemData);
                 }
                 else
@@ -245,9 +240,53 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             _newData.Clear();
         }
 
-        private void _PreallocateChildNodeList()
+        private void _EnsureStraddleListsCreated()
+        {
+            if (_straddleRects is null)
+            {
+                _straddleRects = new FastRectList(BoundingRect);
+            }
+            if (_straddleData is null)
+            {
+                _straddleData = new List<T>();
+            }
+        }
+
+        private void _EnsureChildListsCreated()
+        {
+            if (_childRects is null)
+            {
+                _childRects = new FastRectList(BoundingRect);
+            }
+            if (_childNodes is null)
+            {
+                _childNodes = new List<FastRectNode<T>>();
+            }
+        }
+
+        private FastRectNode<T> _EnsureChildNodeCreated(int childIndex)
+        {
+            var childNode = _childNodes[childIndex];
+            if (childNode is null)
+            {
+                var childRect = _childRects[childIndex];
+                childNode = new FastRectNode<T>(childRect, Settings);
+                _childNodes[childIndex] = childNode;
+            }
+            return childNode;
+        }
+
+        private void _EnsureChildRectsComputed()
         {
             if (!CanCreateChildNodes)
+            {
+                return;
+            }
+            _EnsureChildListsCreated();
+            //
+            // This function should only be executed once.
+            //
+            if (_childRects.Count > 0)
             {
                 return;
             }
@@ -334,21 +373,30 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         private void _CheckClassInvariantElseThrow()
         {
             string s = string.Empty;
+            // ======
+            // The new data list is always preallocated.
+            // ======
             if (_newRects is null ||
                 _newData is null ||
                 _newRects.Count != _newData.Count)
             {
                 s += "(_newRects, _newData); ";
             }
-            if (_childRects is null ||
-                _childNodes is null ||
-                _childRects.Count != _childNodes.Count)
+            // ======
+            // Child rects are populated upon reaching the first ProcessNewData threshold.
+            // ======
+            int childRectCount = _childRects?.Count ?? 0;
+            int childNodeCount = _childNodes?.Count ?? 0;
+            if (childRectCount != childNodeCount)
             {
                 s += "(_childRects, _childNodes); ";
             }
-            if (_straddleRects is null ||
-                _straddleData is null ||
-                _straddleRects.Count != _straddleData.Count)
+            // ======
+            // Likewise, straddle list are populated upon reaching the first ProcessNewData threshold.
+            // ======
+            int straddleRectCount = _straddleRects?.Count ?? 0;
+            int straddleDataCount = _straddleData?.Count ?? 0;
+            if (straddleRectCount != straddleDataCount)
             {
                 s += "(_straddleRects, _straddleData); ";
             }
