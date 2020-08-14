@@ -12,26 +12,31 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     using ScrollStitch.V20200707.Functional;
 
     public class FastRectNode<T>
+        : IRectQuery<KeyValuePair<Rect, T>>
+        , ICollection<KeyValuePair<Rect, T>>
+        , IReadOnlyCollection<KeyValuePair<Rect, T>>
     {
         public Rect BoundingRect { get; }
         public FastRectNodeSettings Settings { get; }
         public bool HasComputedChildRects { get; private set; }
         public bool CanCreateChildNodes => (BoundingRect.Width >= 4 && BoundingRect.Height >= 4);
+        public int Count { get; private set; }
+        public bool IsReadOnly => false;
 
-        #region private
+#region private
         private FastRectList _newRects;
         private List<T> _newData;
-        #endregion
+#endregion
 
-        #region private
+#region private
         private FastRectList _childRects;
         private List<FastRectNode<T>> _childNodes;
-        #endregion
+#endregion
 
-        #region private
+#region private
         private FastRectList _straddleRects;
         private List<T> _straddleData;
-        #endregion
+#endregion
 
         public FastRectNode(Rect boundingRect, FastRectNodeSettings settings)
         {
@@ -59,6 +64,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             _straddleData?.Clear();
             _straddleData = null;
             HasComputedChildRects = false;
+            Count = 0;
             _CheckClassInvariantElseThrow();
         }
 
@@ -71,6 +77,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 _newData.Add(default);
             }
             _newData[index] = data;
+            ++Count;
             if (_newRects.Count >= Settings.ProcessNewDataWhenCountReaches)
             {
                 _ProcessNewData();
@@ -190,6 +197,109 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Enumerates all items.
+        /// </summary>
+        /// <returns>
+        /// An enumeration of all items.
+        /// </returns>
+        public IEnumerable<KeyValuePair<Rect, T>> Enumerate()
+        {
+            _CheckClassInvariantElseThrow();
+            int newCount = _newRects.Count;
+            for (int newIndex = 0; newIndex < newCount; ++newIndex)
+            {
+                Rect itemRect = _newRects[newIndex];
+                T itemData = _newData[newIndex];
+                yield return new KeyValuePair<Rect, T>(itemRect, itemData);
+            }
+            int straddleCount = _straddleRects?.Count ?? 0;
+            for (int straddleIndex = 0; straddleIndex < straddleCount; ++straddleIndex)
+            {
+                Rect itemRect = _straddleRects[straddleIndex];
+                T itemData = _straddleData[straddleIndex];
+                yield return new KeyValuePair<Rect, T>(itemRect, itemData);
+            }
+            if (!(_childNodes is null))
+            {
+                foreach (var childNode in _childNodes)
+                {
+                    if (childNode is null)
+                    {
+                        continue;
+                    }
+                    foreach (var kvp in childNode.Enumerate())
+                    {
+                        yield return kvp;
+                    }
+                }
+            }
+        }
+
+        public IEnumerator<KeyValuePair<Rect, T>> GetEnumerator()
+        {
+            return Enumerate().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Enumerate().GetEnumerator();
+        }
+
+        public bool Contains(KeyValuePair<Rect, T> queryRectAndData)
+        {
+            var defaultComparerForT = EqualityComparer<T>.Default;
+            Rect queryRect = queryRectAndData.Key;
+            foreach (var kvp in Enumerate(queryRect))
+            {
+                if (kvp.Key == queryRect &&
+                    defaultComparerForT.Equals(queryRectAndData.Value, kvp.Value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void CopyTo(KeyValuePair<Rect, T>[] array, int arrayIndex)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            }
+            if (arrayIndex + Count > array.Length)
+            {
+                throw new ArgumentException(
+                    message: $"The array section starting at (arrayIndex = {arrayIndex}) ending at " + 
+                    $"(array.Length = {array.Length}) " + 
+                    $"does not provide sufficient space to copy all items (count = {Count}).");
+            }
+            foreach (var kvp in Enumerate())
+            {
+                array[arrayIndex++] = kvp;
+            }
+        }
+
+        /// <summary>
+        /// <para>
+        /// Not supported. <br/>
+        /// <see cref="FastRectNode{T}"/> currently does not implement item removal.
+        /// </para>
+        /// </summary>
+        /// <param name="item">
+        /// Item to remove.
+        /// </param>
+        /// <returns></returns>
+        /// 
+        public bool Remove(KeyValuePair<Rect, T> item)
+        {
+            throw new NotImplementedException();
         }
 
         private void _ProcessNewData()

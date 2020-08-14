@@ -78,12 +78,39 @@ namespace ScrollStitch.V20200707.RectTreeDev
             }
 #endif
             DateTime timestamp2 = DateTime.Now;
+            int enumerationCount = 0;
+            foreach (var kvp in fastRectNode.Enumerate())
+            {
+                ++enumerationCount;
+            }
+            DateTime timestamp3 = DateTime.Now;
+            if (enumerationCount != rectCount)
+            {
+                Console.WriteLine(Program.Banner);
+                Console.WriteLine("Enumerate() does not return the expected number of items.");
+                Console.WriteLine(Program.Banner);
+                Program.BreakIfDebuggerAttached();
+                throw new Exception();
+            }
+            if (fastRectNode.Count != rectCount)
+            {
+                Console.WriteLine(Program.Banner);
+                Console.WriteLine("Count property does not return the expected number of items.");
+                Console.WriteLine(Program.Banner);
+                Program.BreakIfDebuggerAttached();
+                throw new Exception();
+            }
             TimeSpan additionTime = (timestamp2 - timestamp1);
+            TimeSpan enumerationTime = (timestamp3 - timestamp2);
             if (Program.PrintCriticalTiming)
             {
                 double additionTimeFloat = additionTime.TotalMilliseconds;
                 double additionPerCall = additionTimeFloat / rectCount;
                 Console.WriteLine($"{nameof(additionTime)}: {additionTimeFloat:F6} msecs / {rectCount} = {additionPerCall:F9}");
+                //
+                double enumerationTimeFloat = enumerationTime.TotalMilliseconds;
+                double enumerationPerCall = enumerationTimeFloat / rectCount;
+                Console.WriteLine($"{nameof(enumerationTime)}: {enumerationTimeFloat:F6} msecs / {rectCount} = {enumerationPerCall:F9}");
             }
             Program.PauseIfInteractive();
         }
