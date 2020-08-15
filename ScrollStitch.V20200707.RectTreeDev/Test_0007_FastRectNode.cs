@@ -42,11 +42,11 @@ namespace ScrollStitch.V20200707.RectTreeDev
             int rectCount = 1_000_000;
 #elif false
             int rectCount = 2_000_000;
-#elif true
+#elif false
             int rectCount = 4_000_000;
 #elif false
             int rectCount = 8_000_000;
-#elif false
+#elif true
             int rectCount = 10_000_000;
 #elif false
             int rectCount = 100_000_000;

@@ -50,6 +50,8 @@
     <Compile Include="RandomRectGenerator.cs" />
     <Compile Include="Spatial\Internals\FastRectList.cs" />
     <Compile Include="Spatial\Internals\FastRectNode.cs" />
+    <Compile Include="Spatial\Internals\FastRectNodeChildFactory.cs" />
+    <Compile Include="Spatial\Internals\FastRectNodeChildSpec.cs" />
     <Compile Include="Spatial\Internals\FastRectNodeSettings.cs" />
     <Compile Include="Spatial\Internals\InternalRectUtility.cs" />
     <Compile Include="Spatial\Internals\IRectMaskArith.cs" />
