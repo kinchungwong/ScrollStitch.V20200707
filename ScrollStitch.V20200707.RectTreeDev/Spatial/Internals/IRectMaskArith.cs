@@ -75,5 +75,103 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// </returns>
         /// 
         bool MaybeIntersecting(T other);
+
+        /// <summary>
+        /// Performs the rect mask encompassing test. (See important usage notes.)
+        /// 
+        /// <para>
+        /// Important usage note 1:
+        /// <br/>
+        /// This test is not symmetric.
+        /// <br/>
+        /// That is, the following expressions are NOT equivalent, and may give different results: <br/>
+        /// <code>
+        /// L001 ... RectMask first, second; <br/>
+        /// L002 ... bool test12 = first.MaybeEncompassing(second); <br/>
+        /// L003 ... bool test21 = second.MaybeEncompassing(first);
+        /// </code>
+        /// </para>
+        /// 
+        /// <para>
+        /// Important usage note 2:
+        /// <br/>
+        /// Consider carefully whether to use the non-triviality version of this function.
+        /// <br/>
+        /// See <see cref="MaybeEncompassingNT"/> for details.
+        /// </para>
+        /// </summary>
+        /// 
+        /// <param name="other">
+        /// A second instance of the same type.
+        /// </param>
+        /// 
+        /// <returns>
+        /// <para>
+        /// True if, for each horizontal and vertical band occupied by the other instance, 
+        /// those same bands are also occupied by the current instance.
+        /// <br/>
+        /// The caller should proceed to test the actual rectangle coordinates for encompassing.
+        /// </para>
+        /// 
+        /// <para>
+        /// False if there is at least one horizontal or vertical band occupied by the other instance
+        /// which is not occupied by the current instance. 
+        /// <br/>
+        /// The caller will not need to perform the encompassing tests on the actual rectangle 
+        /// coordinates because the current instance cannot possibly encompass the other instance.
+        /// </para>
+        /// </returns>
+        /// 
+        bool MaybeEncompassing(T other);
+
+        /// <summary>
+        /// The non-trivial ("NT") version of <see cref="MaybeEncompassing(T)"/>.
+        /// 
+        /// <para>
+        /// The non-trivial version of bitwise test functions enforces the constraint that all bit masks
+        /// must have at least one bit set horizontally and vertically, or else the test returns false.
+        /// </para>
+        /// 
+        /// <para>
+        /// Question: What is the significance of this non-triviality?
+        /// <br/>
+        /// Answer: Consider the following code. Without running the code, try predict its printout.
+        /// <br/>
+        /// (Pay attention to the negation before <c>maybeInter12</c>; the two masks obviously don't 
+        /// have a non-trivial intersection.)
+        /// </para>
+        /// 
+        /// <para>
+        /// <code>
+        /// L001 ... const uint something = 1u; <br/>
+        /// L002 ... RectMask64 firstMask = new RectMask64(something, 32u); <br/>
+        /// L003 ... RectMask64 secondMask = new RectMask64(something, 0u); <br/>
+        /// L004 ... bool maybeInter12 = firstMask.MaybeIntersecting(secondMask); <br/>
+        /// L005 ... bool maybeEncomp12 = firstMask.MaybeEncompassing(secondMask); <br/>
+        /// L006 ... bool maybeEncompNT12 = firstMask.MaybeEncompassingNT(secondMask); <br/>
+        /// L007 ... if (!maybeInter12 &amp;&amp; maybeEncomp12) <br/>
+        /// L008 ... { <br/>
+        /// L009 ... ... Console.WriteLine("Haha! Gotcha! (no NT)"); <br/>
+        /// L010 ... } <br/>
+        /// L011 ... if (!maybeInter12 &amp;&amp; maybeEncompNT12) <br/>
+        /// L012 ... { <br/>
+        /// L013 ... ... Console.WriteLine("Haha! Gotcha! (with NT)"); <br/>
+        /// L014 ... }
+        /// </code>
+        /// </para>
+        /// 
+        /// <para>
+        /// Interim Developer Note: 
+        /// <br/>
+        /// The current implementation of <see cref="MaybeIntersecting(T)"/> already satisfies non-triviality.
+        /// <br/>
+        /// It just happens that, during the implementation of <c>MaybeIntersecting</c>, the non-triviality
+        /// implementation happens to produce smaller code, whereas in the implementation of 
+        /// <c>MaybeEncompassing</c>, non-triviality requires more code to implement, which ultimately led to 
+        /// a programmer's mistake by omission.
+        /// </para>
+        /// </summary>
+        /// 
+        bool MaybeEncompassingNT(T other);
     }
 }

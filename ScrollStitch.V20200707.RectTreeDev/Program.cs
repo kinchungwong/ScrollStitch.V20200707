@@ -54,7 +54,9 @@ namespace ScrollStitch.V20200707.RectTreeDev
                 //new Test_0005().Run();
                 //new Test_0006_FastRectList().Run_AddTest();
                 //new Test_0006_FastRectList().Run_SearchTest();
-                new Test_0007_FastRectNode().Run_AdditionTest();
+                //new Test_0007_FastRectNode().Run_AdditionTest();
+                new Test_0008_RectMask().Run();
+                //new Test_0008_RectMask().Run_ShowEncompassTrivialityUnexpectedness();
             }
             catch (Exception ex)
             {

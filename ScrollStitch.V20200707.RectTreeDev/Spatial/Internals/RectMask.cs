@@ -40,6 +40,30 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassing(RectMask8 other)
+        {
+            uint nxyandxy = ~(uint)XYValue & other.XYValue;
+            uint nxandx = nxyandxy & 0x0Fu;
+            uint nyandy = (nxyandxy >> 4) & 0x0Fu;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0uL) && (nyandy == 0uL);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassingNT(RectMask8 other)
+        {
+            // TODO the following tests can be further optimized.
+            uint xyandxy = (uint)XYValue & other.XYValue;
+            uint nxyandxy = ~(uint)XYValue & other.XYValue;
+            uint xandx = xyandxy & 0x0Fu;
+            uint yandy = (xyandxy >> 4) & 0x0Fu;
+            uint nxandx = nxyandxy & 0x0Fu;
+            uint nyandy = (nxyandxy >> 4) & 0x0Fu;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (xandx != 0u) && (yandy != 0u) && (nxandx == 0u) && (nyandy == 0u);
+        }
     }
 
     /// <summary>
@@ -66,6 +90,29 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             uint yandy = (uint)YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassing(RectMask16 other)
+        {
+            uint nxandx = ~(uint)XValue & other.XValue;
+            uint nyandy = ~(uint)YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassingNT(RectMask16 other)
+        {
+            // TODO the following tests can be further optimized.
+            if (XValue == 0u || YValue == 0u || other.XValue == 0u || other.YValue == 0u)
+            {
+                return false;
+            }
+            uint nxandx = ~(uint)XValue & other.XValue;
+            uint nyandy = ~(uint)YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
         }
     }
 
@@ -94,6 +141,29 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassing(RectMask32 other)
+        {
+            uint nxandx = ~(uint)XValue & other.XValue;
+            uint nyandy = ~(uint)YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassingNT(RectMask32 other)
+        {
+            // TODO the following tests can be further optimized.
+            if (XValue == 0u || YValue == 0u || other.XValue == 0u || other.YValue == 0u)
+            {
+                return false;
+            }
+            uint nxandx = ~(uint)XValue & other.XValue;
+            uint nyandy = ~(uint)YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
+        }
     }
 
     /// <summary>
@@ -121,6 +191,29 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0u) && (yandy != 0u);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassing(RectMask64 other)
+        {
+            uint nxandx = ~XValue & other.XValue;
+            uint nyandy = ~YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassingNT(RectMask64 other)
+        {
+            // TODO the following tests can be further optimized.
+            if (XValue == 0u || YValue == 0u || other.XValue == 0u || other.YValue == 0u)
+            {
+                return false;
+            }
+            uint nxandx = ~XValue & other.XValue;
+            uint nyandy = ~YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0u) && (nyandy == 0u);
+        }
     }
 
     /// <summary>
@@ -147,6 +240,27 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             ulong yandy = YValue & other.YValue;
             // TOOD the following can be further optimized to reduce number of branches.
             return (xandx != 0uL) && (yandy != 0uL);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassing(RectMask128 other)
+        {
+            ulong nxandx = ~XValue & other.XValue;
+            ulong nyandy = ~YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (nxandx == 0uL) && (nyandy == 0uL);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MaybeEncompassingNT(RectMask128 other)
+        {
+            // TODO the following tests can be further optimized.
+            ulong xandx = XValue & other.XValue;
+            ulong yandy = YValue & other.YValue;
+            ulong nxandx = ~XValue & other.XValue;
+            ulong nyandy = ~YValue & other.YValue;
+            // TOOD the following can be further optimized to reduce number of branches.
+            return (xandx != 0uL) && (yandy != 0uL) && (nxandx == 0uL) && (nyandy == 0uL);
         }
     }
 }

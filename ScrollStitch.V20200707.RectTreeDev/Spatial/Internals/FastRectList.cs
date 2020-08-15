@@ -182,7 +182,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.MaybeIntersecting(itemMask))
+                if (!itemMask.MaybeEncompassingNT(queryMask))
                 {
                     continue;
                 }
@@ -216,7 +216,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.MaybeIntersecting(itemMask))
+                if (!queryMask.MaybeEncompassingNT(itemMask))
                 {
                     continue;
                 }
