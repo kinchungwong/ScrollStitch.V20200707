@@ -69,7 +69,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
         }
 
-
         /// <summary>
         /// Tests whether any of the signed integer arguments are negative.
         /// 
