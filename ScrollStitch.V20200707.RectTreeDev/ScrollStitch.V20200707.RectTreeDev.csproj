@@ -55,7 +55,6 @@
     <Compile Include="Spatial\Internals\FastRectNodeSettings.cs" />
     <Compile Include="Spatial\Internals\InternalRectUtility.cs" />
     <Compile Include="Spatial\Internals\IRectMaskArith.cs" />
-    <Compile Include="Spatial\Internals\RectBoundBitEncoder.cs" />
     <Compile Include="Spatial\Internals\RectMask.cs" />
     <Compile Include="Spatial\Internals\RectMaskUtility.cs" />
     <Compile Include="Spatial\Internals\SpatialBitMaskUtility.cs" />
@@ -71,7 +70,6 @@
     <Compile Include="Test_0001.cs" />
     <Compile Include="Test_0002.cs" />
     <Compile Include="Test_0003.cs" />
-    <Compile Include="Test_0004_RectBoundBitEncoder.cs" />
     <Compile Include="Test_0005.cs" />
     <Compile Include="Test_0006_FastRectList.cs" />
     <Compile Include="Test_0007_FastRectNode.cs" />
