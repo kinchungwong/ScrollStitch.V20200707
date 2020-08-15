@@ -31,7 +31,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     /// 
     /// <para>
     /// The X-axis and Y-axis is subdivided into some bands of interest. Each band on each axis is assigned a bit. 
-    /// This allows fast overlap checking for two rectangles via bit testing. The <see cref="Test(T)"/> 
+    /// This allows fast overlap checking for two rectangles via bit testing. The <see cref="MaybeIntersecting(T)"/> 
     /// function tests whether overlapping bits are set on at least one horizontal band and at least one vertical band.
     /// </para>
     /// </summary>
@@ -44,7 +44,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     /// </para>
     /// 
     /// <para>
-    /// It is highly recommended that the <see cref="Test(T)"/> method on concrete implementation be 
+    /// It is highly recommended that the <see cref="MaybeIntersecting(T)"/> method on concrete implementation be 
     /// marked with <see cref="MethodImplOptions.AggressiveInlining"/>.
     /// </para>
     /// </typeparam>
@@ -74,6 +74,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// </para>
         /// </returns>
         /// 
-        bool Test(T other);
+        bool MaybeIntersecting(T other);
     }
 }

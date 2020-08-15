@@ -148,7 +148,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.Test(itemMask))
+                if (!queryMask.MaybeIntersecting(itemMask))
                 {
                     continue;
                 }
@@ -182,7 +182,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.Test(itemMask))
+                if (!queryMask.MaybeIntersecting(itemMask))
                 {
                     continue;
                 }
@@ -216,7 +216,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.Test(itemMask))
+                if (!queryMask.MaybeIntersecting(itemMask))
                 {
                     continue;
                 }
@@ -250,7 +250,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.Test(itemMask))
+                if (!queryMask.MaybeIntersecting(itemMask))
                 {
                     continue;
                 }
@@ -310,7 +310,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.Test(itemMask))
+                if (!queryMask.MaybeIntersecting(itemMask))
                 {
                     continue;
                 }

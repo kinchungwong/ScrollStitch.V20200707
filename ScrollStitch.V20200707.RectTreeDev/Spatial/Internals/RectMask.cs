@@ -32,7 +32,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask8 other)
+        public bool MaybeIntersecting(RectMask8 other)
         {
             uint xyandxy = (uint)XYValue & other.XYValue;
             uint xandx = xyandxy & 0x0Fu;
@@ -60,7 +60,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask16 other)
+        public bool MaybeIntersecting(RectMask16 other)
         {
             uint xandx = (uint)XValue & other.XValue;
             uint yandy = (uint)YValue & other.YValue;
@@ -87,7 +87,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask32 other)
+        public bool MaybeIntersecting(RectMask32 other)
         {
             uint xandx = (uint)XValue & other.XValue;
             uint yandy = (uint)YValue & other.YValue;
@@ -114,7 +114,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask64 other)
+        public bool MaybeIntersecting(RectMask64 other)
         {
             uint xandx = XValue & other.XValue;
             uint yandy = YValue & other.YValue;
@@ -141,7 +141,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Test(RectMask128 other)
+        public bool MaybeIntersecting(RectMask128 other)
         {
             ulong xandx = XValue & other.XValue;
             ulong yandy = YValue & other.YValue;
