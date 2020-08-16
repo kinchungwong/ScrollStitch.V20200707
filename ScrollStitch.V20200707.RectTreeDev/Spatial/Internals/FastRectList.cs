@@ -73,8 +73,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             {
                 throw new ArgumentOutOfRangeException(nameof(boundingRect));
             }
-            int maxBoundingLen = Math.Max(boundWidth, boundHeight);
-            _stepSize = (maxBoundingLen + BitsPerAxis - 1) / BitsPerAxis;
+            _stepSize = _ComputeStepSize(boundWidth, boundHeight);
             _rects = new List<Rect>(capacity: capacity);
             _masks = new List<RectMask128>(capacity: capacity);
         }
@@ -130,6 +129,64 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
+        /// Returns the index of the first rectangle item for which the binary relation is true.
+        /// 
+        /// <para>
+        /// Specifically, it finds the first item that satisfies the following expression:
+        /// <br/>
+        /// <c>(relation.TestMaybe(itemMask, queryMask) &amp;&amp; relation.Test(itemRect, queryRect))</c>
+        /// </para>
+        /// </summary>
+        /// 
+        /// <returns>
+        /// The index of the first item satisfying the binary relation with the query. 
+        /// <br/>
+        /// If no item satisfies the relation, a negative value <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FindFirst<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
+            where TRelation : struct, IRectRelation<TRelation, RectMask128>
+        {
+            // Make local copy of instance fields to avoid false aliasing in codegen
+            var masks = _masks;
+            var rects = _rects;
+            int count = masks?.Count ?? 0;
+            for (int index = 0; index < count; ++index)
+            {
+                var itemMask = masks[index];
+                if (relation.TestMaybe(itemMask, queryMask))
+                {
+                    var itemRect = rects[index];
+                    if (relation.Test(itemRect, queryRect))
+                    {
+                        return index;
+                    }
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first rectangle item that is identical to the query rectangle.
+        /// </summary>
+        /// <param name="queryRect">
+        /// The query rectangle.
+        /// </param>
+        /// <returns>
+        /// The index of the first rectangle item that is identical to the query rectangle. <br/>
+        /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int FindFirstIdentical(Rect queryRect)
+        {
+            var relation = default(RectRelations.IdenticalNT);
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            return FindFirst(relation, queryRect, queryMask);
+        }
+
+        /// <summary>
         /// Returns the index of the first rectangle item that intersects with the query rectangle.
         /// </summary>
         /// <param name="queryRect">
@@ -140,26 +197,12 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
         /// </returns>
         /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindFirstIntersect(Rect queryRect)
         {
-            _CheckClassInvariantElseThrow();
+            var relation = default(RectRelations.Intersect);
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            int count = _masks.Count;
-            for (int index = 0; index < count; ++index)
-            {
-                var itemMask = _masks[index];
-                if (!queryMask.MaybeIntersecting(itemMask))
-                {
-                    continue;
-                }
-                var itemRect = _rects[index];
-                if (!InternalRectUtility.NoInline.HasIntersect(queryRect, itemRect))
-                {
-                    continue;
-                }
-                return index;
-            }
-            return -1;
+            return FindFirst(relation, queryRect, queryMask);
         }
 
         /// <summary>
@@ -174,26 +217,12 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// <c>-1</c> is returned.
         /// </returns>
         /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindFirstEncompassing(Rect queryRect)
         {
-            _CheckClassInvariantElseThrow();
+            var relation = default(RectRelations.EncompassingNT);
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            int count = _masks.Count;
-            for (int index = 0; index < count; ++index)
-            {
-                var itemMask = _masks[index];
-                if (!itemMask.MaybeEncompassingNT(queryMask))
-                {
-                    continue;
-                }
-                var itemRect = _rects[index];
-                if (!InternalRectUtility.NoInline.ContainsWithin(rectOuter: itemRect, rectInner: queryRect))
-                {
-                    continue;
-                }
-                return index;
-            }
-            return -1;
+            return FindFirst(relation, queryRect, queryMask);
         }
 
         /// <summary>
@@ -208,59 +237,102 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// <c>-1</c> is returned.
         /// </returns>
         /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindFirstEncompassedBy(Rect queryRect)
         {
-            _CheckClassInvariantElseThrow();
+            var relation = default(RectRelations.EncompassedByNT);
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            int count = _masks.Count;
-            for (int index = 0; index < count; ++index)
+            return FindFirst(relation, queryRect, queryMask);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<int> Enumerate<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
+            where TRelation : struct, IRectRelation<TRelation, RectMask128>
+        {
+            return new HelperClasses.EnumeratorProvider<int>(() =>
             {
-                var itemMask = _masks[index];
-                if (!queryMask.MaybeEncompassingNT(itemMask))
-                {
-                    continue;
-                }
-                var itemRect = _rects[index];
-                if (!InternalRectUtility.NoInline.ContainsWithin(rectOuter: queryRect, rectInner: itemRect))
-                {
-                    continue;
-                }
-                return index;
-            }
-            return -1;
+                return new HelperClasses.FilteredEnumerator<TRelation>(_rects, _masks, relation, queryRect, queryMask);
+            });
+        }
+
+        /// <summary>
+        /// Enumerates all rectangle items that are identical to the non-empty query rectangle.
+        /// 
+        /// <para>
+        /// See also: <br/>
+        /// </para>
+        /// <inheritdoc cref="RectRelations.IdenticalNT"/>
+        /// </summary>
+        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<int> EnumerateIdentical(Rect queryRect)
+        {
+            var relation = default(RectRelations.IdenticalNT);
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            return Enumerate(relation, queryRect, queryMask);
         }
 
         /// <summary>
         /// Enumerates all rectangle items that intersect with the query rectangle.
+        /// 
+        /// <para>
+        /// See also: <br/>
+        /// </para>
+        /// <inheritdoc cref="RectRelations.Intersect"/>
         /// </summary>
         /// 
-        /// <param name="queryRect">
-        /// The query rectangle.
-        /// </param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<int> EnumerateIntersect(Rect queryRect)
+        {
+            var relation = default(RectRelations.Intersect);
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            return Enumerate(relation, queryRect, queryMask);
+        }
+
+        /// <summary>
+        /// Same as <see cref="EnumerateIntersect(Rect)"/>.
+        /// <br/>
+        /// This function is retained for compatibility with <see cref="IRectQuery{T}"/>.
+        /// </summary>
         /// 
-        /// <returns>
-        /// An enumeration of all rectangle items that intersect with the query rectangle.
-        /// </returns>
-        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<int> Enumerate(Rect queryRect)
         {
-            _CheckClassInvariantElseThrow();
+            return EnumerateIntersect(queryRect);
+        }
+
+        /// <summary>
+        /// Enumerates all rectangle items that encompass the non-empty query rectangle.
+        /// 
+        /// <para>
+        /// See also: <br/>
+        /// </para>
+        /// <inheritdoc cref="RectRelations.EncompassingNT"/>
+        /// </summary>
+        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<int> EnumerateEncompassing(Rect queryRect)
+        {
+            var relation = default(RectRelations.EncompassingNT);
             RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            int count = _masks.Count;
-            for (int index = 0; index < count; ++index)
-            {
-                var itemMask = _masks[index];
-                if (!queryMask.MaybeIntersecting(itemMask))
-                {
-                    continue;
-                }
-                var itemRect = _rects[index];
-                if (!InternalRectUtility.NoInline.HasIntersect(queryRect, itemRect))
-                {
-                    continue;
-                }
-                yield return index;
-            }
+            return Enumerate(relation, queryRect, queryMask);
+        }
+
+        /// <summary>
+        /// Enumerates all rectangle items that are non-empty and encompassed by the query rectangle.
+        /// 
+        /// <para>
+        /// See also: <br/>
+        /// </para>
+        /// <inheritdoc cref="RectRelations.EncompassedByNT"/>
+        /// </summary>
+        /// 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<int> EnumerateEncompassedBy(Rect queryRect)
+        {
+            var relation = default(RectRelations.EncompassedByNT);
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            return Enumerate(relation, queryRect, queryMask);
         }
 
         /// <summary>
@@ -315,7 +387,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     continue;
                 }
                 var itemRect = _rects[index];
-                if (!InternalRectUtility.NoInline.HasIntersect(queryRect, itemRect))
+                if (!InternalRectUtility.Inline.HasIntersect(queryRect, itemRect))
                 {
                     continue;
                 }
@@ -466,6 +538,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private RectMask128 _ConvertQueryRectToMask(Rect queryRect)
         {
             if (!RectMaskUtility.TryEncodeRect(BoundingRect, _stepSize, queryRect, out ulong xmask, out ulong ymask))
@@ -478,18 +551,257 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             return queryMask;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void _CheckClassInvariantElseThrow()
         {
             if (_rects is null ||
                 _masks is null ||
                 _rects.Count != _masks.Count)
             {
-                throw new Exception("Class invariant violation.");
+                _ThrowClassInvariantViolation();
             }
         }
 
-        private static class HelperClasses
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int _ComputeStepSize(int boundWidth, int boundHeight)
         {
+            int maxBoundingLen = Math.Max(boundWidth, boundHeight);
+            int stepSize = (maxBoundingLen + BitsPerAxis - 1) / BitsPerAxis;
+            return stepSize;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void _ThrowClassInvariantViolation()
+        {
+            throw new Exception("Class invariant violation.");
+        }
+
+        public static class HelperClasses
+        {
+            #region custom enumerators
+            /// <summary>
+            /// A class that provides an <see cref="IEnumerator{T0}"/> upon request. This class is thus used to 
+            /// satisfy <see cref="IEnumerable{T0}"/>, either for a method or for the class itself.
+            /// </summary>
+            /// <typeparam name="T0"></typeparam>
+            public struct EnumeratorProvider<T0>
+                : IEnumerable<T0>
+            {
+                private Func<IEnumerator<T0>> _enumeratorCreateFunc;
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public EnumeratorProvider(Func<IEnumerator<T0>> enumeratorCreateFunc)
+                {
+                    _enumeratorCreateFunc = enumeratorCreateFunc;
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public IEnumerator<T0> GetEnumerator()
+                {
+                    return _enumeratorCreateFunc();
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return GetEnumerator();
+                }
+            }
+
+            /// <summary>
+            /// Non-relation-filtering enumerator, returning VT(int, Rect, RectMask128).
+            /// </summary>
+            public struct Enumerator
+                : IEnumerator<(int index, Rect rect, RectMask128 mask)> /*default enumerator*/
+                , IEnumerator<int>
+                , IEnumerator<Rect>
+                , IEnumerator<KeyValuePair<int, Rect>>
+            {
+                private List<Rect> _rects;
+                private List<RectMask128> _masks;
+                private int _count;
+                private int _index;
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public Enumerator(List<Rect> rects, List<RectMask128> masks)
+                {
+                    _rects = rects;
+                    _masks = masks;
+                    _count = rects?.Count ?? 0;
+                    _index = -1;
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public bool MoveNext()
+                {
+                    if (_index < 0)
+                    {
+                        _index = 0;
+                    }
+                    else if (_index < _count)
+                    {
+                        ++_index;
+                    }
+                    return (_index < _count);
+                }
+
+                public (int index, Rect rect, RectMask128 mask) Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get
+                    {
+                        bool shouldThrow = unchecked((uint)_index < (uint)_count);
+                        if (shouldThrow)
+                        {
+                            return _Throw_FakeReturn();
+                        }
+                        return (index: _index, rect: _rects[_index], mask: _masks[_index]);
+                    }
+                }
+
+                object IEnumerator.Current => Current;
+
+                int IEnumerator<int>.Current => Current.index;
+
+                Rect IEnumerator<Rect>.Current => Current.rect;
+
+                KeyValuePair<int, Rect> IEnumerator<KeyValuePair<int, Rect>>.Current
+                {
+                    get
+                    {
+                        var current = Current;
+                        return new KeyValuePair<int, Rect>(current.index, current.rect);
+                    }
+                }
+
+                public void Dispose()
+                {
+                    _rects = null;
+                    _masks = null;
+                    _count = 0;
+                    _index = -1;
+                }
+
+                public void Reset()
+                {
+                    _index = -1;
+                }
+
+                [MethodImpl(MethodImplOptions.NoInlining)]
+                private static ValueTuple<int, Rect, RectMask128> _Throw_FakeReturn()
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+
+            /// <summary>
+            /// Relation-filtering enumerator, returning VT(int, Rect, RectMask128).
+            /// </summary>
+            public struct FilteredEnumerator<TRelation>
+                : IEnumerator<(int index, Rect rect, RectMask128 mask)> /*default enumerator*/
+                , IEnumerator<int>
+                , IEnumerator<Rect>
+                , IEnumerator<KeyValuePair<int, Rect>>
+                where TRelation : struct, IRectRelation<TRelation, RectMask128>
+            {
+                private List<Rect> _rects;
+                private List<RectMask128> _masks;
+                private int _count;
+                private int _index;
+                private TRelation _relation;
+                private Rect _secondRect;
+                private RectMask128 _secondMask;
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public FilteredEnumerator(List<Rect> rects, List<RectMask128> masks, TRelation relation, Rect secondRect, RectMask128 secondMask)
+                {
+                    _rects = rects;
+                    _masks = masks;
+                    _count = rects?.Count ?? 0;
+                    _index = -1;
+                    _relation = relation;
+                    _secondRect = secondRect;
+                    _secondMask = secondMask;
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public bool MoveNext()
+                {
+                    if (_count == 0)
+                    {
+                        _index = 0;
+                        return false;
+                    }
+                    if (_index < 0)
+                    {
+                        _index = -1;
+                    }
+                    while (unchecked((uint)(_index + 1) < (uint)_count))
+                    {
+                        _index += 1;
+                        RectMask128 itemMask = _masks[_index];
+                        if (_relation.TestMaybe(itemMask, _secondMask))
+                        {
+                            Rect itemRect = _rects[_index];
+                            if (_relation.Test(itemRect, _secondRect))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                public (int index, Rect rect, RectMask128 mask) Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get
+                    {
+                        if (unchecked((uint)_index < (uint)_count))
+                        {
+                            return (index: _index, rect: _rects[_index], mask: _masks[_index]);
+                        }
+                        return _Throw_FakeReturn();
+                    }
+                }
+
+                object IEnumerator.Current => Current;
+
+                int IEnumerator<int>.Current => Current.index;
+
+                Rect IEnumerator<Rect>.Current => Current.rect;
+
+                KeyValuePair<int, Rect> IEnumerator<KeyValuePair<int, Rect>>.Current
+                {
+                    get
+                    {
+                        var current = Current;
+                        return new KeyValuePair<int, Rect>(current.index, current.rect);
+                    }
+                }
+
+                public void Dispose()
+                {
+                    _rects = null;
+                    _masks = null;
+                    _count = 0;
+                    _index = -1;
+                    _relation = default;
+                }
+
+                public void Reset()
+                {
+                    _index = -1;
+                }
+
+                [MethodImpl(MethodImplOptions.NoInlining)]
+                private static ValueTuple<int, Rect, RectMask128> _Throw_FakeReturn()
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            #endregion
+
             internal class CountHelper
             {
                 internal int Count;
