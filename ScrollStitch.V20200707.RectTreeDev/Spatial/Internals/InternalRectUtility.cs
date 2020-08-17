@@ -64,6 +64,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// (zero width or height), or if any of the rectangles are non-positive.
             /// </returns>
             /// 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Rect? TryComputeIntersection(Rect a, Rect b)
             {
                 if (a.Width <= 0 || a.Height <= 0 ||
@@ -124,6 +125,12 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             public static bool HasIntersect(Rect a, Rect b)
             {
                 return Inline.HasIntersect(a, b);
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            public static Rect? TryComputeIntersection(Rect a, Rect b)
+            {
+                return Inline.TryComputeIntersection(a, b);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
