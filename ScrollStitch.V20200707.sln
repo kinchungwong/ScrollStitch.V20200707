@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.Fixe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.RectTreeDev", "ScrollStitch.V20200707.RectTreeDev\ScrollStitch.V20200707.RectTreeDev.csproj", "{62CCE13C-0579-47C7-A991-83343C445A15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.SpatialUnitTests", "ScrollStitch.V20200707.SpatialUnitTests\ScrollStitch.V20200707.SpatialUnitTests.csproj", "{038B3936-B9CA-4471-B0E0-6085FE8F25AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{62CCE13C-0579-47C7-A991-83343C445A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62CCE13C-0579-47C7-A991-83343C445A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62CCE13C-0579-47C7-A991-83343C445A15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{038B3936-B9CA-4471-B0E0-6085FE8F25AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{038B3936-B9CA-4471-B0E0-6085FE8F25AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{038B3936-B9CA-4471-B0E0-6085FE8F25AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{038B3936-B9CA-4471-B0E0-6085FE8F25AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
