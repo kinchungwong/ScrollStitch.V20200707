@@ -152,6 +152,12 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             var masks = _masks;
             var rects = _rects;
             int count = masks?.Count ?? 0;
+            int rectCount = rects?.Count ?? 0;
+            if (rectCount != count)
+            {
+                // Exception throwing is the caller's responsibility.
+                return -1;
+            }
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = masks[index];
@@ -373,28 +379,33 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         /// </param>
         /// 
-        public void ForEach<TFuncInline>(Rect queryRect, TFuncInline func)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ForEach<TRelation, TFuncInline>(TRelation relation, Rect queryRect, RectMask128 queryMask, TFuncInline func)
+            where TRelation : struct, IRectRelation<TRelation, RectMask128>
             where TFuncInline : struct, IFuncInline<TFuncInline, int, Rect, bool>
         {
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            if (_masks is null ||
+                _rects is null ||
+                _masks.Count != _rects.Count)
+            {
+                // Exception throwing is the caller's responsibility.
+                return;
+            }
             int count = _masks.Count;
             for (int index = 0; index < count; ++index)
             {
                 var itemMask = _masks[index];
-                if (!queryMask.MaybeIntersecting(itemMask))
+                if (relation.TestMaybe(itemMask, queryMask))
                 {
-                    continue;
-                }
-                var itemRect = _rects[index];
-                if (!InternalRectUtility.Inline.HasIntersect(queryRect, itemRect))
-                {
-                    continue;
-                }
-                bool shouldContinue = func.Invoke(index, itemRect);
-                if (!shouldContinue)
-                {
-                    return;
+                    var itemRect = _rects[index];
+                    if (relation.Test(itemRect, queryRect))
+                    {
+                        bool shouldContinue = func.Invoke(index, itemRect);
+                        if (!shouldContinue)
+                        {
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -423,39 +434,63 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// </para>
         /// </summary>
         /// 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Func<int, Rect, bool> func) 
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Func<int, bool> func)
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Func<Rect, bool> func)
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Action<int, Rect> func)
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Action<int> func)
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void ForEach(Rect queryRect, Action<Rect> func)
         {
-            ForEach(queryRect, new HelperClasses.FuncAdapter(func));
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
         }
 
         /// <summary>
@@ -467,11 +502,15 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// <returns>
         /// The number of rectangle items on the list which overlap with the query rectangle.
         /// </returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public int GetCount(Rect queryRect)
         {
-            var helper = new HelperClasses.CountHelper();
-            ForEach(queryRect, new HelperClasses.CountAdapter(helper));
-            return helper.Count;
+            var relation = default(RectRelations.Intersect);
+            _CheckClassInvariantElseThrow();
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
+            var boxedCount = new HelperClasses.BoxedCount();
+            ForEach(relation, queryRect, queryMask, new HelperClasses.CountAdapter(boxedCount));
+            return boxedCount.Count;
         }
 
         public IEnumerator<Rect> GetEnumerator()
@@ -558,7 +597,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 _masks is null ||
                 _rects.Count != _masks.Count)
             {
-                _ThrowClassInvariantViolation();
+                NoInline._ThrowClassInvariantViolation();
             }
         }
 
@@ -570,10 +609,13 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             return stepSize;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void _ThrowClassInvariantViolation()
+        private static class NoInline
         {
-            throw new Exception("Class invariant violation.");
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            public static void _ThrowClassInvariantViolation()
+            {
+                throw new Exception("Class invariant violation.");
+            }
         }
 
         public static class HelperClasses
@@ -611,7 +653,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// <summary>
             /// Non-relation-filtering enumerator, returning VT(int, Rect, RectMask128).
             /// </summary>
-            public struct Enumerator
+            public class Enumerator
                 : IEnumerator<(int index, Rect rect, RectMask128 mask)> /*default enumerator*/
                 , IEnumerator<int>
                 , IEnumerator<Rect>
@@ -622,7 +664,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 private int _count;
                 private int _index;
 
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(MethodImplOptions.NoInlining)]
                 public Enumerator(List<Rect> rects, List<RectMask128> masks)
                 {
                     _rects = rects;
@@ -659,14 +701,25 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     }
                 }
 
-                object IEnumerator.Current => Current;
+                object IEnumerator.Current
+                {
+                    get => Current;
+                }
 
-                int IEnumerator<int>.Current => Current.index;
+                int IEnumerator<int>.Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get => Current.index;
+                }
 
-                Rect IEnumerator<Rect>.Current => Current.rect;
-
+                Rect IEnumerator<Rect>.Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get => Current.rect;
+                }
                 KeyValuePair<int, Rect> IEnumerator<KeyValuePair<int, Rect>>.Current
                 {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
                     get
                     {
                         var current = Current;
@@ -697,7 +750,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// <summary>
             /// Relation-filtering enumerator, returning VT(int, Rect, RectMask128).
             /// </summary>
-            public struct FilteredEnumerator<TRelation>
+            public class FilteredEnumerator<TRelation>
                 : IEnumerator<(int index, Rect rect, RectMask128 mask)> /*default enumerator*/
                 , IEnumerator<int>
                 , IEnumerator<Rect>
@@ -712,7 +765,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 private Rect _secondRect;
                 private RectMask128 _secondMask;
 
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(MethodImplOptions.NoInlining)]
                 public FilteredEnumerator(List<Rect> rects, List<RectMask128> masks, TRelation relation, Rect secondRect, RectMask128 secondMask)
                 {
                     _rects = rects;
@@ -765,14 +818,26 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     }
                 }
 
-                object IEnumerator.Current => Current;
+                object IEnumerator.Current
+                {
+                    get => Current;
+                }
 
-                int IEnumerator<int>.Current => Current.index;
+                int IEnumerator<int>.Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get => Current.index;
+                }
 
-                Rect IEnumerator<Rect>.Current => Current.rect;
+                Rect IEnumerator<Rect>.Current
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get => Current.rect;
+                }
 
                 KeyValuePair<int, Rect> IEnumerator<KeyValuePair<int, Rect>>.Current
                 {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
                     get
                     {
                         var current = Current;
@@ -802,7 +867,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             }
             #endregion
 
-            internal class CountHelper
+            /// <summary>
+            /// <see cref="BoxedCount"/> is a reference type (class) that houses a mutable 
+            /// integer value, <see cref="Count"/>.
+            /// </summary>
+            internal class BoxedCount
             {
                 internal int Count;
             }
@@ -810,17 +879,17 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             internal struct CountAdapter
                 : IFuncInline<CountAdapter, int, Rect, bool>
             {
-                private readonly CountHelper _countHelper;
+                private readonly BoxedCount _boxedCount;
 
-                internal CountAdapter(CountHelper countHelper)
+                internal CountAdapter(BoxedCount countHelper)
                 {
-                    _countHelper = countHelper;
+                    _boxedCount = countHelper;
                 }
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public bool Invoke(int index, Rect rect)
                 {
-                    _countHelper.Count += 1;
+                    _boxedCount.Count += 1;
                     return true;
                 }
             }
