@@ -100,28 +100,28 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial
                 get
                 {
                     yield return 
-                        new BruteForceInput(new int[] { -1, 0, 1, 2 }).SetName("m1_0_1_2")
+                        new BruteForceInput(-1, 0, 1, 2)
                         .Returns(new BruteForceReturnData(560, 560, 896, 896, 64752));
                     yield return 
-                        new BruteForceInput(new int[] { 0, 1, 2, 3 }).SetName("0_1_2_3")
+                        new BruteForceInput(0, 1, 2, 3)
                         .Returns(new BruteForceReturnData(13104, 13104, 9744, 9744, 58480));
                     yield return 
-                        new BruteForceInput(new int[] { 0, 3, 11, 127 }).SetName("0_3_11_127")
+                        new BruteForceInput(0, 3, 11, 127)
                         .Returns(new BruteForceReturnData(236106, 236106, 126828, 126828, 59452));
                     yield return 
-                        new BruteForceInput(new int[] { 1, 2, 3, 4 }).SetName("1_2_3_4")
+                        new BruteForceInput(1, 2, 3, 4)
                         .Returns(new BruteForceReturnData(91520, 91520, 51392, 51392, 34560));
                     yield return
-                        new BruteForceInput(new int[] { -2, -1, 0, 1 }).SetName("m2_m1_0_1")
+                        new BruteForceInput(-2, -1, 0, 1)
                         .Returns(new BruteForceReturnData(-8, -8, 16, 16, 65520));
                     yield return
-                        new BruteForceInput(new int[] { -2, -1, 1, 2 }).SetName("m2_m1_1_2")
+                        new BruteForceInput(-2, -1, 1, 2)
                         .Returns(new BruteForceReturnData(96, 96, 672, 672, 64960));
                     yield return
-                        new BruteForceInput(new int[] { -3, -2, -1, 0 }).SetName("m3_m2_m1_0")
+                        new BruteForceInput(-3, -2, -1, 0)
                         .Returns(new BruteForceReturnData(0, 0, 0, 0, 65536));
                     yield return
-                        new BruteForceInput(new int[] { -3, -2, -1, 1 }).SetName("m3_m2_m1_1")
+                        new BruteForceInput(-3, -2, -1, 1)
                         .Returns(new BruteForceReturnData(-20, -20, 16, 16, 65520));
                 }
             }
@@ -160,13 +160,13 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial
 
         [Test]
         [TestCaseSource(typeof(BruteForceTestCases), nameof(BruteForceTestCases.TestCases_WithReturn))]
-        public BruteForceReturnData TryComputeIntersection_SmokeTest_BruteForce(int i0, int i1, int i2, int i3)
+        public BruteForceReturnData SmokeTest_BruteForce(int i0, int i1, int i2, int i3)
         {
             IList<Rect> testRects = _RectsFromAllIntegerCombinations(i0, i1, i2, i3);
             // ======
             // Code fragment under test
             // ------
-            Rect? Call_TryComputeIntersection_ShouldNotThrow(Rect r1, Rect r2)
+            Rect? Call_ShouldNotThrow(Rect r1, Rect r2)
             {
                 return InternalRectUtility.NoInline.TryComputeIntersection(r1, r2);
             }
@@ -203,7 +203,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial
                     Assert.That(
                         () =>
                         {
-                            maybeInter = Call_TryComputeIntersection_ShouldNotThrow(r1, r2);
+                            maybeInter = Call_ShouldNotThrow(r1, r2);
                         }, Throws.Nothing);
                     UpdateReturnData(maybeInter);
                 }
@@ -213,7 +213,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial
 
         [Test]
         [TestCaseSource(typeof(BruteForceTestCases), nameof(BruteForceTestCases.TestCases_NoReturn))]
-        public void TryComputeIntersection_ForAll_WhenAnyWidthHeightNonPositive_AlwaysNull(int i0, int i1, int i2, int i3)
+        public void When_AnyWidthHeightNonPos_AlwaysNull(int i0, int i1, int i2, int i3)
         {
             IList<Rect> testRects = _RectsFromAllIntegerCombinations(i0, i1, i2, i3);
             // ======
