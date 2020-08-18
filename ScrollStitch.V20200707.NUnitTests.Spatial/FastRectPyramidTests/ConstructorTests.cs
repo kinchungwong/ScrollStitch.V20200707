@@ -15,7 +15,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_100_10000_ratio10()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 10000, ratio: 10.0);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 10000, ratio: 10.0);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -29,7 +29,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_100_1000_ratio316of100()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: 3.16);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: 3.16);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -43,7 +43,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_100_1000000_ratio10()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000000, ratio: 10.0);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000000, ratio: 10.0);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -59,7 +59,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_256_1024_ratio2()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 256, maxRadius: 1024, ratio: 2.0);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 256, maxRadius: 1024, ratio: 2.0);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -73,7 +73,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_256_65536_ratio2()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 256, maxRadius: 65536, ratio: 2.0);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 256, maxRadius: 65536, ratio: 2.0);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -93,7 +93,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_1000_3000_ratio_1point2()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 1000, maxRadius: 3000, ratio: 1.2);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 1000, maxRadius: 3000, ratio: 1.2);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -111,7 +111,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void SmokeTest_1000_3000_ratio_1point201()
         {
-            FastRectPyramid frp = new FastRectPyramid(minRadius: 1000, maxRadius: 3000, ratio: 1.201);
+            FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 1000, maxRadius: 3000, ratio: 1.201);
             Assert.Multiple(() =>
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
@@ -129,17 +129,24 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         [Test]
         public void DefaultCtor_ShouldSucceed_WithLevelsCreated()
         {
-            FastRectPyramid frp = new FastRectPyramid();
+            FastRectPyramid frp = FastRectPyramid.Builder.Create();
             Assert.Multiple(() => 
             {
                 Assert.That(frp.RadiusList, Is.Not.Null);
                 Assert.That(frp.RadiusList.Count, Is.GreaterThan(1));
-                Assert.That(Enumerable.First(frp.RadiusList), Is.EqualTo(FastRectPyramid.MinSupportedRadius));
-                Assert.That(Enumerable.Last(frp.RadiusList), Is.EqualTo(FastRectPyramid.MaxSupportedRadius));
+                Assert.That(Enumerable.First(frp.RadiusList), Is.EqualTo(FastRectPyramid.Constants.MinSupportedRadius));
+                Assert.That(Enumerable.Last(frp.RadiusList), Is.EqualTo(FastRectPyramid.Constants.MaxSupportedRadius));
                 int firstRadius = frp.RadiusList[0];
                 int secondRadius = frp.RadiusList[1];
                 double ratio = (double)secondRadius / firstRadius;
-                Assert.That(ratio, Is.InRange(20.0, 40.0));
+                // ======
+                // Because the ratio argument (or default ratio) is only treated as a suggestion
+                // whereas the actual ratio is computed on a evenly-spaced logarithmic scale, 
+                // the actual ratio between levels can be far from the ratio specified for the constructor.
+                // ======
+                Assert.That(ratio, Is.InRange(
+                    FastRectPyramid.Constants.DefaultRatio * 0.5, 
+                    FastRectPyramid.Constants.DefaultRatio * 2.0));
             });
         }
 
@@ -148,7 +155,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: -1, maxRadius: 100, ratio: 2.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: -1, maxRadius: 100, ratio: 2.0);
             });
         }
 
@@ -157,7 +164,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: -1, ratio: 2.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: -1, ratio: 2.0);
             });
         }
 
@@ -166,7 +173,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 1000, maxRadius: 100, ratio: 2.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 1000, maxRadius: 100, ratio: 2.0);
             });
         }
 
@@ -175,7 +182,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: 0.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: 0.0);
             });
         }
 
@@ -184,7 +191,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: 1.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: 1.0);
             });
         }
 
@@ -193,7 +200,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: 0.5);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: 0.5);
             });
         }
 
@@ -202,7 +209,7 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: -2.0);
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: -2.0);
             });
         }
 
@@ -211,8 +218,8 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                double ratio = 0.999 * FastRectPyramid.MinRatio;
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: ratio);
+                double ratio = 0.999 * FastRectPyramid.Constants.MinRatio;
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: ratio);
             });
         }
 
@@ -221,8 +228,8 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
         {
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                double ratio = 1.001 * FastRectPyramid.MaxRatio;
-                FastRectPyramid frp = new FastRectPyramid(minRadius: 100, maxRadius: 1000, ratio: ratio);
+                double ratio = 1.001 * FastRectPyramid.Constants.MaxRatio;
+                FastRectPyramid frp = FastRectPyramid.Builder.Create(minRadius: 100, maxRadius: 1000, ratio: ratio);
             });
         }
     }
