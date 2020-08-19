@@ -113,10 +113,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// 
             public static FastRectPyramid<T> Create<T>()
             {
-                return Create<T>(
-                    minRadius: Constants.MinSupportedRadius,
-                    maxRadius: Constants.MaxSupportedRadius,
-                    ratio: Constants.DefaultRatio);
+                return new FastRectPyramid<T>(InitDefaultRadiusList());
             }
 
             /// <summary>
@@ -162,6 +159,24 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 List<int> radiusList = InitRadiusList(minRadius, maxRadius, ratio);
                 var frp = new FastRectPyramid<T>(radiusList);
                 return frp;
+            }
+
+            /// <summary>
+            /// <para>
+            /// It is equivalent to calling <see cref="InitRadiusList(int, int, double)"/> with the following:
+            /// <br/>
+            /// ... <c>minRadius: <see cref="Constants.MinSupportedRadius"/></c> <br/>
+            /// ... <c>maxRadius: <see cref="Constants.MaxSupportedRadius"/></c> <br/>
+            /// ... <c>ratio: <see cref="Constants.DefaultRatio"/></c>
+            /// </para>
+            /// </summary>
+            /// 
+            public static List<int> InitDefaultRadiusList()
+            { 
+                return InitRadiusList(
+                    minRadius: Constants.MinSupportedRadius,
+                    maxRadius: Constants.MaxSupportedRadius,
+                    ratio: Constants.DefaultRatio);
             }
 
             /// <summary>
