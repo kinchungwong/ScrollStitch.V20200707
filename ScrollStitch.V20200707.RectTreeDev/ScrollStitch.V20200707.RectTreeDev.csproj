@@ -48,6 +48,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomRectGenerator.cs" />
+    <Compile Include="Spatial\Internals\FastRectDataList.cs" />
     <Compile Include="Spatial\Internals\FastRectListMethods.cs" />
     <Compile Include="Spatial\Internals\FastRectPyramid.cs" />
     <Compile Include="Spatial\Internals\FastRectList.cs" />

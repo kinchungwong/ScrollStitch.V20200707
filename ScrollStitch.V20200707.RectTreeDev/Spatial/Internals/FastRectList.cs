@@ -20,8 +20,9 @@ namespace ScrollStitch.V20200707.Spatial.Internals
     /// </para>
     /// 
     /// <para>
-    /// This class requires a <see cref="BoundingRect"/> parameter. The insertion of rectangle items that 
-    /// do not fit within this bounding rectangle will severely degrade query performance.
+    /// This class requires a <see cref="BoundingRect"/> parameter. This class does not allow insertion 
+    /// of rectangles that do not have positive width and height, or rectangles that are not fully 
+    /// contained within the bounding rectangle of this instance.
     /// </para>
     /// 
     /// <para>

@@ -337,6 +337,8 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         public bool IsReadOnly => false;
 
+        public Func<Rect, ICollection<KeyValuePair<Rect, T>>> ChildCollectionCreateFunc;
+
         #region private
         private List<int> _childRadiusList;
         private List<Rect> _childRects;
@@ -347,6 +349,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         {
             _CtorValidateRadiusList(childRadiusList);
             _CtorInitChildLists(childRadiusList);
+#if false
+            ChildCollectionCreateFunc = (Rect childRect) => new FastRectNode<T>(childRect, new FastRectNodeSettings());
+#elif true
+            ChildCollectionCreateFunc = (Rect childRect) => new FastRectDataList<T>(childRect);
+#endif
         }
 
         public void Add(Rect rect, T data)
@@ -381,30 +388,21 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 {
                     continue;
                 }
+                // ======
+                // Starting C# language version 5.0, the "foreach yield return" can be replaced 
+                // with this one-liner:
+                // ------
+                // yield foreach (child as something).Enumerate(queryRect);
+                // ------
                 switch (child)
                 {
-                    case FastRectNode<T> fastRectNode:
-#if false
-                        // Requires higher C# version.
-                        yield foreach fastRectNode.Enumerate(queryRect);
-#else
-                        foreach (var itemRectData in fastRectNode.Enumerate(queryRect))
-                        {
-                            yield return itemRectData;
-                        }
-#endif
-                        break;
                     case IRectQuery<KeyValuePair<Rect, T>> rectQuery:
-#if false
-                        // Requires higher C# version.
-                        yield foreach rectQuery.Enumerate(queryRect);
-#else
                         foreach (var itemRectData in rectQuery.Enumerate(queryRect))
                         {
                             yield return itemRectData;
                         }
-#endif
                         break;
+
                     default:
                         foreach (var itemRectData in child)
                         {
@@ -480,9 +478,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             if (child is null)
             {
                 var childRect = _childRects[levelIndex];
-                //child = new FastRectList(childRect);
-                child = new FastRectNode<T>(childRect, new FastRectNodeSettings());
-                //child = new List<Rect>();
+                child = ChildCollectionCreateFunc(childRect);
                 _childCollections[levelIndex] = child;
             }
             return child;
