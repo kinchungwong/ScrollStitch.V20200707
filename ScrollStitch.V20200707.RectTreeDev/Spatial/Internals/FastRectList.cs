@@ -41,7 +41,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         public Rect BoundingRect { get; }
 
-        public int Count => _rects.Count;
+        public int Count => _GetCount_Validated();
 
         public int Capacity
         {
@@ -65,21 +65,18 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         public FastRectList(Rect boundingRect, int capacity)
         {
-            BoundingRect = boundingRect;
-            int boundWidth = boundingRect.Width;
-            int boundHeight = boundingRect.Height;
-            if (boundWidth <= 0 ||
-                boundHeight <= 0)
+            if (!boundingRect.IsPositive)
             {
                 throw new ArgumentOutOfRangeException(nameof(boundingRect));
             }
-            _stepSize = _ComputeStepSize(boundWidth, boundHeight);
+            BoundingRect = boundingRect;
+            _stepSize = _CtorComputeStepSize();
             _rects = new List<Rect>(capacity: capacity);
             _masks = new List<RectMask128>(capacity: capacity);
         }
 
         public FastRectList(Rect boundingRect, IEnumerable<Rect> rects)
-            : this(boundingRect, capacity: _CtorTryGetCount(rects))
+            : this(boundingRect, capacity: _TryGetEnumerableCount(rects))
         {
             AddRange(rects);
         }
@@ -96,16 +93,17 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public int Add(Rect rect)
         {
-            _CheckClassInvariantElseThrow();
-            if (!RectMaskUtility.TryEncodeRect(BoundingRect, _stepSize, rect, out ulong xmask, out ulong ymask))
+            if (!InternalRectUtility.Inline.ContainsWithin(BoundingRect, rect))
             {
-                // all bits set, which forces a bruteforce comparison.
-                xmask = ~0uL;
-                ymask = ~0uL;
+                throw new ArgumentException(nameof(rect));
             }
+            RectMaskUtility.TryEncodeRect(BoundingRect, _stepSize, rect, out ulong xmask, out ulong ymask);
             _rects.Add(rect);
             _masks.Add(new RectMask128(xmask, ymask));
-            return _rects.Count - 1;
+            // ======
+            // Returns the index of the most recently inserted item.
+            // ------
+            return _GetCount_Validated() - 1;
         }
 
         /// <summary>
@@ -116,6 +114,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public void AddRange(IEnumerable<Rect> rects)
         {
+            _ReserveNewSpace(_TryGetEnumerableCount(rects));
             foreach (var rect in rects)
             {
                 Add(rect);
@@ -129,7 +128,74 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
+        /// Finds the index of the first rectangle for which the predicate returns true.
+        /// </summary>
+        /// <param name="rectPredicate"></param>
+        /// <returns>
+        /// The index of the first rectangle for which the predicate returns true, or 
+        /// a negative value such as minus one <c>(-1)</c> if the predicate returns false for all of the rectangles.
+        /// </returns>
+        /// 
+        public int FindFirst(Func<Rect, bool> rectPredicate)
+        {
+            int count = _GetCount_Validated();
+            for (int index = 0; index < count; ++index)
+            {
+                if (rectPredicate(_rects[index]))
+                {
+                    return index;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Returns the index of the first rectangle item for which the binary relation is true.
+        /// 
+        /// <para>
+        /// This is an overload that takes an <see cref="IRectRelation"/>.
+        /// </para>
+        /// 
+        /// <para>
+        /// Specifically, it finds the first item that satisfies the following expression:
+        /// <br/>
+        /// <c>(relation.Test(itemRect, queryRect))</c>
+        /// </para>
+        /// </summary>
+        /// 
+        /// <returns>
+        /// The index of the first item satisfying the binary relation with the query. 
+        /// <br/>
+        /// If no item satisfies the relation, a negative value <c>-1</c> is returned.
+        /// </returns>
+        /// 
+        public int FindFirst(IRectRelation relation, Rect queryRect)
+        {
+            if (relation is null)
+            {
+                throw new ArgumentNullException(nameof(relation));
+            }
+            if (relation is IRectMaskRelation<RectMask128> maskRelation128)
+            {
+                return FindFirst(maskRelation128, queryRect);
+            }
+            int count = _GetCount_Validated();
+            for (int index = 0; index < count; ++index)
+            {
+                if (relation.Test(_rects[index], queryRect))
+                {
+                    return index;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first rectangle item for which the binary relation is true.
+        /// 
+        /// <para>
+        /// This is an overload that takes an <see cref="IRectMaskRelation{TRectMask}/> of <see cref="RectMask128"/>.
+        /// </para>
         /// 
         /// <para>
         /// Specifically, it finds the first item that satisfies the following expression:
@@ -144,27 +210,53 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// If no item satisfies the relation, a negative value <c>-1</c> is returned.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int FindFirst<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
-            where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
+        public int FindFirst(IRectMaskRelation<RectMask128> relation, Rect queryRect)
         {
-            // Make local copy of instance fields to avoid false aliasing in codegen
-            var masks = _masks;
-            var rects = _rects;
-            int count = masks?.Count ?? 0;
-            int rectCount = rects?.Count ?? 0;
-            if (rectCount != count)
+            if (relation is null)
             {
-                // Exception throwing is the caller's responsibility.
+                throw new ArgumentNullException(nameof(relation));
+            }
+            switch (relation)
+            {
+                case RectRelations.Identical identical:
+                    return FindFirst<RectRelations.Identical>(identical, queryRect);
+
+                case RectRelations.IdenticalNT identicalNT:
+                    return FindFirst<RectRelations.IdenticalNT>(identicalNT, queryRect);
+
+                case RectRelations.Intersect intersect:
+                    return FindFirst<RectRelations.Intersect>(intersect, queryRect);
+
+                case RectRelations.Encompassing encompassing:
+                    return FindFirst<RectRelations.Encompassing>(encompassing, queryRect);
+
+                case RectRelations.EncompassingNT encompassingNT:
+                    return FindFirst<RectRelations.EncompassingNT>(encompassingNT, queryRect);
+
+                case RectRelations.EncompassedBy encompassedBy:
+                    return FindFirst<RectRelations.EncompassedBy>(encompassedBy, queryRect);
+
+                case RectRelations.EncompassedByNT encompassedByNT:
+                    return FindFirst<RectRelations.EncompassedByNT>(encompassedByNT, queryRect);
+                
+                default:
+                    break;
+            }
+            // ======
+            // In some types of rectangular relation queries (specifically: triviality-allowing relations), 
+            // a distinction needs to be made between the original query rect and the clamped query rect.
+            // ------
+            if (!(InternalRectUtility.Inline.TryComputeIntersection(BoundingRect, queryRect) is Rect clampedQueryRect))
+            {
                 return -1;
             }
+            RectMask128 queryMask = _ConvertQueryRectToMask(clampedQueryRect);
+            int count = _GetCount_Validated();
             for (int index = 0; index < count; ++index)
             {
-                var itemMask = masks[index];
-                if (relation.TestMaybe(itemMask, queryMask))
+                if (relation.TestMaybe(_masks[index], queryMask))
                 {
-                    var itemRect = rects[index];
-                    if (relation.Test(itemRect, queryRect))
+                    if (relation.Test(_rects[index], queryRect))
                     {
                         return index;
                     }
@@ -174,87 +266,59 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
-        /// Returns the index of the first rectangle item that is identical to the query rectangle.
+        /// Returns the index of the first rectangle item for which the binary relation is true.
+        /// 
+        /// <para>
+        /// This is an overload that takes an <see cref="IRectMaskRelationInline{TStruct, TRectMask}"/> 
+        /// of <see cref="RectMask128"/>. 
+        /// <br/>
+        /// This overload forces the relation type to be known at compile-time and its bit mask testing 
+        /// method to be available for inlining.
+        /// </para>
+        /// 
+        /// <para>
+        /// Specifically, it finds the first item that satisfies the following expression:
+        /// <br/>
+        /// <c>(relation.TestMaybe(itemMask, queryMask) &amp;&amp; relation.Test(itemRect, queryRect))</c>
+        /// </para>
         /// </summary>
-        /// <param name="queryRect">
-        /// The query rectangle.
-        /// </param>
+        /// 
         /// <returns>
-        /// The index of the first rectangle item that is identical to the query rectangle. <br/>
-        /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
+        /// The index of the first item satisfying the binary relation with the query. 
+        /// <br/>
+        /// If no item satisfies the relation, a negative value <c>-1</c> is returned.
         /// </returns>
         /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int FindFirstIdentical(Rect queryRect)
-        {
-            var relation = default(RectRelations.IdenticalNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return FindFirst(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Returns the index of the first rectangle item that intersects with the query rectangle.
-        /// </summary>
-        /// <param name="queryRect">
-        /// The query rectangle.
-        /// </param>
-        /// <returns>
-        /// The index of the first rectangle item that intersects with the query rectangle. <br/>
-        /// If none of the rectangle items intersect, a negative value <c>-1</c> is returned.
-        /// </returns>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int FindFirstIntersect(Rect queryRect)
-        {
-            var relation = default(RectRelations.Intersect);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return FindFirst(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Returns the index of the first rectangle item that encompasses the query rectangle.
-        /// </summary>
-        /// <param name="queryRect">
-        /// The query rectangle.
-        /// </param>
-        /// <returns>
-        /// The index of the first rectangle item that encompasses the query rectangle. <br/>
-        /// If none of the rectangle items encompasses the query rectangle, a negative value 
-        /// <c>-1</c> is returned.
-        /// </returns>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int FindFirstEncompassing(Rect queryRect)
-        {
-            var relation = default(RectRelations.EncompassingNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return FindFirst(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Returns the index of the first rectangle item that is encompassed by the query rectangle.
-        /// </summary>
-        /// <param name="queryRect">
-        /// The query rectangle.
-        /// </param>
-        /// <returns>
-        /// The index of the first rectangle item that is encompassed by the query rectangle. <br/>
-        /// If none of the rectangle items are encompassed by the query rectangle, a negative value 
-        /// <c>-1</c> is returned.
-        /// </returns>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int FindFirstEncompassedBy(Rect queryRect)
-        {
-            var relation = default(RectRelations.EncompassedByNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return FindFirst(relation, queryRect, queryMask);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<int> Enumerate<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
+        public int FindFirst<TRelation>(TRelation relation, Rect queryRect)
             where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
         {
+            // ======
+            // In some types of rectangular relation queries (specifically: triviality-allowing relations), 
+            // a distinction needs to be made between the original query rect and the clamped query rect.
+            // ------
+            if (!(InternalRectUtility.Inline.TryComputeIntersection(BoundingRect, queryRect) is Rect clampedQueryRect))
+            {
+                return -1;
+            }
+            RectMask128 queryMask = _ConvertQueryRectToMask(clampedQueryRect);
+            int count = _GetCount_Validated();
+            for (int index = 0; index < count; ++index)
+            {
+                if (relation.TestMaybe(_masks[index], queryMask))
+                {
+                    if (relation.Test(_rects[index], queryRect))
+                    {
+                        return index;
+                    }
+                }
+            }
+            return -1;
+        }
+
+        public IEnumerable<int> Enumerate<TRelation>(TRelation relation, Rect queryRect)
+            where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
+        {
+            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
             return new HelperClasses.EnumeratorProvider<int>(() =>
             {
                 return new HelperClasses.FilteredEnumerator<TRelation>(_rects, _masks, relation, queryRect, queryMask);
@@ -262,83 +326,14 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
-        /// Enumerates all rectangle items that are identical to the non-empty query rectangle.
-        /// 
-        /// <para>
-        /// See also: <br/>
-        /// </para>
-        /// <inheritdoc cref="RectRelations.IdenticalNT"/>
-        /// </summary>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<int> EnumerateIdentical(Rect queryRect)
-        {
-            var relation = default(RectRelations.IdenticalNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return Enumerate(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Enumerates all rectangle items that intersect with the query rectangle.
-        /// 
-        /// <para>
-        /// See also: <br/>
-        /// </para>
-        /// <inheritdoc cref="RectRelations.Intersect"/>
-        /// </summary>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<int> EnumerateIntersect(Rect queryRect)
-        {
-            var relation = default(RectRelations.Intersect);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return Enumerate(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Same as <see cref="EnumerateIntersect(Rect)"/>.
+        /// Same as <see cref="FastRectListMethods.EnumerateIntersect(FastRectList, Rect)"/>.
         /// <br/>
         /// This function is retained for compatibility with <see cref="IRectQuery{T}"/>.
         /// </summary>
         /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<int> Enumerate(Rect queryRect)
         {
-            return EnumerateIntersect(queryRect);
-        }
-
-        /// <summary>
-        /// Enumerates all rectangle items that encompass the non-empty query rectangle.
-        /// 
-        /// <para>
-        /// See also: <br/>
-        /// </para>
-        /// <inheritdoc cref="RectRelations.EncompassingNT"/>
-        /// </summary>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<int> EnumerateEncompassing(Rect queryRect)
-        {
-            var relation = default(RectRelations.EncompassingNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return Enumerate(relation, queryRect, queryMask);
-        }
-
-        /// <summary>
-        /// Enumerates all rectangle items that are non-empty and encompassed by the query rectangle.
-        /// 
-        /// <para>
-        /// See also: <br/>
-        /// </para>
-        /// <inheritdoc cref="RectRelations.EncompassedByNT"/>
-        /// </summary>
-        /// 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<int> EnumerateEncompassedBy(Rect queryRect)
-        {
-            var relation = default(RectRelations.EncompassedByNT);
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            return Enumerate(relation, queryRect, queryMask);
+            return Enumerate(default(RectRelations.Intersect), queryRect);
         }
 
         /// <summary>
@@ -380,22 +375,23 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// </param>
         /// 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ForEach<TRelation, TFuncInline>(TRelation relation, Rect queryRect, RectMask128 queryMask, TFuncInline func)
+        public void ForEach<TRelation, TFuncInline>(TRelation relation, Rect queryRect, TFuncInline func)
             where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
             where TFuncInline : struct, IFuncInline<TFuncInline, int, Rect, bool>
         {
-            if (_masks is null ||
-                _rects is null ||
-                _masks.Count != _rects.Count)
+            // ======
+            // In some types of rectangular relation queries (specifically: triviality-allowing relations), 
+            // a distinction needs to be made between the original query rect and the clamped query rect.
+            // ------
+            if (!(InternalRectUtility.Inline.TryComputeIntersection(BoundingRect, queryRect) is Rect clampedQueryRect))
             {
-                // Exception throwing is the caller's responsibility.
                 return;
             }
-            int count = _masks.Count;
+            RectMask128 queryMask = _ConvertQueryRectToMask(clampedQueryRect);
+            int count = _GetCount_Validated();
             for (int index = 0; index < count; ++index)
             {
-                var itemMask = _masks[index];
-                if (relation.TestMaybe(itemMask, queryMask))
+                if (relation.TestMaybe(_masks[index], queryMask))
                 {
                     var itemRect = _rects[index];
                     if (relation.Test(itemRect, queryRect))
@@ -411,89 +407,6 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         /// <summary>
-        /// Calls the specified function for each rectangle item that intersects with the query rectangle.
-        /// 
-        /// <para>
-        /// There are several <c>ForEach</c> overloads: <br/>
-        /// <see cref="ForEach(Rect, Action{Rect})"/> <br/>
-        /// <see cref="ForEach(Rect, Action{int, Rect})"/> <br/>
-        /// <see cref="ForEach(Rect, Action{int})"/> <br/>
-        /// <see cref="ForEach(Rect, Func{Rect, bool})"/> <br/>
-        /// <see cref="ForEach(Rect, Func{int, Rect, bool})"/> <br/>
-        /// <see cref="ForEach(Rect, Func{int, bool})"/>
-        /// </para>
-        /// 
-        /// <para>
-        /// The callback's integer parameter refers to the item index on the list. The item index helps 
-        /// disambiguate between duplicate rectangles on the list.
-        /// </para>
-        /// 
-        /// <para>
-        /// Overloads which accept a <c>Func&lt;..., bool&gt;</c> can return a bool to indicate continuation. 
-        /// The query loop can be stopped early by returning false.
-        /// </para>
-        /// </summary>
-        /// 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Func<int, Rect, bool> func) 
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Func<int, bool> func)
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Func<Rect, bool> func)
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Action<int, Rect> func)
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Action<int> func)
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <inheritdoc cref="ForEach(Rect, Func{int, Rect, bool})"/>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ForEach(Rect queryRect, Action<Rect> func)
-        {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
-            ForEach(relation, queryRect, queryMask, new HelperClasses.FuncAdapter(func));
-        }
-
-        /// <summary>
         /// Counts the number of rectangles that overlaps with the specified query rectangle.
         /// </summary>
         /// <param name="queryRect">
@@ -505,23 +418,20 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         [MethodImpl(MethodImplOptions.NoInlining)]
         public int GetCount(Rect queryRect)
         {
-            var relation = default(RectRelations.Intersect);
-            _CheckClassInvariantElseThrow();
-            RectMask128 queryMask = _ConvertQueryRectToMask(queryRect);
             var boxedCount = new HelperClasses.BoxedCount();
-            ForEach(relation, queryRect, queryMask, new HelperClasses.CountAdapter(boxedCount));
+            ForEach(default(RectRelations.Intersect), queryRect, new HelperClasses.CountAdapter(boxedCount));
             return boxedCount.Count;
         }
 
         public IEnumerator<Rect> GetEnumerator()
         {
-            _CheckClassInvariantElseThrow();
+            _GetCount_Validated();
             return ((IEnumerable<Rect>)_rects).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            _CheckClassInvariantElseThrow();
+            _GetCount_Validated();
             return ((IEnumerable)_rects).GetEnumerator();
         }
 
@@ -544,7 +454,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public IReadOnlyList<Rect> AsReadOnly()
         {
-            _CheckClassInvariantElseThrow();
+            _GetCount_Validated();
             return _rects.AsReadOnly();
         }
 
@@ -558,11 +468,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         public Rect[] ToArray()
         {
-            _CheckClassInvariantElseThrow();
+            _GetCount_Validated();
             return _rects.ToArray();
         }
 
-        private static int _CtorTryGetCount(IEnumerable<Rect> rects)
+        private static int _TryGetEnumerableCount(IEnumerable<Rect> rects)
         {
             switch (rects)
             {
@@ -574,6 +484,30 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     return rocoll.Count;
                 default:
                     return 0;
+            }
+        }
+
+        private void _ReserveNewSpace(int additionalItemCount)
+        {
+            if (additionalItemCount <= 0)
+            {
+                return;
+            }
+            checked
+            {
+                int capacityAtLeast = _rects.Count + additionalItemCount;
+                if (_rects.Capacity >= capacityAtLeast)
+                {
+                    return;
+                }
+                // Preserve the "grow by doubling" behavior.
+                int targetCapacity = _rects.Capacity;
+                while (targetCapacity < capacityAtLeast)
+                {
+                    targetCapacity *= 2;
+                }
+                _rects.Capacity = targetCapacity;
+                _masks.Capacity = targetCapacity;
             }
         }
 
@@ -591,20 +525,26 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void _CheckClassInvariantElseThrow()
+        private int _GetCount_Validated()
         {
             if (_rects is null ||
-                _masks is null ||
-                _rects.Count != _masks.Count)
+                _masks is null)
             {
                 NoInline._ThrowClassInvariantViolation();
             }
+            int count = _rects.Count;
+            int maskCount = _masks.Count;
+            if (count != maskCount)
+            {
+                NoInline._ThrowClassInvariantViolation();
+            }
+            return count;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int _ComputeStepSize(int boundWidth, int boundHeight)
+        private int _CtorComputeStepSize()
         {
-            int maxBoundingLen = Math.Max(boundWidth, boundHeight);
+            int maxBoundingLen = Math.Max(BoundingRect.Width, BoundingRect.Height);
             int stepSize = (maxBoundingLen + BitsPerAxis - 1) / BitsPerAxis;
             return stepSize;
         }
@@ -620,7 +560,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         public static class HelperClasses
         {
-            #region custom enumerators
+#region custom enumerators
             /// <summary>
             /// A class that provides an <see cref="IEnumerator{T0}"/> upon request. This class is thus used to 
             /// satisfy <see cref="IEnumerable{T0}"/>, either for a method or for the class itself.
@@ -768,9 +708,14 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 [MethodImpl(MethodImplOptions.NoInlining)]
                 public FilteredEnumerator(List<Rect> rects, List<RectMask128> masks, TRelation relation, Rect secondRect, RectMask128 secondMask)
                 {
+                    if (rects is null || masks is null ||
+                        rects.Count != masks.Count)
+                    {
+                        throw new ArgumentException();
+                    }
                     _rects = rects;
                     _masks = masks;
-                    _count = rects?.Count ?? 0;
+                    _count = rects.Count;
                     _index = -1;
                     _relation = relation;
                     _secondRect = secondRect;
@@ -865,7 +810,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     throw new InvalidOperationException();
                 }
             }
-            #endregion
+#endregion
 
             /// <summary>
             /// <see cref="BoxedCount"/> is a reference type (class) that houses a mutable 
