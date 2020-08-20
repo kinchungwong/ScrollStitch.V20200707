@@ -55,8 +55,50 @@ namespace ScrollStitch.V20200707.NUnitTests.Spatial.FastRectPyramidTests
                 bool hasFound = pyramid.ContainsRect(rects[k]);
                 Assert.That(hasFound, Is.True);
             }
+        }
+
+        [Test]
+        public void Default_Add_Random_10000_Check()
+        {
+            const int addCount = 10_000;
+            List<Rect> rects = new List<Rect>(capacity: addCount);
+            for (int k = 0; k < addCount; ++k)
+            {
+                rects.Add(NextRandomRect());
+            }
+            FastRectPyramid<int> pyramid = FastRectPyramid<int>.Builder.Create();
+            for (int k = 0; k < addCount; ++k)
+            {
+                pyramid.Add(new KeyValuePair<Rect, int>(rects[k], k));
+            }
+            for (int k = 0; k < addCount; ++k)
+            {
+                bool hasFound = pyramid.ContainsRect(rects[k]);
+                Assert.That(hasFound, Is.True);
+            }
+        }
+
+        [Test]
+        [Explicit("The outcome of this test is not determinate, as there may be random hits.")]
+        public void Default_Add_Random_1000_Check_RandomHits()
+        {
+            const int addCount = 1000;
+            List<Rect> rects = new List<Rect>(capacity: addCount);
+            for (int k = 0; k < addCount; ++k)
+            {
+                rects.Add(NextRandomRect());
+            }
+            FastRectPyramid<int> pyramid = FastRectPyramid<int>.Builder.Create();
+            for (int k = 0; k < addCount; ++k)
+            {
+                pyramid.Add(new KeyValuePair<Rect, int>(rects[k], k));
+            }
+            // ======
             // The following is supposed to be a very unlikely event, 
             // but a small number of matches by chance are expected.
+            // ------
+            // The actual count of hit-by-chance is not asserted.
+            // ------
             int randomMatches = 0;
             for (int k = 0; k < addCount; ++k)
             {
