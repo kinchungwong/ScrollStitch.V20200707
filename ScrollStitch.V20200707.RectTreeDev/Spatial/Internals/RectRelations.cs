@@ -49,11 +49,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case (both rectangles are empty) is allowed.
         /// </summary>
         public struct Identical
-            : IRectRelation<Identical, RectMask128>
-            , IRectRelation<Identical, RectMask64>
-            , IRectRelation<Identical, RectMask32>
-            , IRectRelation<Identical, RectMask16>
-            , IRectRelation<Identical, RectMask8>
+            : IRectMaskRelation<Identical, RectMask128>
+            , IRectMaskRelation<Identical, RectMask64>
+            , IRectMaskRelation<Identical, RectMask32>
+            , IRectMaskRelation<Identical, RectMask16>
+            , IRectMaskRelation<Identical, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -101,11 +101,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case (both rectangles are empty) is disallowed.
         /// </summary>
         public struct IdenticalNT
-            : IRectRelation<IdenticalNT, RectMask128>
-            , IRectRelation<IdenticalNT, RectMask64>
-            , IRectRelation<IdenticalNT, RectMask32>
-            , IRectRelation<IdenticalNT, RectMask16>
-            , IRectRelation<IdenticalNT, RectMask8>
+            : IRectMaskRelation<IdenticalNT, RectMask128>
+            , IRectMaskRelation<IdenticalNT, RectMask64>
+            , IRectMaskRelation<IdenticalNT, RectMask32>
+            , IRectMaskRelation<IdenticalNT, RectMask16>
+            , IRectMaskRelation<IdenticalNT, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -165,11 +165,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// This relation does not have a trivial case.
         /// </summary>
         public struct Intersect
-            : IRectRelation<Intersect, RectMask128>
-            , IRectRelation<Intersect, RectMask64>
-            , IRectRelation<Intersect, RectMask32>
-            , IRectRelation<Intersect, RectMask16>
-            , IRectRelation<Intersect, RectMask8>
+            : IRectMaskRelation<Intersect, RectMask128>
+            , IRectMaskRelation<Intersect, RectMask64>
+            , IRectMaskRelation<Intersect, RectMask32>
+            , IRectMaskRelation<Intersect, RectMask16>
+            , IRectMaskRelation<Intersect, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -213,11 +213,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case is allowed. 
         /// </summary>
         public struct Encompassing
-            : IRectRelation<Encompassing, RectMask128>
-            , IRectRelation<Encompassing, RectMask64>
-            , IRectRelation<Encompassing, RectMask32>
-            , IRectRelation<Encompassing, RectMask16>
-            , IRectRelation<Encompassing, RectMask8>
+            : IRectMaskRelation<Encompassing, RectMask128>
+            , IRectMaskRelation<Encompassing, RectMask64>
+            , IRectMaskRelation<Encompassing, RectMask32>
+            , IRectMaskRelation<Encompassing, RectMask16>
+            , IRectMaskRelation<Encompassing, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -272,11 +272,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case is disallowed. 
         /// </summary>
         public struct EncompassingNT
-            : IRectRelation<EncompassingNT, RectMask128>
-            , IRectRelation<EncompassingNT, RectMask64>
-            , IRectRelation<EncompassingNT, RectMask32>
-            , IRectRelation<EncompassingNT, RectMask16>
-            , IRectRelation<EncompassingNT, RectMask8>
+            : IRectMaskRelation<EncompassingNT, RectMask128>
+            , IRectMaskRelation<EncompassingNT, RectMask64>
+            , IRectMaskRelation<EncompassingNT, RectMask32>
+            , IRectMaskRelation<EncompassingNT, RectMask16>
+            , IRectMaskRelation<EncompassingNT, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -331,11 +331,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case is allowed. 
         /// </summary>
         public struct EncompassedBy
-            : IRectRelation<EncompassedBy, RectMask128>
-            , IRectRelation<EncompassedBy, RectMask64>
-            , IRectRelation<EncompassedBy, RectMask32>
-            , IRectRelation<EncompassedBy, RectMask16>
-            , IRectRelation<EncompassedBy, RectMask8>
+            : IRectMaskRelation<EncompassedBy, RectMask128>
+            , IRectMaskRelation<EncompassedBy, RectMask64>
+            , IRectMaskRelation<EncompassedBy, RectMask32>
+            , IRectMaskRelation<EncompassedBy, RectMask16>
+            , IRectMaskRelation<EncompassedBy, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
@@ -393,11 +393,11 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// The trivial case is disallowed. 
         /// </summary>
         public struct EncompassedByNT
-            : IRectRelation<EncompassedByNT, RectMask128>
-            , IRectRelation<EncompassedByNT, RectMask64>
-            , IRectRelation<EncompassedByNT, RectMask32>
-            , IRectRelation<EncompassedByNT, RectMask16>
-            , IRectRelation<EncompassedByNT, RectMask8>
+            : IRectMaskRelation<EncompassedByNT, RectMask128>
+            , IRectMaskRelation<EncompassedByNT, RectMask64>
+            , IRectMaskRelation<EncompassedByNT, RectMask32>
+            , IRectMaskRelation<EncompassedByNT, RectMask16>
+            , IRectMaskRelation<EncompassedByNT, RectMask8>
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Test(Rect rectFirst, Rect rectSecond)
