@@ -50,7 +50,8 @@ namespace ScrollStitch.V20200707.Spatial.Internals
             /// Computes the intersecting rectangle between the two input rectangles.
             /// 
             /// <para>
-            /// This method does not throw any exception.
+            /// This method does not throw any exception. <br/>
+            /// It may return null, namely a <see cref="Nullable{T}"/> of <see cref="Rect"/> with no value.
             /// </para>
             /// </summary>
             /// 
