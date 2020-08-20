@@ -177,23 +177,29 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                     T itemData = _newData[newIndex];
                     yield return new KeyValuePair<Rect, T>(itemRect, itemData);
                 }
-                foreach (int straddleIndex in _straddleRects.Enumerate(queryRect))
+                if (!(_straddleRects is null))
                 {
-                    Rect itemRect = _straddleRects[straddleIndex];
-                    T itemData = _straddleData[straddleIndex];
-                    yield return new KeyValuePair<Rect, T>(itemRect, itemData);
-                }
-                foreach (int childIndex in _childRects.Enumerate(queryRect))
-                {
-                    Rect childRect = _childRects[childIndex];
-                    var childNode = _childNodes[childIndex];
-                    if (childNode is null)
+                    foreach (int straddleIndex in _straddleRects.Enumerate(queryRect))
                     {
-                        continue;
+                        Rect itemRect = _straddleRects[straddleIndex];
+                        T itemData = _straddleData[straddleIndex];
+                        yield return new KeyValuePair<Rect, T>(itemRect, itemData);
                     }
-                    foreach (var kvp in childNode.Enumerate(queryRect))
+                }
+                if (!(_childRects is null))
+                {
+                    foreach (int childIndex in _childRects.Enumerate(queryRect))
                     {
-                        yield return kvp;
+                        Rect childRect = _childRects[childIndex];
+                        var childNode = _childNodes[childIndex];
+                        if (childNode is null)
+                        {
+                            continue;
+                        }
+                        foreach (var kvp in childNode.Enumerate(queryRect))
+                        {
+                            yield return kvp;
+                        }
                     }
                 }
             }
