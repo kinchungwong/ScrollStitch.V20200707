@@ -146,7 +146,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int FindFirst<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
-            where TRelation : struct, IRectMaskRelation<TRelation, RectMask128>
+            where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
         {
             // Make local copy of instance fields to avoid false aliasing in codegen
             var masks = _masks;
@@ -253,7 +253,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IEnumerable<int> Enumerate<TRelation>(TRelation relation, Rect queryRect, RectMask128 queryMask)
-            where TRelation : struct, IRectMaskRelation<TRelation, RectMask128>
+            where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
         {
             return new HelperClasses.EnumeratorProvider<int>(() =>
             {
@@ -381,7 +381,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         /// 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ForEach<TRelation, TFuncInline>(TRelation relation, Rect queryRect, RectMask128 queryMask, TFuncInline func)
-            where TRelation : struct, IRectMaskRelation<TRelation, RectMask128>
+            where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
             where TFuncInline : struct, IFuncInline<TFuncInline, int, Rect, bool>
         {
             if (_masks is null ||
@@ -755,7 +755,7 @@ namespace ScrollStitch.V20200707.Spatial.Internals
                 , IEnumerator<int>
                 , IEnumerator<Rect>
                 , IEnumerator<KeyValuePair<int, Rect>>
-                where TRelation : struct, IRectMaskRelation<TRelation, RectMask128>
+                where TRelation : struct, IRectMaskRelationInline<TRelation, RectMask128>
             {
                 private List<Rect> _rects;
                 private List<RectMask128> _masks;

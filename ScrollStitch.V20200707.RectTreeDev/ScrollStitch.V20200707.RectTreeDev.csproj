@@ -57,6 +57,7 @@
     <Compile Include="Spatial\Internals\InternalRectUtility.cs" />
     <Compile Include="Spatial\Internals\IRectMaskArith.cs" />
     <Compile Include="Spatial\Internals\IRectMaskRelation.cs" />
+    <Compile Include="Spatial\Internals\IRectMaskRelationInline.cs" />
     <Compile Include="Spatial\Internals\IRectRelation.cs" />
     <Compile Include="Spatial\Internals\NullList.cs" />
     <Compile Include="Spatial\Internals\NullListUtility.cs" />
