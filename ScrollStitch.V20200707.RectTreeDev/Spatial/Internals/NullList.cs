@@ -108,6 +108,20 @@ namespace ScrollStitch.V20200707.Spatial.Internals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public NullList(int capacity, int count)
+        {
+            if (capacity < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity));
+            }
+            if (count < 0 || count > capacity)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+            Count = count;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(T _)
         {
             ++Count;
