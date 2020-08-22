@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\FilteredEnumerable.cs" />
+    <Compile Include="Collections\FilteredEnumerableInline.cs" />
+    <Compile Include="Collections\FilteredEnumerator.cs" />
+    <Compile Include="Collections\FilteredEnumeratorBuilder.cs" />
+    <Compile Include="Collections\FilteredEnumeratorInline.cs" />
+    <Compile Include="Functional\IDeconstruct.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomRectGenerator.cs" />
@@ -68,6 +74,12 @@
     <Compile Include="Spatial\Internals\RectRelations.cs" />
     <Compile Include="Spatial\Internals\SpatialBitMaskUtility.cs" />
     <Compile Include="Spatial\IRectKeyDictionary.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign2\FilteredRectMaskEnumerator.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign2\RectMaskPredicateInline.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign\RectMaskDataListEnumeratorBase.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign\RectMaskDataListEnumeratorBuilder.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign\FilteredRectDataEnumerator.cs" />
+    <Compile Include="Spatial\NewEnumeratorDesign\RectMaskRelationPredicate.cs" />
     <Compile Include="Spatial\RectDictionary.cs" />
     <Compile Include="Spatial\RectTreeInternals\ItemFlag.cs" />
     <Compile Include="Spatial\RectTreeInternals\Node.cs" />
