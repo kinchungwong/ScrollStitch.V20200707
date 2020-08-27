@@ -72,6 +72,7 @@
     <Compile Include="Spatial\Internals\RectMask.cs" />
     <Compile Include="Spatial\Internals\RectMaskUtility.cs" />
     <Compile Include="Spatial\Internals\RectRelations.cs" />
+    <Compile Include="Spatial\Internals\RectTreeV3\RectNodeV3.cs" />
     <Compile Include="Spatial\Internals\SpatialBitMaskUtility.cs" />
     <Compile Include="Spatial\IRectKeyDictionary.cs" />
     <Compile Include="Spatial\NewEnumeratorDesign2\FilteredRectMaskEnumerator.cs" />
