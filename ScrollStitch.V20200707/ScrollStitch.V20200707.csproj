@@ -74,7 +74,6 @@
     <Compile Include="Arrays\IArray2.cs" />
     <Compile Include="Arrays\IArray2Info.cs" />
     <Compile Include="Arrays\IReadOnlyArray2.cs" />
-    <Compile Include="Bitwise\BitwiseUtility.cs" />
     <Compile Include="Caching\IItemSource.cs" />
     <Compile Include="Caching\ItemSource.cs" />
     <Compile Include="Collections\ReadOnlyEnumerableCollection.cs" />
@@ -105,15 +104,6 @@
     <Compile Include="Config\Data\TestSetEnumeratedFiles.cs" />
     <Compile Include="Config\TestClassConfig.cs" />
     <Compile Include="Data\HorzOrVert.cs" />
-    <Compile Include="Data\Movement.cs" />
-    <Compile Include="Data\Point.cs" />
-    <Compile Include="Data\Range.cs" />
-    <Compile Include="Data\Rect.cs" />
-    <Compile Include="Data\Size.cs" />
-    <Compile Include="Functional\IAction.cs" />
-    <Compile Include="Functional\IFunc.cs" />
-    <Compile Include="Functional\IFuncInline.cs" />
-    <Compile Include="HashCode\HashCodeBuilder.cs" />
     <Compile Include="ImageManager.cs" />
     <Compile Include="Imaging\BitmapCopyUtility.cs" />
     <Compile Include="Imaging\ByteBitmap.cs" />
@@ -271,7 +261,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Bitwise\" />
     <Folder Include="Experimental\" />
+    <Folder Include="Functional\" />
+    <Folder Include="HashCode\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -289,6 +282,12 @@
     <Content Include="TestClassConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Base\ScrollStitch.V20200707.Base.csproj">
+      <Project>{e0880bfa-2047-4dfe-90b6-1bc72d120e8d}</Project>
+      <Name>ScrollStitch.V20200707.Base</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

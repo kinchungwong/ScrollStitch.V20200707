@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Base\ScrollStitch.V20200707.Base.csproj" />
     <ProjectReference Include="..\ScrollStitch.V20200707.RectTreeDev\ScrollStitch.V20200707.RectTreeDev.csproj" />
     <ProjectReference Include="..\ScrollStitch.V20200707\ScrollStitch.V20200707.csproj" />
   </ItemGroup>

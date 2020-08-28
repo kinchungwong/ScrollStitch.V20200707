@@ -101,6 +101,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Base\ScrollStitch.V20200707.Base.csproj">
+      <Project>{e0880bfa-2047-4dfe-90b6-1bc72d120e8d}</Project>
+      <Name>ScrollStitch.V20200707.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ScrollStitch.V20200707\ScrollStitch.V20200707.csproj">
       <Project>{515523d6-13f3-4327-8004-b18a3355da43}</Project>
       <Name>ScrollStitch.V20200707</Name>

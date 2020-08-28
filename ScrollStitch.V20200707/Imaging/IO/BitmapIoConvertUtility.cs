@@ -40,7 +40,7 @@ namespace ScrollStitch.V20200707.Imaging.IO
 
         public static void CopyTo(Bitmap input, ByteBitmap output)
         {
-            _ValidateSizeElseThrow(input.Size, output.Size);
+            _ValidateSizeElseThrow(input.Size, _Cvt(output.Size));
             int width = input.Width;
             int height = input.Height;
             var format = input.PixelFormat;
@@ -83,7 +83,7 @@ namespace ScrollStitch.V20200707.Imaging.IO
 
         public static void CopyTo(Bitmap input, IntBitmap output)
         {
-            _ValidateSizeElseThrow(input.Size, output.Size);
+            _ValidateSizeElseThrow(input.Size, _Cvt(output.Size));
             int width = input.Width;
             int height = input.Height;
             var format = input.PixelFormat;
@@ -126,7 +126,7 @@ namespace ScrollStitch.V20200707.Imaging.IO
 
         public static void CopyTo(ByteBitmap input, Bitmap output)
         {
-            _ValidateSizeElseThrow(input.Size, output.Size);
+            _ValidateSizeElseThrow(_Cvt(input.Size), output.Size);
             int width = input.Width;
             int height = input.Height;
             var format = output.PixelFormat;
@@ -169,7 +169,7 @@ namespace ScrollStitch.V20200707.Imaging.IO
 
         public static void CopyTo(IntBitmap input, Bitmap output)
         {
-            _ValidateSizeElseThrow(input.Size, output.Size);
+            _ValidateSizeElseThrow(_Cvt(input.Size), output.Size);
             int width = input.Width;
             int height = input.Height;
             var format = output.PixelFormat;
@@ -217,6 +217,26 @@ namespace ScrollStitch.V20200707.Imaging.IO
             {
                 throw new InvalidOperationException("Bitmap size mismatch");
             }
+        }
+
+        private static System.Drawing.Size _Cvt(V20200707.Data.Size size)
+        {
+            return new System.Drawing.Size(size.Width, size.Height);
+        }
+
+        private static V20200707.Data.Size _Cvt(System.Drawing.Size size)
+        {
+            return new V20200707.Data.Size(size.Width, size.Height);
+        }
+
+        private static System.Drawing.Point _Cvt(V20200707.Data.Point point)
+        {
+            return new System.Drawing.Point(point.X, point.Y);
+        }
+
+        private static V20200707.Data.Point _Cvt(System.Drawing.Point point)
+        {
+            return new V20200707.Data.Point(point.X, point.Y);
         }
     }
 }

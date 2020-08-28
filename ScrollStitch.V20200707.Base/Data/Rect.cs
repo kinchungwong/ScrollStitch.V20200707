@@ -206,16 +206,6 @@ namespace ScrollStitch.V20200707.Data
             return !p1.Equals(p2);
         }
 
-        public static implicit operator System.Drawing.Rectangle(Rect r)
-        {
-            return new System.Drawing.Rectangle(r.X, r.Y, r.Width, r.Height);
-        }
-
-        public static implicit operator Rect(System.Drawing.Rectangle r)
-        {
-            return new Rect(r.X, r.Y, r.Width, r.Height);
-        }
-
         public static Rect operator +(Rect r, Movement m)
         {
             return new Rect(r.X + m.DeltaX, r.Y + m.DeltaY, r.Width, r.Height);

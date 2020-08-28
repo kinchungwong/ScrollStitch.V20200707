@@ -52,16 +52,6 @@ namespace ScrollStitch.V20200707.Data
             return !s1.Equals(s2);
         }
 
-        public static implicit operator System.Drawing.Size(Size s)
-        {
-            return new System.Drawing.Size(s.Width, s.Height);
-        }
-
-        public static implicit operator Size(System.Drawing.Size s)
-        {
-            return new Size(s.Width, s.Height);
-        }
-
         public override int GetHashCode()
         {
             return HashCodeBuilder.ForType<Size>().Ingest(Width, Height).GetHashCode();
