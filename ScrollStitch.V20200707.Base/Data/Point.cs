@@ -67,16 +67,6 @@ namespace ScrollStitch.V20200707.Data
             return !p1.Equals(p2);
         }
 
-        public static implicit operator System.Drawing.Point(Point p)
-        {
-            return new System.Drawing.Point(p.X, p.Y);
-        }
-
-        public static implicit operator Point(System.Drawing.Point p)
-        {
-            return new Point(p.X, p.Y);
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Point((int x, int y) p)
         {
