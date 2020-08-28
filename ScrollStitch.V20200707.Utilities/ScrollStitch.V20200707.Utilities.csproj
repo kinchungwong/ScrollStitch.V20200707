@@ -41,6 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\IUniqueList.cs" />
+    <Compile Include="Collections\ReadOnlyEnumerableCollection.cs" />
+    <Compile Include="Collections\ReadOnlyUtility.cs" />
+    <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Memory\Diagnostics\ArrayPoolMemoryUsage.cs" />
     <Compile Include="Memory\ExactLengthArrayPool.cs" />
     <Compile Include="Memory\IArrayPoolClient.cs" />

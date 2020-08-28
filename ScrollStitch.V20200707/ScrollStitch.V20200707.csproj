@@ -64,18 +64,14 @@
   <ItemGroup>
     <Compile Include="Caching\IItemSource.cs" />
     <Compile Include="Caching\ItemSource.cs" />
-    <Compile Include="Collections\ReadOnlyEnumerableCollection.cs" />
-    <Compile Include="Collections\ReadOnlyUtility.cs" />
     <Compile Include="Collections\Specialized\Histogram.cs" />
     <Compile Include="Collections\Specialized\IHistogram.cs" />
     <Compile Include="Collections\Internals\HistArith.cs" />
     <Compile Include="Collections\Specialized\HistogramUtility.cs" />
     <Compile Include="Collections\Internals\IHistArith.cs" />
     <Compile Include="Caching\ItemFactory.cs" />
-    <Compile Include="Collections\IUniqueList.cs" />
     <Compile Include="Collections\Specialized\IntKeyIntRow.cs" />
     <Compile Include="Collections\Specialized\ITable.cs" />
-    <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Config\ConfigVariableSubstitutions.cs" />
     <Compile Include="Config\Data\ClassParallelPermission.cs" />
     <Compile Include="Config\Data\ClassParallelPermissionProfile.cs" />
