@@ -45,9 +45,18 @@
     <Compile Include="Imaging\ByteBitmap.cs" />
     <Compile Include="Imaging\ColorUtility.cs" />
     <Compile Include="Imaging\FloatBitmap.cs" />
+    <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
     <Compile Include="Imaging\IArrayBitmap.cs" />
     <Compile Include="Imaging\IntBitmap.cs" />
     <Compile Include="Imaging\IScalarBitmapInfo.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
+    <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />
+    <Compile Include="Imaging\RowAccess\CroppedBitmapRowAccess.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowAccess.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowDirect.cs" />
+    <Compile Include="Imaging\RowAccess\IBitmapRowSource.cs" />
+    <Compile Include="Imaging\Specialized\SpecializedArrayMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

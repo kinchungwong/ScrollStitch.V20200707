@@ -97,7 +97,6 @@
     <Compile Include="Imaging\Collections\UniformSizeRowSourceList.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Compare\MultiImageComparer.cs" />
-    <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
     <Compile Include="Imaging\Hash2D\ImageHashPoint.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DSingleRow.cs" />
     <Compile Include="Imaging\Hash2D\Vectorized\Hash2DVector.cs" />
@@ -122,21 +121,13 @@
     <Compile Include="Imaging\Plotting\TextInternals\AsciiConsoleFont_10x14.cs" />
     <Compile Include="Imaging\Plotting\TextInternals\FixedWidthBitmapFontBase.cs" />
     <Compile Include="Imaging\Plotting\VertAlign.cs" />
-    <Compile Include="Imaging\RowAccess\BitmapRowAccess.cs" />
-    <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
-    <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />
-    <Compile Include="Imaging\RowAccess\CroppedBitmapRowAccess.cs" />
     <Compile Include="Imaging\Hash2D\Direction.cs" />
     <Compile Include="Imaging\Hash2D\Hash2DProcessor.cs" />
     <Compile Include="Imaging\Hash2D\HashPoint.cs" />
-    <Compile Include="Imaging\RowAccess\IBitmapRowAccess.cs" />
-    <Compile Include="Imaging\RowAccess\IBitmapRowDirect.cs" />
-    <Compile Include="Imaging\RowAccess\IBitmapRowSource.cs" />
     <Compile Include="Imaging\RowCompare\IBitmapComparer.cs" />
     <Compile Include="Imaging\RowCompare\IBitmapRowComparer.cs" />
     <Compile Include="Imaging\RowCompare\PixelMismatchCounter.cs" />
     <Compile Include="Imaging\ScreenCapture\ScreenCaptureUtility.cs" />
-    <Compile Include="Imaging\Specialized\SpecializedArrayMethods.cs" />
     <Compile Include="Logging\Sinks\LogMemorySink.cs" />
     <Compile Include="Logging\Structured\LoggingStringFormattingUtility.cs" />
     <Compile Include="Logging\Structured\LogCall.cs" />
@@ -229,6 +220,8 @@
     <Folder Include="Experimental\" />
     <Folder Include="Functional\" />
     <Folder Include="HashCode\" />
+    <Folder Include="Imaging\Functional\" />
+    <Folder Include="Imaging\Specialized\" />
     <Folder Include="Memory\" />
   </ItemGroup>
   <ItemGroup>
