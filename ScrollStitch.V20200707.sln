@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScrollStitch.V20200707.NUni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.Base", "ScrollStitch.V20200707.Base\ScrollStitch.V20200707.Base.csproj", "{E0880BFA-2047-4DFE-90B6-1BC72D120E8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.Imaging", "ScrollStitch.V20200707.Imaging\ScrollStitch.V20200707.Imaging.csproj", "{77A3D2C5-EF7B-4F4D-A642-C44451CE4BD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrollStitch.V20200707.Utilities", "ScrollStitch.V20200707.Utilities\ScrollStitch.V20200707.Utilities.csproj", "{D2FA21DF-7840-4DFB-AE85-D8B5DBC17326}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{E0880BFA-2047-4DFE-90B6-1BC72D120E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0880BFA-2047-4DFE-90B6-1BC72D120E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0880BFA-2047-4DFE-90B6-1BC72D120E8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77A3D2C5-EF7B-4F4D-A642-C44451CE4BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77A3D2C5-EF7B-4F4D-A642-C44451CE4BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77A3D2C5-EF7B-4F4D-A642-C44451CE4BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77A3D2C5-EF7B-4F4D-A642-C44451CE4BD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2FA21DF-7840-4DFB-AE85-D8B5DBC17326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2FA21DF-7840-4DFB-AE85-D8B5DBC17326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2FA21DF-7840-4DFB-AE85-D8B5DBC17326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2FA21DF-7840-4DFB-AE85-D8B5DBC17326}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

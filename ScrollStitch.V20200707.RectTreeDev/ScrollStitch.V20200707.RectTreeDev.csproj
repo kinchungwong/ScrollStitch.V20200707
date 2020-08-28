@@ -92,6 +92,10 @@
       <Project>{e0880bfa-2047-4dfe-90b6-1bc72d120e8d}</Project>
       <Name>ScrollStitch.V20200707.Base</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Utilities\ScrollStitch.V20200707.Utilities.csproj">
+      <Project>{d2fa21df-7840-4dfb-ae85-d8b5dbc17326}</Project>
+      <Name>ScrollStitch.V20200707.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ScrollStitch.V20200707\ScrollStitch.V20200707.csproj">
       <Project>{515523d6-13f3-4327-8004-b18a3355da43}</Project>
       <Name>ScrollStitch.V20200707</Name>

@@ -62,18 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Arrays\Array2HeteroHook.cs" />
-    <Compile Include="Arrays\Array2Hook.cs" />
-    <Compile Include="Arrays\Array2PureHook.cs" />
-    <Compile Include="Arrays\Array2Wrapper.cs" />
-    <Compile Include="Arrays\ArrayCopyUtility.cs" />
-    <Compile Include="Arrays\ArrayDimAdapter_2as1.cs" />
-    <Compile Include="Arrays\BuiltinArrayMethods.cs" />
-    <Compile Include="Arrays\ArrayWrapper.cs" />
-    <Compile Include="Arrays\IArray.cs" />
-    <Compile Include="Arrays\IArray2.cs" />
-    <Compile Include="Arrays\IArray2Info.cs" />
-    <Compile Include="Arrays\IReadOnlyArray2.cs" />
     <Compile Include="Caching\IItemSource.cs" />
     <Compile Include="Caching\ItemSource.cs" />
     <Compile Include="Collections\ReadOnlyEnumerableCollection.cs" />
@@ -105,11 +93,8 @@
     <Compile Include="Config\TestClassConfig.cs" />
     <Compile Include="Data\HorzOrVert.cs" />
     <Compile Include="ImageManager.cs" />
-    <Compile Include="Imaging\BitmapCopyUtility.cs" />
-    <Compile Include="Imaging\ByteBitmap.cs" />
     <Compile Include="Imaging\Collections\UniformSizeArrayBitmapList.cs" />
     <Compile Include="Imaging\Collections\UniformSizeRowSourceList.cs" />
-    <Compile Include="Imaging\ColorUtility.cs" />
     <Compile Include="Imaging\Compare\FastImageComparer.cs" />
     <Compile Include="Imaging\Compare\MultiImageComparer.cs" />
     <Compile Include="Imaging\Functional\BgrxBlendWith.cs" />
@@ -141,12 +126,10 @@
     <Compile Include="Imaging\RowAccess\BitmapRowAccessUtility.cs" />
     <Compile Include="Imaging\RowAccess\BitmapRowDirect.cs" />
     <Compile Include="Imaging\RowAccess\CroppedBitmapRowAccess.cs" />
-    <Compile Include="Imaging\FloatBitmap.cs" />
     <Compile Include="Imaging\Hash2D\Direction.cs" />
     <Compile Include="Imaging\Hash2D\Hash2DProcessor.cs" />
     <Compile Include="Imaging\Hash2D\HashPoint.cs" />
     <Compile Include="Imaging\RowAccess\IBitmapRowAccess.cs" />
-    <Compile Include="Imaging\IScalarBitmapInfo.cs" />
     <Compile Include="Imaging\RowAccess\IBitmapRowDirect.cs" />
     <Compile Include="Imaging\RowAccess\IBitmapRowSource.cs" />
     <Compile Include="Imaging\RowCompare\IBitmapComparer.cs" />
@@ -161,7 +144,6 @@
     <Compile Include="Logging\Structured\LogThread.cs" />
     <Compile Include="Logging\Structured\LogThreadManager.cs" />
     <Compile Include="Main_ScreenCaptureLoop.cs" />
-    <Compile Include="Memory\Diagnostics\ArrayPoolMemoryUsage.cs" />
     <Compile Include="Spatial\GridArray.cs" />
     <Compile Include="Spatial\GridArray_DoNotUse.cs" />
     <Compile Include="Spatial\GridCollectionUtility_DoNotUse.cs" />
@@ -178,16 +160,6 @@
     <Compile Include="Spatial\PointTree.cs" />
     <Compile Include="Spatial\RectList.cs" />
     <Compile Include="Spatial\RectTreeUtility.cs" />
-    <Compile Include="Text\CharArrayFilterUtility.cs" />
-    <Compile Include="Text\IntegerBaseFormatter.cs" />
-    <Compile Include="Text\IStringBuilder.cs" />
-    <Compile Include="Text\IMultiLineTextOutput.cs" />
-    <Compile Include="Text\ITextGridSource.cs" />
-    <Compile Include="Text\MultiLineTextOutput.cs" />
-    <Compile Include="Text\RecordFormatter.cs" />
-    <Compile Include="Text\StringBuilderWrapper.cs" />
-    <Compile Include="Text\TextGridFormatter.cs" />
-    <Compile Include="Text\TextGridSource.cs" />
     <Compile Include="Tracking\BitFlagArith\BitFlagArith_Int32.cs" />
     <Compile Include="Tracking\BitFlagArith\BitFlagArith_UInt32.cs" />
     <Compile Include="Tracking\BitFlagArith\BitFlagArith_UInt64.cs" />
@@ -216,8 +188,6 @@
     <Compile Include="Tracking\ImagePairMovementDetail.cs" />
     <Compile Include="Imaging\Hash2D\UniqueHashPointFilter.cs" />
     <Compile Include="Imaging\Hash2D\VerticalBitmapWorker.cs" />
-    <Compile Include="Imaging\IArrayBitmap.cs" />
-    <Compile Include="Imaging\IntBitmap.cs" />
     <Compile Include="Imaging\IO\Bgr888ToBgr32.cs" />
     <Compile Include="Imaging\IO\Bgr888ToGray8.cs" />
     <Compile Include="Imaging\IO\Bgrx8888ToBgr32.cs" />
@@ -231,8 +201,6 @@
     <Compile Include="Imaging\Plotting\MarkCmds.cs" />
     <Compile Include="Imaging\Plotting\PointList.cs" />
     <Compile Include="Imaging\Plotting\PointListCmd.cs" />
-    <Compile Include="Memory\ExactLengthArrayPool.cs" />
-    <Compile Include="Memory\IArrayPoolClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spatial\AxisSubdiv.cs" />
@@ -249,13 +217,9 @@
     <Compile Include="Tracking\T3Main.cs" />
     <Compile Include="Tracking\T3Movements.cs" />
     <Compile Include="Tracking\ThreeImageMovementCluster.cs" />
-    <Compile Include="Arrays\ArrayWrapperUtility.cs" />
     <Compile Include="Tracking\ThreeImageMovementFilter.cs" />
     <Compile Include="Tracking\T3HashPoints.cs" />
-    <Compile Include="Utility\DynamicCast.cs" />
     <Compile Include="Logging\MethodTimer.cs" />
-    <Compile Include="Utility\OwnershipToken.cs" />
-    <Compile Include="Utility\PercentFromRatio.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -265,6 +229,7 @@
     <Folder Include="Experimental\" />
     <Folder Include="Functional\" />
     <Folder Include="HashCode\" />
+    <Folder Include="Memory\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -287,6 +252,14 @@
     <ProjectReference Include="..\ScrollStitch.V20200707.Base\ScrollStitch.V20200707.Base.csproj">
       <Project>{e0880bfa-2047-4dfe-90b6-1bc72d120e8d}</Project>
       <Name>ScrollStitch.V20200707.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Imaging\ScrollStitch.V20200707.Imaging.csproj">
+      <Project>{77a3d2c5-ef7b-4f4d-a642-c44451ce4bd5}</Project>
+      <Name>ScrollStitch.V20200707.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScrollStitch.V20200707.Utilities\ScrollStitch.V20200707.Utilities.csproj">
+      <Project>{d2fa21df-7840-4dfb-ae85-d8b5dbc17326}</Project>
+      <Name>ScrollStitch.V20200707.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
